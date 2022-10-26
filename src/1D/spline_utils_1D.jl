@@ -33,38 +33,38 @@ The inputs to this function are:
 The goal is to find a new interpolation values ``\hat{y}`` for ``y``, so that for given ``\lambda``, 
 the following equation is minimized:
 ```math
-\begin{equation}
+\begin{aligned}
 		\text{PSS} = \sum_{i = 1}^{n} \left( y_i - \underbrace{S(t_i)}_{=\hat{y}_i} \right)^2 
     + \lambda \int_{x_1}^{x_n} (S''(t))^2 dt,
-	\end{equation}
+	\end{aligned}
 ```
 where ``S(t)`` is a cubic spline function. 
 ``\hat{y}`` is determined as follows:
 ```math
-\begin{equation}
+\begin{aligned}
 \hat{y} = (I+\lambda K)^{-1} y
-\end{equation}
+\end{aligned}
 ```
 where ``I`` is the ``n \times n`` identity matrix and ``K = \Delta^T W^{-1} \Delta`` with
 ```math
-\begin{equation}
+\begin{aligned}
 \Delta = \begin{pmatrix}
 1/h & -2/h & 1/h & ... & 0\\
 0 & \ddots & \ddots & \ddots & 0\\
 0 & ... & 1/h & -2/h & 1/h
 \end{pmatrix} \in \mathbb{R}^{(n-2) \times n}
-\end{equation}
+\end{aligned}
 ```
 and
 ```math
-\begin{equation}
+\begin{aligned}
 W = \begin{pmatrix}
 2/3 h & 1/6 h & 0 & ... & 0\\
 1/6 h & 2/3 h & 1/6 h & ... & 0\\
 0 & \ddots & \ddots & \ddots & 0\\
 0 & ... & 0 & 2/3 h & 1/6 h
 \end{pmatrix} \in \mathbb{R}^{n \times n}
-\end{equation}
+\end{aligned}
 ```
 
 - Germán Rodríguez (2001)

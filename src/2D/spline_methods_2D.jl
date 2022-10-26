@@ -20,14 +20,14 @@ for further calculations. `ny` does the same for `v`.
 
 To evaluate the spline at `(u,v)`, we have to calculate the following:
 ```math
-\begin{equation}
+\begin{aligned}
 c_{i,j,1}(\mu_i(u),\nu_j(v)) = 
 		\begin{bmatrix} \mu_i(u)\\ 1 \end{bmatrix}^T
 		\underbrace{\begin{bmatrix} -1 & 1\\ 1 & 0 \end{bmatrix}}_{\text{IP}}
 		\begin{bmatrix} Q_{i,j} & Q_{i,j+1}\\ Q_{i+1,j} & Q_{i+1,j+1} \end{bmatrix}
 		\underbrace{\begin{bmatrix} -1 & 1\\ 1 & 0 \end{bmatrix}}_{\text{IP}^T}
 		\begin{bmatrix} \nu_j(v) \\ 1\end{bmatrix}
-\end{equation}
+\end{aligned}
 ```
 
 A reference for the calculations in this script can be found in Chapter 2 of
@@ -73,8 +73,8 @@ for further calculations. `ny` does the same for `v`.
 
 To evaluate the spline at `(u,v)`, we have to calculate the following:
 ```math
-\begin{equation}
-c_{i,j,3}(\mu_i,\nu_j) \nonumber \\ = \frac{1}{36}
+\begin{aligned}
+c_{i,j,3}(\mu_i,\nu_j) = \frac{1}{36}
 \begin{bmatrix} \nu_j^3 \\ \nu_j^2 \\ \nu_j \\ 1 \end{bmatrix}^T
 \underbrace{\begin{bmatrix}
   -1 & 3 & -3 & 1\\
@@ -95,7 +95,7 @@ c_{i,j,3}(\mu_i,\nu_j) \nonumber \\ = \frac{1}{36}
   1 & 0 & 0 & 0
 \end{bmatrix}}_{\text{IP}}
 \begin{bmatrix} \mu_i^3 \\ \mu_i^2 \\ \mu_i \\ 1 \end{bmatrix}
-\end{equation}
+\end{aligned}
 ```
 
 A reference for the calculations in this script can be found in Chapter 2 of

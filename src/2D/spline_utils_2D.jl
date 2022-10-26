@@ -66,12 +66,12 @@ end
 This function restructures the input values
 - `x`: a vector with `n` values in x-direction
 - `y`: a vector with `m` values in y-direction
-- `z`: a  `m` ``\\times`` `n` matrix with values in z-direction where the values of `z` correspond 
+- `z`: a  `m` ``\times`` `n` matrix with values in z-direction where the values of `z` correspond 
        to the indexing `(y,x)`
 
 The output is of the following form:
 ```math
-\begin{equation}
+\begin{aligned}
   \begin{bmatrix}
     x_1 & y_1 & z_{1,1}\\
     x_2 & y_1 & z_{1,2}\\
@@ -81,7 +81,7 @@ The output is of the following form:
     & \vdots & \\
     x_n & y_m & z_{m,n}
   \end{bmatrix}
-\end{equation}
+\end{aligned}
 ```
 
 """
@@ -113,7 +113,7 @@ The inputs to this function are:
 This function uses the thin plate spline approach to perform the smoothing.
 To do so the following linear equations system has to be solved for `coeff`:
 ```math
-\begin{equation}\label{tps_mat}
+\begin{aligned}
 		\underbrace{
 		\begin{bmatrix}
 			K & P \\
@@ -127,7 +127,7 @@ To do so the following linear equations system has to be solved for `coeff`:
 		\underbrace{\begin{bmatrix}
 			z\\o
 		\end{bmatrix}}_{\text{:= rhs}}
-\end{equation}
+\end{aligned}
 ```
 First of all the inputs are restructured using the function [`restructure_data`](@ref) and
 saved in the variables `x_hat`, `y_hat` and `z_hat`.
@@ -142,10 +142,10 @@ Now the system is solved to redeem the vector `coeff`.
 This vector is then used to calculate the smoothed values for `z` and save them in `H_f` by 
 the following function:
 ```math
-\begin{align}
+\begin{align*}
 H\_f[i] = &a[1] + a[2]x\_hat[i] + a[3]y\_hat[i] \\
         + &\sum_{j = 0}^p tps\_base\_func(\|(x\_hat[i], y\_hat[i]) - (x\_hat[j], y\_hat[j]) \|)
-\end{align}
+\end{align*}
 ```
 here `p` is the number of entries in `z_hat`.
 

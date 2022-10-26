@@ -19,17 +19,18 @@ for further calculations.
 
 To evaluate the spline at `t`, we have to calculate the following:
 ```math
-\begin{equation}
+\begin{aligned}
 c_{i,1}(\kappa_i) = 
 		\begin{bmatrix}
 			\kappa_i\\ 1
 		\end{bmatrix}^T
-		\underbrace{\begin{bmatrix}
+		\begin{bmatrix}
 			-1 & 1\\1 & 0
-		\end{bmatrix}}_{\text{IP}}
+		\end{bmatrix}
 		\begin{bmatrix}
 			Q_i\\Q_{i+1}
-\end{equation}
+		\end{bmatrix}
+\end{aligned}
 ```
 
 A reference for the calculations in this script can be found in Chapter 1 of
@@ -69,7 +70,7 @@ for further calculations.
 
 To evaluate the spline at `t`, we have to calculate the following:
 ```math
-\begin{equation}
+\begin{aligned}
 c_{i,3}\left(\kappa_i(t) \right) = \frac{1}{6} 
 		\begin{bmatrix}
 			\kappa_i(t)^3\\ \kappa_i(t)^2\\ \kappa_i(t) \\1
@@ -83,7 +84,7 @@ c_{i,3}\left(\kappa_i(t) \right) = \frac{1}{6}
 		\begin{bmatrix}
 			Q_{i,\text{free}}\\ Q_{i+1,\text{free}}\\ Q_{i+2,\text{free}}\\ Q_{i+3,\text{free}}
 		\end{bmatrix}
-\end{equation}
+\end{aligned}
 ```
 
 A reference for the calculations in this script can be found in Chapter 1 of

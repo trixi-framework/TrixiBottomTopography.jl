@@ -49,14 +49,14 @@ we only consider equally spaced `x` values.
 For linear B-spline interpolation, the control points `Q` correspond with the values in `y`.
 
 The coefficients matrix `IP` for linear B-splines is fixed to be
-  ```math
-  \begin{aligned}
-    \begin{pmatrix}
-      -1 & 1\\
-      1 & 0
-    \end{pmatrix}
-  \end{aligned}
-  ```
+```math
+\begin{aligned}
+  \begin{pmatrix}
+    -1 & 1\\
+    1 & 0
+  \end{pmatrix}
+\end{aligned}
+```
 
 A reference for the calculations in this script can be found in Chapter 1 of
 -  Quentin Agrapart & Alain Batailly (2020)
@@ -152,7 +152,7 @@ end
 
 # Fill structure
 @doc raw"""
-    cubic_b_spline(x::Vector, y::Vector; smoothing_factor)
+    cubic_b_spline(x::Vector, y::Vector; smoothing_factor = 0.0)
 
 This function calculates the inputs for the structure [`CubicBSpline`](@ref).
 The input values are:
@@ -171,27 +171,27 @@ The patch size `h` is calculated by subtracting the second and first `x` value. 
 we only consider equally spaced `x` values. 
 (A patch is the area between two consecutive `x` values)
 
-If a `smoothing_factor > 0.0` is set, the function [`spline_smoothing`](@ref) calculates new `y` values
+If a `smoothing_factor`  > 0.0 is set, the function [`spline_smoothing`](@ref) calculates new `y` values
 which guarantee a B-Spline with less curvature.
 
 The coefficients matrix `IP` for linear B-splines is fixed to be
-  ```math
-  \begin{aligned}
-    IP = \begin{pmatrix}
-      -1 & 3 & -3 & 1\\
-      3 & -6 & 3 & 0\\
-      -3 & 0 & 3 & 0\\
-      1 & 4 & 1 & 0
-    \end{pmatrix}
-  \end{aligned}
-  ```
+```math
+\begin{aligned}
+  IP = \begin{pmatrix}
+    -1 & 3 & -3 & 1\\
+    3 & -6 & 3 & 0\\
+    -3 & 0 & 3 & 0\\
+    1 & 4 & 1 & 0
+  \end{pmatrix}
+\end{aligned}
+```
 
 The `free` end condition requires the second and the second last control points is exactly
 between the first and the third control point and the second last control points is 
 between the third last and the last control point. It is only possible with at least two
 values in `x`. The linear equations system to determine the control points has the following form:
 ```math
-\begin{equation}
+\begin{aligned}
 		\underbrace{\begin{bmatrix}
 				0 \\ P_1 \\ P_2 \\ \vdots \\ P_{n-1} \\ P_n\\ 0 
 		\end{bmatrix}}_{:= P^*_{\text{free}}}
@@ -210,7 +210,7 @@ values in `x`. The linear equations system to determine the control points has t
 		\underbrace{\begin{bmatrix}
 				Q_1 \\ Q_2 \\ Q_3 \\ \vdots \\ Q_n \\ Q_{n+1} \\ Q_{n+2}
 		\end{bmatrix}}_{:= Q_{\text{free}}},
-	\end{equation}
+	\end{aligned}
 ```
 which is solved for ``Q_{\text{free}}``.
 
@@ -218,7 +218,7 @@ The `not-a-knot` end condition requires the continuity of the third derivative i
 and second last fit knot. This end condition is only possible with at least four values in `x`.
 The linear equations system to determine the control points has the following form:
 ```math
-\begin{equation}
+\begin{aligned}
 		\underbrace{\begin{bmatrix}
 				0 \\ P_1 \\ P_2 \\ \vdots \\ P_{n-1} \\ P_n\\ 0 
 		\end{bmatrix}}_{:= P^*_{\text{not-a-knot}}}
@@ -238,7 +238,7 @@ The linear equations system to determine the control points has the following fo
 		\underbrace{\begin{bmatrix}
 				Q_1 \\ Q_2 \\ Q_3 \\ \vdots \\ \vdots \\ Q_n \\ Q_{n+1} \\ Q_{n+2}
 		\end{bmatrix}}_{:= Q_{\text{not-a-knot}}}.
-	\end{equation}
+	\end{aligned}
 ```
 which is solved for ``Q_{\text{not-a-knot}}``.
 

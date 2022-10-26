@@ -42,14 +42,18 @@ The input values are:
        y-values has to be the same as the spacing between the x-values
 - `z`: A matrix which contains the corresponding values in z-direction.
        Where the values are ordered in the following way:
-
-             x_1  x_2  ... x_n
-      
-       y_1   z_11 z_12 ... z_1n
-       y_2   z_21 z_22 ... z_2n
-       ⋮       ⋮    ⋮    ⋱   ⋮
-       y_m   z_m1 z_m2 ... z_mn
-
+```math
+\begin{aligned}
+  \begin{matrix}
+    & & x_1 & x_2 & ... & x_n\\
+    & & & & &\\
+    y_1 & & z_{11} & z_{12} & ... & z_{1n}\\
+    y_1 & & z_{21} & z_{22} & ... & z_{2n}\\
+    \vdots & & \vdots & \vdots & \ddots & \vdots\\
+    y_m & & z_{m1} & z_{m2} & ... & z_{mn}
+  \end{matrix}
+\end{aligned}
+```
 Bilinear B-spline interpolation is only possible if we have at least two values in `x` 
 and two values in `y` and the dimensions of vectors `x` and `y` correspond with the dimensions
 of the matrix `z`.
@@ -65,14 +69,14 @@ because we only consider equal space between consecutive `x` and `y` values.
 For bilinear B-spline interpolation, the control points `Q` correspond with the `z` values.
 
 The coefficients matrix `IP` for bilinear B-splines is fixed to be
-  ```math
-  \begin{aligned}
-    \begin{pmatrix}
-      -1 & 1\\
-      1 & 0
-    \end{pmatrix}
-  \end{aligned}
-  ```
+```math
+\begin{aligned}
+  \begin{pmatrix}
+    -1 & 1\\
+    1 & 0
+  \end{pmatrix}
+\end{aligned}
+```
 
 A reference for the calculations in this script can be found in Chapter 2 of
 -  Quentin Agrapart & Alain Batailly (2020)
@@ -190,14 +194,18 @@ The input values are:
        y-values has to be the same as the spacing between the x-values
 - `z`: A matrix which contains the corresponding values in z-direction.
        Where the values are ordered in the following way:
-
-             x_1  x_2  ... x_n
-      
-       y_1   z_11 z_12 ... z_1n
-       y_2   z_21 z_22 ... z_2n
-       ⋮       ⋮    ⋮    ⋱   ⋮
-       y_m   z_m1 z_m2 ... z_mn
-
+```math
+\begin{aligned}
+  \begin{matrix}
+    & & x_1 & x_2 & ... & x_n\\
+    & & & & &\\
+    y_1 & & z_{11} & z_{12} & ... & z_{1n}\\
+    y_1 & & z_{21} & z_{22} & ... & z_{2n}\\
+    \vdots & & \vdots & \vdots & \ddots & \vdots\\
+    y_m & & z_{m1} & z_{m2} & ... & z_{mn}
+  \end{matrix}
+\end{aligned}
+```
 - `end_condition`: a string which can either be `free` or `not-a-knot` and defines which 
                    end condition should be considered. By default this is set to `free`.
 - `smoothing_factor`: a Float64 ``\geq`` 0.0 which specifies the degree of smoothing of the `z` values.
@@ -214,22 +222,21 @@ The patch size `h` is calculated by subtracting the second by the first `x` valu
 because we only consider equal space between consecutive `x` and `y` values. 
 (A patch is the area between two consecutive `x` and `y` values)
 
-If a `smoothing_factor` > 0.0 is set, the function [`calc_tps`](@ref) 
+If a `smoothing_factor` ``>`` 0.0 is set, the function [`calc_tps`](@ref) 
 calculates new values for `z` which guarantee a resulting parametric B-spline surface 
 with less curvature.
 
 The coefficients matrix `IP` for bicubic B-splines is fixed to be
-  ```math
-  \begin{aligned}
-    \begin{pmatrix}
-      -1 & 3 & -3 & 1\\
-      3 & -6 & 3 & 0\\
-      -3 & 0 & 3 & 0\\
-      1 & 4 & 1 & 0
-    \end{pmatrix}
-  \end{aligned}
-  ```
-
+```math
+\begin{aligned}
+  \begin{pmatrix}
+    -1 & 3 & -3 & 1\\
+    3 & -6 & 3 & 0\\
+    -3 & 0 & 3 & 0\\
+    1 & 4 & 1 & 0
+  \end{pmatrix}
+\end{aligned}
+```
 To get the matrix of control points `Q` which is necessary to set up an interpolation function,
 we need to define a matrix `Phi` which maps the control points to a vector `P`. This can be done
 by solving the following linear equations system for `Q`.
@@ -244,13 +251,13 @@ by solving the following linear equations system for `Q`.
     Q_{1,1} \\ Q_{1,2} \\ \vdots \\ Q_{1,n+2} \\ Q_{2,1} \\ \vdots \\ Q_{m+2,n+2}
   \end{bmatrix}}_{\text{:= Q} \in \mathbb{R}^{(m+2) \times (n+2)}}
 ```
-For the first `n` ``\\cdot`` `m` lines, the matrix `Phi` is the same for the `free` end and the
+For the first `n` ``\cdot`` `m` lines, the matrix `Phi` is the same for the `free` end and the
 `not-a-knot` end condition. These lines have to address the following condition:
 ```math
-\begin{align}
+\begin{align*}
 			z_{j,i} = \frac{1}{36} \Big( &Q_{j,i} + 4Q_{j+1,i} + Q_{j+2,i} + 4Q_{j,i+1} + 16Q_{j+1,i+1}\\ 
 			&+ 4Q_{j+2,i+1} + Q_{j,i+2} + 4Q_{j+1,i+2} + Q_{j+2,i+2} \Big) 
-		\end{align}
+		\end{align*}
 ```
 for i = 1,...,n and j = 1,...,m.
 
