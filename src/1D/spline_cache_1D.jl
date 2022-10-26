@@ -36,9 +36,6 @@ This function calculates the inputs for the structure [`LinearBSpline`](@ref).
 The input values are:
 - `x`: A vector which contains equally spaced values in x-direction
 - `y`: A vector which contains values in y-direction
-- `smoothing_factor`: A float64 ``\geq`` 0.0 which specifies the degree of smoothing of the `y` 
-                      values. By default this value is set to 0.0 which corresponds to no 
-                      smoothing.
 
 Linear B-spline interpolation is only possible if we have at least two values in `x`. 
 
@@ -48,9 +45,6 @@ guarantee that the `x` values are in ascending order.
 The patch size `h` is calculated by subtracting the second and first `x` value. This can be done because
 we only consider equally spaced `x` values. 
 (A patch is the area between two consecutive `x` values)
-
-If a `smoothing_factor > 0.0` is set, the function [`spline_smoothing`](@ref) calculates new `y` 
-values which guarantee a B-Spline with less curvature.
 
 For linear B-spline interpolation, the control points `Q` correspond with the values in `y`.
 
@@ -69,7 +63,7 @@ A reference for the calculations in this script can be found in Chapter 1 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function linear_b_spline(x::Vector, y::Vector; smoothing_factor = 0.0)
+function linear_b_spline(x::Vector, y::Vector)
 
   if length(x) == length(y)
     if length(x) == 1
@@ -79,10 +73,6 @@ function linear_b_spline(x::Vector, y::Vector; smoothing_factor = 0.0)
       x,y = sort_data(x,y)
 
       h = x[2] - x[1]
-
-      if smoothing_factor > 0.0
-        y = spline_smoothing(smoothing_factor, h, y)
-     end
 
       IP = [-1 1;
              1 0]
@@ -105,9 +95,6 @@ A function which reads in the `x` and `y` values for
 [`linear_b_spline`](@ref) from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
-- `smoothing_factor`: a Float64 ``\\geq`` 0.0 which specifies the degree of smoothing of the `y` 
-                      values. By default this value is set to `0.0` which corresponds to no 
-                      smoothing.
 
 The .txt file has to have the following structure to be interpreted by this function:
 - First line: comment `# Number of x values`
@@ -120,7 +107,7 @@ The .txt file has to have the following structure to be interpreted by this func
 Note that the number of `x` and `y` values have to be the same.
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/b05a90e66025ee1ebddf444a32c3fa01/raw/90d375c1ac11b26589aab1fe92bd0e6f6daf37b7/Rhine_data_1D_10.txt)
 """
-function linear_b_spline(path::String; smoothing_factor = 0.0)
+function linear_b_spline(path::String)
 
   file = open(path)
   lines = readlines(file)
@@ -130,7 +117,7 @@ function linear_b_spline(path::String; smoothing_factor = 0.0)
   x = [parse(Float64, val) for val in lines[4:3+num_elements]]
   y = [parse(Float64, val) for val in lines[5+num_elements:end]]
 
-  linear_b_spline(x, y; smoothing_factor = smoothing_factor)
+  linear_b_spline(x, y)
 end
 
 ######################

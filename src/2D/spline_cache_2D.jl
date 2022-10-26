@@ -50,9 +50,6 @@ The input values are:
        ⋮       ⋮    ⋮    ⋱   ⋮
        y_m   z_m1 z_m2 ... z_mn
 
-- `smoothing_factor`: a Float64 ``\geq`` 0.0 which specifies the degree of smoothing of the `z` values.
-                      By default this value is set to 0.0 which corresponds to no smoothing.
-
 Bilinear B-spline interpolation is only possible if we have at least two values in `x` 
 and two values in `y` and the dimensions of vectors `x` and `y` correspond with the dimensions
 of the matrix `z`.
@@ -64,10 +61,6 @@ that the `x` and `y` values are in ascending order with corresponding matrix `z`
 The patch size `h` is calculated by subtracting the second by the first `x` value. This can be done 
 because we only consider equal space between consecutive `x` and `y` values. 
 (A patch is the area between two consecutive `x` and `y` values)
-
-If a `smoothing_factor` > 0.0 is set, the function [`calc_tps`](@ref) 
-calculates new values for `z` which guarantee a resulting parametric B-spline surface 
-with less curvature.
 
 For bilinear B-spline interpolation, the control points `Q` correspond with the `z` values.
 
@@ -86,7 +79,7 @@ A reference for the calculations in this script can be found in Chapter 2 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function bilinear_b_spline(x::Vector, y::Vector, z::Matrix; smoothing_factor = 0.0)
+function bilinear_b_spline(x::Vector, y::Vector, z::Matrix)
 
   n = length(x)
   m = length(y)
@@ -97,11 +90,6 @@ function bilinear_b_spline(x::Vector, y::Vector, z::Matrix; smoothing_factor = 0
               contain at least 2 values each.")
     else
       x, y, z = sort_data(x,y,z)
-
-      # Consider spline smoothing if required
-      if smoothing_factor > 0.0
-        z = calc_tps(smoothing_factor, x, y, z)
-      end
 
       h = x[2] - x[1]
   
@@ -126,8 +114,6 @@ A function which reads in the `x`, `y` and `z` values for
 [`bilinear_b_spline`](@ref) from a .txt 
 file. The input values are:
 - `path`: String of a path of the specific .txt file
-- `smoothing_factor`: a Float64 ``\\geq`` 0.0 which specifies the degree of smoothing of the `y` values.
-                      By default this value is set to 0.0 which corresponds to no smoothing.
 
 The .txt file has to have the following structure to be interpreted by this function:
 - First line: comment `# Number of x values`
@@ -144,7 +130,7 @@ The .txt file has to have the following structure to be interpreted by this func
 
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/7b1b943eac142d5bc836bb818fe83a5a/raw/74228e349e91fbfe1563479f99943b469f26ac62/Rhine_data_2D_10.txt)
 """
-function bilinear_b_spline(path::String; smoothing_factor = 0.0)
+function bilinear_b_spline(path::String)
   file = open(path)
   lines = readlines(file)
   close(file)
@@ -158,7 +144,7 @@ function bilinear_b_spline(path::String; smoothing_factor = 0.0)
 
   z = transpose(reshape(z_tmp, (n, m)))
 
-  bilinear_b_spline(x, y, Matrix(z); smoothing_factor = smoothing_factor)
+  bilinear_b_spline(x, y, Matrix(z))
 end
 
 ######################################
