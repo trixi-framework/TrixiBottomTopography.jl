@@ -23,7 +23,6 @@ makedocs(
     # Explicitly specify documentation structure
     pages = [
         "Home" => "index.md",
-        "Reference" => "reference.md",
         "License" => "license.md"
     ],
     # strict = true # to make the GitHub action fail when doctests fail
