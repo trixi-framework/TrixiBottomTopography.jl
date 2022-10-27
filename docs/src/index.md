@@ -4,14 +4,23 @@ TrixiBottomTopography.jl is a supplementary package to the numerical solver [Tri
 
 ## Introduction
 The shallow water equations in one dimension
-$$\begin{pmatrix} h \\ hv \end{pmatrix}_t 
+```math
+\begin{aligned}
+\begin{pmatrix} h \\ hv \end{pmatrix}_t 
 + \begin{pmatrix} hv \\ hv^2 + \frac{1}{2}gh^2 \end{pmatrix}_x 
-= \begin{pmatrix} 0\\ -ghb_x \end{pmatrix} $$
+= \begin{pmatrix} 0\\ -ghb_x \end{pmatrix}
+\end{aligned}
+```
 and two dimensions
-$$\begin{pmatrix} h \\ hv_1 \\ hv_2 \end{pmatrix}_t 
+```math
+\begin{aligned}
+\begin{pmatrix} h \\ hv_1 \\ hv_2 \end{pmatrix}_t 
 + \begin{pmatrix} hv_1 \\ hv_1^2 + \frac{1}{2}gh^2 \\ hv_1v_2 \end{pmatrix}_x
 + \begin{pmatrix} hv_2 \\ hv_1v_2 \\ hv_2^2 + \frac{1}{2}gh^2  \end{pmatrix}_y
-= \begin{pmatrix} 0\\ -ghb_x \\ -ghb_y \end{pmatrix}$$
+= \begin{pmatrix} 0\\ -ghb_x \\ -ghb_y \end{pmatrix}
+\end{aligned}
+```
+
 require a differentiable function $b$ which describes the bottom topography.
 
 Geographical data is almost always given as scattered data points on a coordinate system with corresponding elevation. So to incorporate geographical data into the shallow water equations, we need to define a function, which remodels the topography from the data. 
@@ -117,14 +126,20 @@ Populating these works analogously to the one dimensional case with the function
 - [`bicubic_b_spline(x,y,z)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.bicubic_b_spline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T})
 
 Note that `z` has to be a matrix of the following form
-$$ \begin{matrix}
+
+```math
+\begin{aligned}
+\begin{matrix}
     & & x_1 & x_2 & ... & x_n\\
     & & & & &\\
     y_1 & & z_{11} & z_{12} & ... & z_{1n}\\
     y_1 & & z_{21} & z_{22} & ... & z_{2n}\\
     \vdots & & \vdots & \vdots & \ddots & \vdots\\
     y_m & & z_{m1} & z_{m2} & ... & z_{mn}
-  \end{matrix}$$
+  \end{matrix}
+\end{aligned}
+```
+
 
 ### B-spline interpolation function
 
