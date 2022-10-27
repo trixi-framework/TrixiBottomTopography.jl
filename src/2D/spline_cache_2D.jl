@@ -33,7 +33,7 @@ end
 
 # Fill structure
 @doc raw"""
-    bilinear_b_spline(x::Vector, y::Vector, z::Matrix; smoothing_factor = 0.0)
+    bilinear_b_spline(x::Vector, y::Vector, z::Matrix)
 
 This function calculates the inputs for the structure [`BilinearBSpline`](@ref).
 The input values are:
@@ -112,7 +112,7 @@ end
 
 # Read from file
 """
-    bilinear_b_spline(path::String; smoothing_factor = 0.0)
+    bilinear_b_spline(path::String)
 
 A function which reads in the `x`, `y` and `z` values for 
 [`bilinear_b_spline`](@ref) from a .txt 
@@ -542,7 +542,7 @@ end
 
 # Read from file
 """
-    bicubic_b_spline(path::String; smoothing_factor = 0.0)
+    bicubic_b_spline(path::String; end_condition = "free", smoothing_factor = 0.0)
 
 A function which reads in the `x`, `y` and `z` values for 
 [`bicubic_b_spline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)`](@ref) 
