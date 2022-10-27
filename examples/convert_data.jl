@@ -7,11 +7,14 @@
 # Include packages
 using TrixiBottomTopography
 
+# Get root directory
+dir_path = pkgdir(TrixiBottomTopography)
+
 # Define file paths
-path_src_file = "examples/data/dgm1_32_357_5646_1_nw.xyz"
-path_out_file_1d_x = "examples/data/rhine_data_1d_20_x.txt"
-path_out_file_1d_y = "examples/data/rhine_data_1d_20_y.txt"
-path_out_file_2d = "examples/data/rhine_data_2d_20.txt"
+path_src_file = string(dir_path, "/examples/data/dgm1_32_357_5646_1_nw.xyz")
+path_out_file_1d_x = string(dir_path, "/examples/data/rhine_data_1d_20_x.txt")
+path_out_file_1d_y = string(dir_path, "/examples/data/rhine_data_1d_20_y.txt")
+path_out_file_2d = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
 
 # Convert data
 convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 20, section = 100)

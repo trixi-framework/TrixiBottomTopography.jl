@@ -33,8 +33,11 @@ function fill_sol_mat(f, x, y)
   return z
 end
 
+# Get root directory
+dir_path = pkgdir(TrixiBottomTopography)
+
 # Define data path
-data = "examples/data/rhine_data_2d_20.txt"
+data = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
 
 # Define B-spline structure
 spline_struct = bicubic_b_spline(data; smoothing_factor = 9999)

@@ -8,13 +8,11 @@ on:
       - 'LICENSE.md'
       - 'README.md'
       - 'docs/**'
-      - 'utils/**'
   pull_request:
     paths-ignore:
       - 'LICENSE.md'
       - 'README.md'
       - 'docs/**'
-      - 'utils/**'
   workflow_dispatch:
 
 # Cancel redundant CI tests automatically

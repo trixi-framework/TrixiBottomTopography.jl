@@ -8,8 +8,11 @@
 using TrixiBottomTopography
 using Plots
 
+# Get root directory
+dir_path = pkgdir(TrixiBottomTopography)
+
 # Define data path
-data = "examples/data/rhine_data_1d_20_y.txt"
+data = string(dir_path, "/examples/data/rhine_data_1d_20_y.txt")
 
 # Define B-spline structure
 spline_struct = linear_b_spline(data)
