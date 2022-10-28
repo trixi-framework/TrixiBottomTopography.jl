@@ -8,9 +8,14 @@ spline_struct = linear_b_spline(data)
 # Define B-spline interpolation function
 spline_func(x) = spline_interpolation(spline_struct, x)
 
-# Define interpolation points
-n = 100
-x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
+# Get y values from file
+file = open(data)
+lines = readlines(file)
+close(file)
 
-# Get interpolated values
-y_int_pts = spline_func.(x_int_pts)
+num_elements = parse(Int64,lines[2])
+y = [parse(Float64, val) for val in lines[5+num_elements:end]]
+
+# Check if x values put into spline function
+# correspond to actual y values
+@test spline_func.(spline_struct.x) == y

@@ -24,3 +24,15 @@ convert_dgm_1d(path_src_file, path_out_file_1d_10_x_100; excerpt = 10, section =
 convert_dgm_1d(path_src_file, path_out_file_1d_10_y_100; excerpt = 10, direction = "y", section = 100)
 convert_dgm_2d(path_src_file, path_out_file_2d)
 convert_dgm_2d(path_src_file, path_out_file_2d_10; excerpt = 10)
+
+# Check if files exist
+@test isfile(path_out_file_1d_1_x_1)
+@test isfile(path_out_file_1d_1_y_1)
+@test isfile(path_out_file_1d_1_x_100)
+@test isfile(path_out_file_1d_1_y_100)
+@test isfile(path_out_file_1d_10_x_1)
+@test isfile(path_out_file_1d_10_y_1)
+@test isfile(path_out_file_1d_10_x_100)
+@test isfile(path_out_file_1d_10_y_100)
+@test isfile(path_out_file_2d)
+@test isfile(path_out_file_2d_10)
