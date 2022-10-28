@@ -6,11 +6,14 @@ using Test
 @testset "TrixiBottomTopography.jl" begin
     
   # Test data conversion
-  include("test_convert.jl")
-
-  # Test one dimensional B-spline interpolation
-  # include("test_1d_b_spline.jl")
-
+  @testset "Conversion" begin
+    include("test_convert.jl")
+  end
+  
+  @testset "Linear B-spline interpolation" begin
+    include("test_1d_lin_b_spline.jl")
+  end
+  
   # Test two dimensional B-spline interpolation
   # include("test_2d_b_spline.jl")
 
