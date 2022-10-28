@@ -10,11 +10,24 @@ using Test
     include("test_convert.jl")
   end
   
+  # Linear B-splines
   @testset "Linear B-spline interpolation" begin
-    include("test_1d_lin_b_spline.jl")
+    include("test_linear_b_spline.jl")
   end
   
-  # Test two dimensional B-spline interpolation
-  # include("test_2d_b_spline.jl")
+  # Cubic B-splines
+  @testset "Cubic B-spline interpolation" begin
+    include("test_cubic_b_spline.jl")
+  end
+
+  # Bilinear B-splines
+  @testset "Bilinear B-spline interpolation" begin
+    include("test_bilinear_b_spline.jl")
+  end
+
+  # Bicubic B-splines
+  @testset "Bicubic B-spline interpolation" begin
+    include("test_bicubic_b_spline.jl")
+  end
 
 end
