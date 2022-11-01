@@ -18,14 +18,10 @@ These attributes are:
 - `IP`: Coefficients matrix
 """
 mutable struct LinearBSpline{x_type, h_type, Q_type, IP_type}
-
   x::x_type
   h::h_type
   Q::Q_type
   IP::IP_type
-
-  LinearBSpline(x, h, Q, IP) = new{typeof(x), typeof(h), typeof(Q), 
-  typeof(IP)}(x, h, Q, IP)
 end
 
 # Fill structure
