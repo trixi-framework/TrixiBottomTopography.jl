@@ -60,25 +60,25 @@ A reference for the calculations in this script can be found in Chapter 1 of
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function LinearBSpline(x::Vector, y::Vector)
-  if length(x) == length(y)
-    if length(x) == 1
-      @error("To perform linear B-spline interpolation, we need an x vector which 
-              contains at least 2 values.")
-    else
-      x,y = sort_data(x,y)
-
-      h = x[2] - x[1]
-
-      IP = [-1 1;
-             1 0]
-
-      Q = y
-
-      LinearBSpline(x, h, Q, IP)
-    end
-  else
+  if length(x) != length(y)
     @error("Vectors x and y have to contain the same number of values")
   end
+
+  if length(x) == 1
+    @error("To perform linear B-spline interpolation, we need an x vector which 
+            contains at least 2 values.")
+  end
+
+  x,y = sort_data(x,y)
+
+  h = x[2] - x[1]
+
+  IP = [-1 1;
+        1 0]
+
+  Q = y
+
+  LinearBSpline(x, h, Q, IP)
 end
 
 # Read from file
