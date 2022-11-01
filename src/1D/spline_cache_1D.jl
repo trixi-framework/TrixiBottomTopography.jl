@@ -59,8 +59,7 @@ A reference for the calculations in this script can be found in Chapter 1 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function linear_b_spline(x::Vector, y::Vector)
-
+function LinearBSpline(x::Vector, y::Vector)
   if length(x) == length(y)
     if length(x) == 1
       @error("To perform linear B-spline interpolation, we need an x vector which 
@@ -80,7 +79,6 @@ function linear_b_spline(x::Vector, y::Vector)
   else
     @error("Vectors x and y have to contain the same number of values")
   end
-
 end
 
 # Read from file
