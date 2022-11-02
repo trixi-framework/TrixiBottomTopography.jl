@@ -20,20 +20,16 @@ These attributes are:
 - `IP`: Coefficients matrix
 """
 mutable struct BilinearBSpline{x_type, y_type, h_type, Q_type, IP_type}
-
   x::x_type
   y::y_type
   h::h_type
   Q::Q_type
   IP::IP_type
-
-  BilinearBSpline(x, y, h, Q, IP) = new{typeof(x), typeof(y),
-  typeof(h), typeof(Q), typeof(IP)}(x, y, h, Q, IP)
 end
 
 # Fill structure
 @doc raw"""
-    bilinear_b_spline(x::Vector, y::Vector, z::Matrix)
+    BilinearBSpline(x::Vector, y::Vector, z::Matrix)
 
 This function calculates the inputs for the structure [`BilinearBSpline`](@ref).
 The input values are:
@@ -83,39 +79,39 @@ A reference for the calculations in this script can be found in Chapter 2 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function bilinear_b_spline(x::Vector, y::Vector, z::Matrix)
+function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
 
   n = length(x)
   m = length(y)
 
-  if (size(z,2) == n & size(z,1) == m)
-    if (n < 2 || n < 2)
-      @error("To perform bilinear B-spline interpolation, we need x and y vectors which
-              contain at least 2 values each.")
-    else
-      x, y, z = sort_data(x,y,z)
-
-      h = x[2] - x[1]
-  
-      P = vcat(reshape(z', (m*n,1)))
-      IP = [-1 1;
-             1 0];
-
-      Q = reshape(P, (n, m)) 
- 
-      BilinearBSpline(x, y, h, Q, IP)  
-    end
-  else
+  if (size(z,2) != n | size(z,1) != m)
     @error("The dimensions of z do not coincide with x and y.")
   end
+
+  if (n < 2 || n < 2)
+    @error("To perform bilinear B-spline interpolation, we need x and y vectors which
+            contain at least 2 values each.")
+  end
+    
+  x, y, z = sort_data(x,y,z)
+
+  h = x[2] - x[1]
+
+  P = vcat(reshape(z', (m*n,1)))
+  IP = [-1 1;
+         1 0];
+
+  Q = reshape(P, (n, m)) 
+
+  BilinearBSpline(x, y, h, Q, IP)  
 end
 
 # Read from file
 """
-    bilinear_b_spline(path::String)
+    BilinearBSpline(path::String)
 
 A function which reads in the `x`, `y` and `z` values for 
-[`bilinear_b_spline`](@ref) from a .txt 
+[`BilinearBSpline`](@ref) from a .txt 
 file. The input values are:
 - `path`: String of a path of the specific .txt file
 
@@ -134,7 +130,7 @@ The .txt file has to have the following structure to be interpreted by this func
 
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/7b1b943eac142d5bc836bb818fe83a5a/raw/74228e349e91fbfe1563479f99943b469f26ac62/Rhine_data_2D_10.txt)
 """
-function bilinear_b_spline(path::String)
+function BilinearBSpline(path::String)
   file = open(path)
   lines = readlines(file)
   close(file)
@@ -148,7 +144,7 @@ function bilinear_b_spline(path::String)
 
   z = transpose(reshape(z_tmp, (n, m)))
 
-  bilinear_b_spline(x, y, Matrix(z))
+  BilinearBSpline(x, y, Matrix(z))
 end
 
 ######################################
@@ -172,20 +168,16 @@ These attributes are:
 - `IP`: Coefficients matrix
 """
 mutable struct BicubicBSpline{x_type, y_type, h_type, Q_type, IP_type}
-
   x::x_type
   y::y_type
   h::h_type
   Q::Q_type
   IP::IP_type
-
-  BicubicBSpline(x, y, h, Q, IP) = new{typeof(x), typeof(y), typeof(h), 
-  typeof(Q), typeof(IP)}(x, y, h, Q, IP)
 end
 
 # Fill structure
 @doc raw"""
-    bicubic_b_spline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)
+    BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)
 
 This function calculates the inputs for the structure [`BicubicBSpline`](@ref).
 The input values are:
@@ -288,261 +280,258 @@ A reference for the calculations in this script can be found in Chapter 2 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function bicubic_b_spline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)
+function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)
 
   n = length(x)
   m = length(y)
 
-  if (size(z,2) == n & size(z,1) == m)
-
-    x, y, z = sort_data(x,y,z)
-
-    # Consider spline smoothing if required
-    if smoothing_factor > 0.0
-      z = calc_tps(smoothing_factor, x, y, z)
-    end
-
-    h = x[2] - x[1]
-    boundary_elmts = 4 + 2*m + 2*n
-    inner_elmts = m*n
-    P = vcat(reshape(z', (inner_elmts,1)), zeros(boundary_elmts))
-    
-    IP = [-1  3 -3 1;
-          3 -6  3 0;
-          -3  0  3 0;
-          1  4  1 0]
-
-    # Mapping matrix Phi
-    Phi = spzeros((m+2)*(n+2), (m+2)*(n+2))
-
-    # Fill inner control point matrix
-    idx = 0
-    for i in 1:inner_elmts
-      Phi[i, idx           + 1] =  1
-      Phi[i, idx           + 2] =  4
-      Phi[i, idx           + 3] =  1
-      Phi[i, idx +   (n+2) + 1] =  4
-      Phi[i, idx +   (n+2) + 2] = 16
-      Phi[i, idx +   (n+2) + 3] =  4
-      Phi[i, idx + 2*(n+2) + 1] =  1
-      Phi[i, idx + 2*(n+2) + 2] =  4
-      Phi[i, idx + 2*(n+2) + 3] =  1
-
-      if (i % n) == 0
-        idx += 3
-      else
-        idx += 1
-      end
-    end
-    
-    ########################
-    ## Free end condition ##
-    ########################
-    if end_condition == "free"
-      if (n < 2) || (m < 2)
-        @error("To perform bicubic B-spline interpolation with the free end condition, 
-                we need x and y vectors which contain at least 2 values each.")
-      else
-
-        # Q_{j,1} - 2Q_{j,2} + Q_{j,3} = 0
-        idx = 0
-        for i in (inner_elmts+1):(inner_elmts+m)
-          Phi[i, idx + (n+2) + 1] =  1
-          Phi[i, idx + (n+2) + 2] = -2
-          Phi[i, idx + (n+2) + 3] =  1
-          idx += (n+2)
-        end
-
-        # Q_{j,n} - 2Q_{j,n+1} + Q_{j,n+2} = 0
-        idx = 0
-        for i in (inner_elmts+(m+1)):(inner_elmts+(2*m))
-          Phi[i, idx + (n+2) + (n)  ] =  1
-          Phi[i, idx + (n+2) + (n+1)] = -2
-          Phi[i, idx + (n+2) + (n+2)] =  1
-          idx += (n+2)
-        end
-
-        # Q_{1,i} - 2Q_{2,i} + Q_{3,i} = 0
-        idx = 0
-        for i in (inner_elmts+(2*m)+1):(inner_elmts+(2*m)+n)
-          Phi[i, idx           + 2] =  1
-          Phi[i, idx +   (n+2) + 2] = -2
-          Phi[i, idx + 2*(n+2) + 2] =  1
-          idx += 1
-        end
-
-        # Q_{m,i} - 2Q_{m+1,i} + Q_{m+2,i} = 0
-        idx = (m-1) * (n+2)
-        for i in (inner_elmts+(2*m)+(n+1)):(inner_elmts+(2*m)+(2*n))
-          Phi[i, idx           + 2] =  1
-          Phi[i, idx +   (n+2) + 2] = -2
-          Phi[i, idx + 2*(n+2) + 2] =  1
-          idx += 1
-        end
-      
-        i = inner_elmts + boundary_elmts - 3   
-      
-        # Q_{1,1} - 2Q_{2,2} + Q_{3,3} = 0
-        Phi[(i  ),               1] =  1 
-        Phi[(i  ),       (n+2) + 2] = -2
-        Phi[(i  ), (  2)*(n+2) + 3] =  1
-
-        # Q_{m+2,1} - 2Q_{m+1,2} + Q_{m,3} = 0
-        Phi[(i+1),       (n+2)    ] =  1
-        Phi[(i+1), (  2)*(n+2) - 1] = -2
-        Phi[(i+1), (  3)*(n+2) - 2] =  1
-        
-        # Q_{1,n+2} - 2Q_{2,n+1} + Q_{3,n} = 0
-        Phi[(i+2), (m-1)*(n+2) + 3] =  1
-        Phi[(i+2), (m  )*(n+2) + 2] = -2
-        Phi[(i+2), (m+1)*(n+2) + 1] =  1
-        
-        # Q_{m,n} - 2Q_{m+1,n+1} + Q_{m+2,n+2} = 0
-        Phi[(i+3), (m  )*(n+2) - 2] =  1
-        Phi[(i+3), (m+1)*(n+2) - 1] = -2
-        Phi[(i+3), (m+2)*(n+2)    ] =  1
-
-        Q_temp = 36 * (Phi\P)
-        Q      = reshape(Q_temp, (n+2, m+2)) 
-
-        BicubicBSpline(x, y, h, Q, IP)
-      end
-
-    ###################################
-    ## Not-a-knot boundary condition ##
-    ###################################
-    elseif end_condition == "not-a-knot"
-      if (n < 4) || (m < 4)
-        @error("To perform bicubic B-spline interpolation with the not-a-knot end condition, 
-                we need x and y vectors which contain at least 4 values each.")
-      else
-       
-        # Continuity of the third `x` derivative between the leftmost and second leftmost patch
-        idx = 0
-        for i in (inner_elmts+1):(inner_elmts+m)
-          Phi[i, idx           + 1] = - 1
-          Phi[i, idx           + 2] =   4
-          Phi[i, idx           + 3] = - 6
-          Phi[i, idx           + 4] =   4
-          Phi[i, idx           + 5] = - 1
-          Phi[i, idx +   (n+2) + 1] = - 4
-          Phi[i, idx +   (n+2) + 2] =  16
-          Phi[i, idx +   (n+2) + 3] = -24
-          Phi[i, idx +   (n+2) + 4] =  16
-          Phi[i, idx +   (n+2) + 5] = - 4
-          Phi[i, idx + 2*(n+2) + 1] = - 1
-          Phi[i, idx + 2*(n+2) + 2] =   4
-          Phi[i, idx + 2*(n+2) + 3] = - 6
-          Phi[i, idx + 2*(n+2) + 4] =   4
-          Phi[i, idx + 2*(n+2) + 5] = - 1
-          idx += (n+2)
-        end
-
-        # Continuity of the third `x` derivative between the rightmost and second rightmost patch
-        idx = (n+2) + 1
-        for i in (inner_elmts+(m+1)):(inner_elmts+(2*m))
-          Phi[i, idx           - 5] = - 1
-          Phi[i, idx           - 4] =   4
-          Phi[i, idx           - 3] = - 6
-          Phi[i, idx           - 2] =   4
-          Phi[i, idx           - 1] = - 1
-          Phi[i, idx +   (n+2) - 5] = - 4
-          Phi[i, idx +   (n+2) - 4] =  16
-          Phi[i, idx +   (n+2) - 3] = -24
-          Phi[i, idx +   (n+2) - 2] =  16
-          Phi[i, idx +   (n+2) - 1] = - 4
-          Phi[i, idx + 2*(n+2) - 5] = - 1
-          Phi[i, idx + 2*(n+2) - 4] =   4
-          Phi[i, idx + 2*(n+2) - 3] = - 6
-          Phi[i, idx + 2*(n+2) - 2] =   4
-          Phi[i, idx + 2*(n+2) - 1] = - 1
-          idx += (n+2)
-        end
-
-        # Continuity of the third `y` derivative between the patch at the top and the patch below
-        idx = 0
-        for i in (inner_elmts+(2*m)+1):(inner_elmts+(2*m)+n)
-          Phi[i, idx           + 1] = - 1
-          Phi[i, idx           + 2] = - 4
-          Phi[i, idx           + 3] = - 1
-          Phi[i, idx +   (n+2) + 1] =   4
-          Phi[i, idx +   (n+2) + 2] =  16
-          Phi[i, idx +   (n+2) + 3] =   4
-          Phi[i, idx + 2*(n+2) + 1] = - 6
-          Phi[i, idx + 2*(n+2) + 2] = -24
-          Phi[i, idx + 2*(n+2) + 3] = - 6
-          Phi[i, idx + 3*(n+2) + 1] =   4
-          Phi[i, idx + 3*(n+2) + 2] =  16
-          Phi[i, idx + 3*(n+2) + 3] =   4
-          Phi[i, idx + 4*(n+2) + 1] = - 1
-          Phi[i, idx + 4*(n+2) + 2] = - 4
-          Phi[i, idx + 4*(n+2) + 3] = - 1
-          idx += 1
-        end
-
-        # Continuity of the third `y` derivative between the patch at the bottom and the patch above
-        idx = (m-3) * (n+2)
-        for i in (inner_elmts+(2*m)+(n+1)):(inner_elmts+(2*m)+(2*n))
-          Phi[i, idx           + 1] = - 1
-          Phi[i, idx           + 2] = - 4
-          Phi[i, idx           + 3] = - 1
-          Phi[i, idx +   (n+2) + 1] =   4
-          Phi[i, idx +   (n+2) + 2] =  16
-          Phi[i, idx +   (n+2) + 3] =   4
-          Phi[i, idx + 2*(n+2) + 1] = - 6
-          Phi[i, idx + 2*(n+2) + 2] = -24
-          Phi[i, idx + 2*(n+2) + 3] = - 6
-          Phi[i, idx + 3*(n+2) + 1] =   4
-          Phi[i, idx + 3*(n+2) + 2] =  16
-          Phi[i, idx + 3*(n+2) + 3] =   4
-          Phi[i, idx + 4*(n+2) + 1] = - 1
-          Phi[i, idx + 4*(n+2) + 2] = - 4
-          Phi[i, idx + 4*(n+2) + 3] = - 1
-          idx += 1
-        end
-
-        i = inner_elmts + boundary_elmts - 3   
-      
-        # Q_{1,1} - Q_{1,2} - Q_{2,1} + Q_{2,2} = 0
-        Phi[(i  ),               1] =  1
-        Phi[(i  ),               2] = -1
-        Phi[(i  ),       (n+2) + 1] = -1
-        Phi[(i  ),       (n+2) + 2] =  1
-        
-        # Q_{m-1,1} + Q_{m,1} + Q_{m-1,2} - Q_{m,2} = 0
-        Phi[(i+1),       (n+2) - 1] = -1
-        Phi[(i+1),       (n+2)    ] =  1
-        Phi[(i+1),     2*(n+2) - 1] =  1
-        Phi[(i+1),     2*(n+2)    ] = -1
-        
-        # Q_{1,n-1} + Q_{2,n} + Q_{1,n-1} - Q_{2,n} = 0
-        Phi[(i+2), (m  )*(n+2) + 1] = -1
-        Phi[(i+2), (m  )*(n+2) + 2] =  1
-        Phi[(i+2), (m+1)*(n+2) + 1] =  1
-        Phi[(i+2), (m+1)*(n+2) + 2] = -1
-        
-        # Q_{m-1,n-1} - Q_{m,n-1} - Q_{m-1,n} + Q_{m,n} = 0
-        Phi[(i+3), (m+1)*(n+2) - 1] =  1
-        Phi[(i+3), (m+1)*(n+2)    ] = -1
-        Phi[(i+3), (m+2)*(n+2) - 1] = -1
-        Phi[(i+3), (m+2)*(n+2)    ] =  1
-
-        Q_temp = 36 * (Phi\P)
-        Q      = reshape(Q_temp, (n+2, m+2)) 
-
-        BicubicBSpline(x, y, h, Q, IP)
-      end
-    else
-      @error("Only free and not-a-knot boundary conditions are implemented!")
-    end
-  else
+  if (size(z,2) != n | size(z,1) != m)
     @error("The dimensions of z do not coincide with x and y.")
+  end
+
+  x, y, z = sort_data(x,y,z)
+
+  # Consider spline smoothing if required
+  if smoothing_factor > 0.0
+    z = calc_tps(smoothing_factor, x, y, z)
+  end
+
+  h = x[2] - x[1]
+  boundary_elmts = 4 + 2*m + 2*n
+  inner_elmts = m*n
+  P = vcat(reshape(z', (inner_elmts,1)), zeros(boundary_elmts))
+  
+  IP = [-1  3 -3 1;
+         3 -6  3 0;
+        -3  0  3 0;
+         1  4  1 0]
+
+  # Mapping matrix Phi
+  Phi = spzeros((m+2)*(n+2), (m+2)*(n+2))
+
+  # Fill inner control point matrix
+  idx = 0
+  for i in 1:inner_elmts
+    Phi[i, idx           + 1] =  1
+    Phi[i, idx           + 2] =  4
+    Phi[i, idx           + 3] =  1
+    Phi[i, idx +   (n+2) + 1] =  4
+    Phi[i, idx +   (n+2) + 2] = 16
+    Phi[i, idx +   (n+2) + 3] =  4
+    Phi[i, idx + 2*(n+2) + 1] =  1
+    Phi[i, idx + 2*(n+2) + 2] =  4
+    Phi[i, idx + 2*(n+2) + 3] =  1
+
+    if (i % n) == 0
+      idx += 3
+    else
+      idx += 1
+    end
+  end
+  
+  ########################
+  ## Free end condition ##
+  ########################
+  if end_condition == "free"
+    if (n < 2) || (m < 2)
+      @error("To perform bicubic B-spline interpolation with the free end condition, 
+              we need x and y vectors which contain at least 2 values each.")
+    end
+
+    # Q_{j,1} - 2Q_{j,2} + Q_{j,3} = 0
+    idx = 0
+    for i in (inner_elmts+1):(inner_elmts+m)
+      Phi[i, idx + (n+2) + 1] =  1
+      Phi[i, idx + (n+2) + 2] = -2
+      Phi[i, idx + (n+2) + 3] =  1
+      idx += (n+2)
+    end
+
+    # Q_{j,n} - 2Q_{j,n+1} + Q_{j,n+2} = 0
+    idx = 0
+    for i in (inner_elmts+(m+1)):(inner_elmts+(2*m))
+      Phi[i, idx + (n+2) + (n)  ] =  1
+      Phi[i, idx + (n+2) + (n+1)] = -2
+      Phi[i, idx + (n+2) + (n+2)] =  1
+      idx += (n+2)
+    end
+
+    # Q_{1,i} - 2Q_{2,i} + Q_{3,i} = 0
+    idx = 0
+    for i in (inner_elmts+(2*m)+1):(inner_elmts+(2*m)+n)
+      Phi[i, idx           + 2] =  1
+      Phi[i, idx +   (n+2) + 2] = -2
+      Phi[i, idx + 2*(n+2) + 2] =  1
+      idx += 1
+    end
+
+    # Q_{m,i} - 2Q_{m+1,i} + Q_{m+2,i} = 0
+    idx = (m-1) * (n+2)
+    for i in (inner_elmts+(2*m)+(n+1)):(inner_elmts+(2*m)+(2*n))
+      Phi[i, idx           + 2] =  1
+      Phi[i, idx +   (n+2) + 2] = -2
+      Phi[i, idx + 2*(n+2) + 2] =  1
+      idx += 1
+    end
+  
+    i = inner_elmts + boundary_elmts - 3   
+  
+    # Q_{1,1} - 2Q_{2,2} + Q_{3,3} = 0
+    Phi[(i  ),               1] =  1 
+    Phi[(i  ),       (n+2) + 2] = -2
+    Phi[(i  ), (  2)*(n+2) + 3] =  1
+
+    # Q_{m+2,1} - 2Q_{m+1,2} + Q_{m,3} = 0
+    Phi[(i+1),       (n+2)    ] =  1
+    Phi[(i+1), (  2)*(n+2) - 1] = -2
+    Phi[(i+1), (  3)*(n+2) - 2] =  1
+    
+    # Q_{1,n+2} - 2Q_{2,n+1} + Q_{3,n} = 0
+    Phi[(i+2), (m-1)*(n+2) + 3] =  1
+    Phi[(i+2), (m  )*(n+2) + 2] = -2
+    Phi[(i+2), (m+1)*(n+2) + 1] =  1
+    
+    # Q_{m,n} - 2Q_{m+1,n+1} + Q_{m+2,n+2} = 0
+    Phi[(i+3), (m  )*(n+2) - 2] =  1
+    Phi[(i+3), (m+1)*(n+2) - 1] = -2
+    Phi[(i+3), (m+2)*(n+2)    ] =  1
+
+    Q_temp = 36 * (Phi\P)
+    Q      = reshape(Q_temp, (n+2, m+2)) 
+
+    BicubicBSpline(x, y, h, Q, IP)
+
+  ###################################
+  ## Not-a-knot boundary condition ##
+  ###################################
+  elseif end_condition == "not-a-knot"
+    if (n < 4) || (m < 4)
+      @error("To perform bicubic B-spline interpolation with the not-a-knot end condition, 
+              we need x and y vectors which contain at least 4 values each.")
+    end
+      
+    # Continuity of the third `x` derivative between the leftmost and second leftmost patch
+    idx = 0
+    for i in (inner_elmts+1):(inner_elmts+m)
+      Phi[i, idx           + 1] = - 1
+      Phi[i, idx           + 2] =   4
+      Phi[i, idx           + 3] = - 6
+      Phi[i, idx           + 4] =   4
+      Phi[i, idx           + 5] = - 1
+      Phi[i, idx +   (n+2) + 1] = - 4
+      Phi[i, idx +   (n+2) + 2] =  16
+      Phi[i, idx +   (n+2) + 3] = -24
+      Phi[i, idx +   (n+2) + 4] =  16
+      Phi[i, idx +   (n+2) + 5] = - 4
+      Phi[i, idx + 2*(n+2) + 1] = - 1
+      Phi[i, idx + 2*(n+2) + 2] =   4
+      Phi[i, idx + 2*(n+2) + 3] = - 6
+      Phi[i, idx + 2*(n+2) + 4] =   4
+      Phi[i, idx + 2*(n+2) + 5] = - 1
+      idx += (n+2)
+    end
+
+    # Continuity of the third `x` derivative between the rightmost and second rightmost patch
+    idx = (n+2) + 1
+    for i in (inner_elmts+(m+1)):(inner_elmts+(2*m))
+      Phi[i, idx           - 5] = - 1
+      Phi[i, idx           - 4] =   4
+      Phi[i, idx           - 3] = - 6
+      Phi[i, idx           - 2] =   4
+      Phi[i, idx           - 1] = - 1
+      Phi[i, idx +   (n+2) - 5] = - 4
+      Phi[i, idx +   (n+2) - 4] =  16
+      Phi[i, idx +   (n+2) - 3] = -24
+      Phi[i, idx +   (n+2) - 2] =  16
+      Phi[i, idx +   (n+2) - 1] = - 4
+      Phi[i, idx + 2*(n+2) - 5] = - 1
+      Phi[i, idx + 2*(n+2) - 4] =   4
+      Phi[i, idx + 2*(n+2) - 3] = - 6
+      Phi[i, idx + 2*(n+2) - 2] =   4
+      Phi[i, idx + 2*(n+2) - 1] = - 1
+      idx += (n+2)
+    end
+
+    # Continuity of the third `y` derivative between the patch at the top and the patch below
+    idx = 0
+    for i in (inner_elmts+(2*m)+1):(inner_elmts+(2*m)+n)
+      Phi[i, idx           + 1] = - 1
+      Phi[i, idx           + 2] = - 4
+      Phi[i, idx           + 3] = - 1
+      Phi[i, idx +   (n+2) + 1] =   4
+      Phi[i, idx +   (n+2) + 2] =  16
+      Phi[i, idx +   (n+2) + 3] =   4
+      Phi[i, idx + 2*(n+2) + 1] = - 6
+      Phi[i, idx + 2*(n+2) + 2] = -24
+      Phi[i, idx + 2*(n+2) + 3] = - 6
+      Phi[i, idx + 3*(n+2) + 1] =   4
+      Phi[i, idx + 3*(n+2) + 2] =  16
+      Phi[i, idx + 3*(n+2) + 3] =   4
+      Phi[i, idx + 4*(n+2) + 1] = - 1
+      Phi[i, idx + 4*(n+2) + 2] = - 4
+      Phi[i, idx + 4*(n+2) + 3] = - 1
+      idx += 1
+    end
+
+    # Continuity of the third `y` derivative between the patch at the bottom and the patch above
+    idx = (m-3) * (n+2)
+    for i in (inner_elmts+(2*m)+(n+1)):(inner_elmts+(2*m)+(2*n))
+      Phi[i, idx           + 1] = - 1
+      Phi[i, idx           + 2] = - 4
+      Phi[i, idx           + 3] = - 1
+      Phi[i, idx +   (n+2) + 1] =   4
+      Phi[i, idx +   (n+2) + 2] =  16
+      Phi[i, idx +   (n+2) + 3] =   4
+      Phi[i, idx + 2*(n+2) + 1] = - 6
+      Phi[i, idx + 2*(n+2) + 2] = -24
+      Phi[i, idx + 2*(n+2) + 3] = - 6
+      Phi[i, idx + 3*(n+2) + 1] =   4
+      Phi[i, idx + 3*(n+2) + 2] =  16
+      Phi[i, idx + 3*(n+2) + 3] =   4
+      Phi[i, idx + 4*(n+2) + 1] = - 1
+      Phi[i, idx + 4*(n+2) + 2] = - 4
+      Phi[i, idx + 4*(n+2) + 3] = - 1
+      idx += 1
+    end
+
+    i = inner_elmts + boundary_elmts - 3   
+  
+    # Q_{1,1} - Q_{1,2} - Q_{2,1} + Q_{2,2} = 0
+    Phi[(i  ),               1] =  1
+    Phi[(i  ),               2] = -1
+    Phi[(i  ),       (n+2) + 1] = -1
+    Phi[(i  ),       (n+2) + 2] =  1
+    
+    # Q_{m-1,1} + Q_{m,1} + Q_{m-1,2} - Q_{m,2} = 0
+    Phi[(i+1),       (n+2) - 1] = -1
+    Phi[(i+1),       (n+2)    ] =  1
+    Phi[(i+1),     2*(n+2) - 1] =  1
+    Phi[(i+1),     2*(n+2)    ] = -1
+    
+    # Q_{1,n-1} + Q_{2,n} + Q_{1,n-1} - Q_{2,n} = 0
+    Phi[(i+2), (m  )*(n+2) + 1] = -1
+    Phi[(i+2), (m  )*(n+2) + 2] =  1
+    Phi[(i+2), (m+1)*(n+2) + 1] =  1
+    Phi[(i+2), (m+1)*(n+2) + 2] = -1
+    
+    # Q_{m-1,n-1} - Q_{m,n-1} - Q_{m-1,n} + Q_{m,n} = 0
+    Phi[(i+3), (m+1)*(n+2) - 1] =  1
+    Phi[(i+3), (m+1)*(n+2)    ] = -1
+    Phi[(i+3), (m+2)*(n+2) - 1] = -1
+    Phi[(i+3), (m+2)*(n+2)    ] =  1
+
+    Q_temp = 36 * (Phi\P)
+    Q      = reshape(Q_temp, (n+2, m+2)) 
+
+    BicubicBSpline(x, y, h, Q, IP)
+  else
+    @error("Only free and not-a-knot boundary conditions are implemented!")
   end
 end
 
 # Read from file
 """
-    bicubic_b_spline(path::String; end_condition = "free", smoothing_factor = 0.0)
+    BicubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
 
 A function which reads in the `x`, `y` and `z` values for 
 [`bicubic_b_spline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)`](@ref) 
@@ -569,7 +558,7 @@ The .txt file has to have the following structure to be interpreted by this func
 
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/7b1b943eac142d5bc836bb818fe83a5a/raw/74228e349e91fbfe1563479f99943b469f26ac62/Rhine_data_2D_10.txt)
 """
-function bicubic_b_spline(path::String; end_condition = "free", smoothing_factor = 0.0)
+function BicubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
   file = open(path)
   lines = readlines(file)
   close(file)
@@ -583,6 +572,6 @@ function bicubic_b_spline(path::String; end_condition = "free", smoothing_factor
 
   z = transpose(reshape(z_tmp, (n, m)))
 
-  bicubic_b_spline(x, y, Matrix(z); end_condition = end_condition, 
+  BicubicBSpline(x, y, Matrix(z); end_condition = end_condition, 
                    smoothing_factor = smoothing_factor)
 end

@@ -25,8 +25,8 @@ module TrixiBottomTopography
   include("auxiliary/convert.jl")
 
   # Export the functions which are used for B-spline interpolation
-  export linear_b_spline, cubic_b_spline
-  export bilinear_b_spline, bicubic_b_spline
+  export LinearBSpline, CubicBSpline
+  export BilinearBSpline, BicubicBSpline
   export spline_interpolation
 
   # Export the functions which are used DGM data conversion

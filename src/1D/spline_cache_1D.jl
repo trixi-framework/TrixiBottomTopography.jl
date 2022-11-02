@@ -26,7 +26,7 @@ end
 
 # Fill structure
 @doc raw"""
-    linear_b_spline(x::Vector, y::Vector)
+    LinearBSpline(x::Vector, y::Vector)
 
 This function calculates the inputs for the structure [`LinearBSpline`](@ref).
 The input values are:
@@ -83,10 +83,10 @@ end
 
 # Read from file
 """
-    linear_b_spline(path::String)
+    LinearBSpline(path::String)
 
 A function which reads in the `x` and `y` values for 
-[`linear_b_spline`](@ref) from a .txt file.
+[`LinearBSpline`](@ref) from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
 
@@ -101,7 +101,7 @@ The .txt file has to have the following structure to be interpreted by this func
 Note that the number of `x` and `y` values have to be the same.
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/b05a90e66025ee1ebddf444a32c3fa01/raw/90d375c1ac11b26589aab1fe92bd0e6f6daf37b7/Rhine_data_1D_10.txt)
 """
-function linear_b_spline(path::String)
+function LinearBSpline(path::String)
 
   file = open(path)
   lines = readlines(file)
@@ -111,7 +111,7 @@ function linear_b_spline(path::String)
   x = [parse(Float64, val) for val in lines[4:3+num_elements]]
   y = [parse(Float64, val) for val in lines[5+num_elements:end]]
 
-  linear_b_spline(x, y)
+  LinearBSpline(x, y)
 end
 
 ######################
@@ -134,19 +134,15 @@ These attributes are:
 - `IP`: Coefficients matrix
 """
 mutable struct CubicBSpline{x_type, h_type, Q_type, IP_type}
-
   x::x_type
   h::h_type
   Q::Q_type
   IP::IP_type
-
-  CubicBSpline(x, h, Q, IP) = new{typeof(x), typeof(h), typeof(Q), 
-  typeof(IP)}(x, h, Q, IP)
 end
 
 # Fill structure
 @doc raw"""
-    cubic_b_spline(x::Vector, y::Vector; end_condition = "free", smoothing_factor = 0.0)
+    CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_factor = 0.0)
 
 This function calculates the inputs for the structure [`CubicBSpline`](@ref).
 The input values are:
@@ -243,72 +239,73 @@ A reference for the calculations in this script can be found in Chapter 1 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function cubic_b_spline(x::Vector, y::Vector; end_condition = "free", smoothing_factor = 0.0)
+function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_factor = 0.0)
 
   if length(x) < 2
     @error("To perform cubic B-spline interpolation, we need an x vector which 
             contains at least 2 values.")
+  end
+  
+  x,y = sort_data(x,y)
+
+  h  = x[2] - x[1]
+
+  # Consider spline smoothing if required
+  if smoothing_factor > 0.0
+    y = spline_smoothing(smoothing_factor, h, y)
+  end
+
+  n  = length(x)
+  P  = vcat(0, y, 0)
+  IP = [-1  3 -3 1;
+         3 -6  3 0;
+        -3  0  3 0;
+         1  4  1 0]
+
+  # Free end condition
+  if end_condition == "free"
+    du = vcat(-2, ones(n))
+    dm = vcat(1, 4*ones(n), 1)
+    dl = vcat(ones(n), -2)
+  
+    Phi             = Matrix(Tridiagonal(dl, dm, du))
+    Phi[1  , 3    ] = 1
+    Phi[end, end-2] = 1
+    Phi_free        = sparse(Phi)
+    Q_free = 6 * (Phi_free\P) 
+
+    CubicBSpline(x, h, Q_free, IP)
+
+  # Not-a-knot end condition
+  elseif end_condition == "not-a-knot"
+    if length(x) < 4
+      @error("To perform cubic B-spline interpolation with not-a-knot end condition, 
+              we need an x vector which contains at least 4 values.")
+    end
+    
+    du = vcat(4, ones(n))
+    dm = vcat(-1, 4*ones(n), -1)
+    dl = vcat(ones(n), 4)
+
+    Phi                       = Matrix(Tridiagonal(dl, dm, du))
+    Phi[1  , 3:5            ] = [-6 4 -1]
+    Phi[end, (end-4):(end-2)] = [-1 4 -6]
+    Phi_knot                  = sparse(Phi)
+
+    Q_knot = 6 * (Phi_knot\P) 
+
+    CubicBSpline(x, h, Q_knot, IP)
+
   else
-    x,y = sort_data(x,y)
-
-    h  = x[2] - x[1]
-
-    # Consider spline smoothing if required
-    if smoothing_factor > 0.0
-      y = spline_smoothing(smoothing_factor, h, y)
-    end
-
-    n  = length(x)
-    P  = vcat(0, y, 0)
-    IP = [-1  3 -3 1;
-           3 -6  3 0;
-          -3  0  3 0;
-           1  4  1 0]
-
-    # Free end condition
-    if end_condition == "free"
-      du = vcat(-2, ones(n))
-      dm = vcat(1, 4*ones(n), 1)
-      dl = vcat(ones(n), -2)
-    
-      Phi             = Matrix(Tridiagonal(dl, dm, du))
-      Phi[1  , 3    ] = 1
-      Phi[end, end-2] = 1
-      Phi_free        = sparse(Phi)
-      Q_free = 6 * (Phi_free\P) 
-
-      CubicBSpline(x, h, Q_free, IP)
-
-    # Not-a-knot end condition
-    elseif end_condition == "not-a-knot"
-      if length(x) < 4
-        @error("To perform cubic B-spline interpolation with not-a-knot end condition, 
-                we need an x vector which contains at least 4 values.")
-      else
-        du = vcat(4, ones(n))
-        dm = vcat(-1, 4*ones(n), -1)
-        dl = vcat(ones(n), 4)
-    
-        Phi                       = Matrix(Tridiagonal(dl, dm, du))
-        Phi[1  , 3:5            ] = [-6 4 -1]
-        Phi[end, (end-4):(end-2)] = [-1 4 -6]
-        Phi_knot                  = sparse(Phi)
-
-        Q_knot = 6 * (Phi_knot\P) 
-
-        CubicBSpline(x, h, Q_knot, IP)
-      end
-    else
-      @error("Only free and not-a-knot conditions are implemented!")
-    end
+    @error("Only free and not-a-knot conditions are implemented!")
   end
 end
 
 # Read from file
 """
-    cubic_b_spline(path::String; end_condition = "free", smoothing_factor = 0.0)
+    CubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
 
-A function which reads in the `x` and `y` values for [`cubic_b_spline`](@ref) from a .txt file.
+A function which reads in the `x` and `y` values for [`CubicBSpline`](@ref) from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
 - `end_condition`: a string which can either be `free` or `not-a-knot` and defines which 
@@ -328,7 +325,7 @@ The .txt file has to have the following structure to be interpreted by this func
 Note that the number of `x` and `y` values have to be the same.
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/b05a90e66025ee1ebddf444a32c3fa01/raw/90d375c1ac11b26589aab1fe92bd0e6f6daf37b7/Rhine_data_1D_10.txt)
 """
-function cubic_b_spline(path::String; end_condition = "free", smoothing_factor = 0.0)
+function CubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
 
   file = open(path)
   lines = readlines(file)
@@ -338,5 +335,5 @@ function cubic_b_spline(path::String; end_condition = "free", smoothing_factor =
   x = [parse(Float64, val) for val in lines[4:3+num_elements]]
   y = [parse(Float64, val) for val in lines[5+num_elements:end]]
 
-  cubic_b_spline(x, y; end_condition = end_condition, smoothing_factor = smoothing_factor)
+  CubicBSpline(x, y; end_condition = end_condition, smoothing_factor = smoothing_factor)
 end

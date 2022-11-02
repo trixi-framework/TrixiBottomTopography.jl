@@ -7,7 +7,7 @@ using TrixiBottomTopography
   data = "data/rhine_2d_10.txt"
 
   # Define B-spline structure
-  spline_struct = bicubic_b_spline(data)
+  spline_struct = BicubicBSpline(data)
   # Define B-spline interpolation function
   spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
@@ -24,7 +24,7 @@ end
   data = "data/rhine_2d_10.txt"
 
   # Define B-spline structure
-  spline_struct = bicubic_b_spline(data; smoothing_factor = 9999)
+  spline_struct = BicubicBSpline(data; smoothing_factor = 9999)
   # Define B-spline interpolation function
   spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
@@ -40,7 +40,7 @@ end
   data = "data/rhine_2d_10.txt"
 
   # Define B-spline structure
-  spline_struct = bicubic_b_spline(data; end_condition = "not-a-knot")
+  spline_struct = BicubicBSpline(data; end_condition = "not-a-knot")
   # Define B-spline interpolation function
   spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
@@ -56,7 +56,7 @@ end
   data = "data/rhine_2d_10.txt"
 
   # Define B-spline structure
-  spline_struct = bicubic_b_spline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
+  spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
   # Define B-spline interpolation function
   spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 

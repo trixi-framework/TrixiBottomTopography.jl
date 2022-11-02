@@ -39,7 +39,7 @@ dir_path = pkgdir(TrixiBottomTopography)
 data = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
 
 # Define B-spline structure
-spline_struct = bilinear_b_spline(data)
+spline_struct = BilinearBSpline(data)
 # Define B-spline interpolation function
 spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 

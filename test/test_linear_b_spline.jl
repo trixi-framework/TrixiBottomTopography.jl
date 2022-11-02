@@ -4,7 +4,7 @@ using TrixiBottomTopography
 data = "data/rhine_1d_10_x_1.txt"
 
 # Define B-spline structure
-spline_struct = linear_b_spline(data)
+spline_struct = LinearBSpline(data)
 # Define B-spline interpolation function
 spline_func(x) = spline_interpolation(spline_struct, x)
 
