@@ -55,8 +55,8 @@ The coefficients matrix `IP` for linear B-splines is fixed to be
 ```
 
 A reference for the calculations in this script can be found in Chapter 1 of
--  Quentin Agrapart & Alain Batailly (2020)
-   Cubic and bicubic spline interpolation in Python. 
+-  Quentin Agrapart & Alain Batailly (2020) <br/>
+   Cubic and bicubic spline interpolation in Python. <br/>
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function LinearBSpline(x::Vector, y::Vector)
@@ -126,7 +126,6 @@ One dimensional cubic B-spline structure which contains all important attributes
 a B-Spline interpolation function. Similar to [`LinearBSpline`](@ref) 
 These attributes are:
 - `x`: Vector of values in x-direction
-- `y`: Vector of values in y-direction
 - `h`: Length of a single patch in the given data set. A patch is the area between two consecutive 
        `x` values. `h` corresponds to the distance between two consecutive values in x-direction. 
        As we are only considering Cartesian grids, `h` is equal for all patches
@@ -235,8 +234,8 @@ which is solved for ``Q_{\text{not-a-knot}}``.
 For both cases ``P_1,...,P_n = y_1,...,y_n``.
 
 A reference for the calculations in this script can be found in Chapter 1 of
--  Quentin Agrapart & Alain Batailly (2020)
-   Cubic and bicubic spline interpolation in Python. 
+-  Quentin Agrapart & Alain Batailly (2020) <br/>
+   Cubic and bicubic spline interpolation in Python. <br/> 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_factor = 0.0)

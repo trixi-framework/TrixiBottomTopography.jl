@@ -15,6 +15,11 @@ makedocs(
     modules = [TrixiBottomTopography],
     pages = [
         "Home" => "index.md",
+        "Overview" => [
+            "Data Conversion" => "conversion.md",
+            "B-spline structure" => "structure.md",
+            "B-spline function" => "function.md",
+        ],
         "Reference" => "reference.md",
         "Licence" => "licence.md"
     ],

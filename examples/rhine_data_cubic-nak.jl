@@ -15,7 +15,7 @@ dir_path = pkgdir(TrixiBottomTopography)
 data = string(dir_path, "/examples/data/rhine_data_1d_20_x.txt")
 
 # Define B-spline structure
-spline_struct = CubicBSpline(data; end_condition = "not-a-knot")
+spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 # Define B-spline interpolation function
 spline_func(x) = spline_interpolation(spline_struct, x)
 
@@ -31,4 +31,4 @@ pyplot()
 plot(x_int_pts, y_int_pts,
      xlabel="ETRS89 East", ylabel="DHHN2016 Height",
      label="Bottom topography", 
-     title="Cubic B-spline interpolation with not-a-knot end condition")
+     title="Cubic B-spline interpolation with not-a-knot end condition and smoothing")

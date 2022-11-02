@@ -24,6 +24,11 @@ Inputs:
 function convert_dgm_1d(path_read::String, path_write::String; 
                         excerpt = 1, direction = "x", section = 1)
 
+  # Check if section has an accepted value
+  if (section < 1 | section > 1000)
+    @error("The value for section must be between 1 and 1000!")
+  end
+
   # Get file data
   read_file = open(path_read)
   data = readlines(read_file)
@@ -50,13 +55,9 @@ function convert_dgm_1d(path_read::String, path_write::String;
 
     end
 
-    if ( 1 <= section <= 1000)
-      # Save only the relevant data
-      x_uniq = x_all[1:excerpt:dimension_data]
-      y_uniq = reshape(z_all, (dimension_data, dimension_data))[1:excerpt:dimension_data, section]
-    else
-      @error("The value for section must be between 1 and 1000!")
-    end
+    # Save only the relevant data
+    x_uniq = x_all[1:excerpt:dimension_data]
+    y_uniq = reshape(z_all, (dimension_data, dimension_data))[1:excerpt:dimension_data, section]
 
   elseif direction == "y"
 
@@ -75,13 +76,9 @@ function convert_dgm_1d(path_read::String, path_write::String;
 
     end
 
-    if ( 1 <= section <= 1000)
-      # Save only the relevant data
-      x_uniq = y_all[1:(excerpt*dimension_data):length_data]
-      y_uniq = reshape(z_all, (dimension_data, dimension_data))[section, 1:excerpt:dimension_data]
-    else
-      @error("The value for section must be between 1 and 1000!")
-    end
+    # Save only the relevant data
+    x_uniq = y_all[1:(excerpt*dimension_data):length_data]
+    y_uniq = reshape(z_all, (dimension_data, dimension_data))[section, 1:excerpt:dimension_data]
 
   else
     @error("The input direction can either be the String x or y")
