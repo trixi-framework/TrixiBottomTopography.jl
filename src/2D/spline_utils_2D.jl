@@ -150,7 +150,7 @@ H\_f[i] = &a[1] + a[2]x\_hat[i] + a[3]y\_hat[i] \\
 here `p` is the number of entries in `z_hat`.
 
 A reference to the calculations can be found in the lecture notes of
-- Gianluca Donato and Serge Belongie (2001)
+- Gianluca Donato and Serge Belongie (2001),
   Approximate Thin Plate Spline Mappings
   [DOI: 10.1007/3-540-47977-5_2](https://link.springer.com/content/pdf/10.1007/3-540-47977-5_2.pdf)
 """

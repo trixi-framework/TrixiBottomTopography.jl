@@ -67,7 +67,7 @@ W = \begin{pmatrix}
 \end{aligned}
 ```
 
-- Germán Rodríguez (2001) <br/>
+- Germán Rodríguez (2001),
 [Smoothing and non-parametric regression](https://data.princeton.edu/eco572/smoothing.pdf)
 """
 function spline_smoothing(lambda::Number, h::Number, y::Vector)

@@ -34,7 +34,7 @@ c_{i,1}(\kappa_i) =
 ```
 
 A reference for the calculations in this script can be found in Chapter 1 of
--  Quentin Agrapart & Alain Batailly (2020)
+-  Quentin Agrapart & Alain Batailly (2020),
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
@@ -88,7 +88,7 @@ c_{i,3}\left(\kappa_i(t) \right) = \frac{1}{6}
 ```
 
 A reference for the calculations in this script can be found in Chapter 1 of
--  Quentin Agrapart & Alain Batailly (2020)
+-  Quentin Agrapart & Alain Batailly (2020),
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """

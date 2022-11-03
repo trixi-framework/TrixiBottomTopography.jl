@@ -99,7 +99,7 @@ c_{i,j,3}(\mu_i,\nu_j) = \frac{1}{36}
 ```
 
 A reference for the calculations in this script can be found in Chapter 2 of
--  Quentin Agrapart & Alain Batailly (2020)
+-  Quentin Agrapart & Alain Batailly (2020),
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """

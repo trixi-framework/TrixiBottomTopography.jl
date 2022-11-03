@@ -75,8 +75,8 @@ The coefficients matrix `IP` for bilinear B-splines is fixed to be
 ```
 
 A reference for the calculations in this script can be found in Chapter 2 of
--  Quentin Agrapart & Alain Batailly (2020) <br/>
-   Cubic and bicubic spline interpolation in Python. <br/>
+-  Quentin Agrapart & Alain Batailly (2020),
+   Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
@@ -276,8 +276,8 @@ The `not-a-knot` end condition needs at least four values for the `x` and `y` ve
 - ``Q_{m-1,n-1} - Q_{m,n-1} - Q_{m-1,n} + Q_{m,n} = 0``
 
 A reference for the calculations in this script can be found in Chapter 2 of
--  Quentin Agrapart & Alain Batailly (2020) <br/>
-   Cubic and bicubic spline interpolation in Python. <br/>
+-  Quentin Agrapart & Alain Batailly (2020),
+   Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)
