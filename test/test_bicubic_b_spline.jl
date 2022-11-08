@@ -29,7 +29,7 @@ end
   spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
   # Test function at arbitrary point
-  @test 39.23237242069 < spline_func(357555, 5646555) < 39.23237242070
+  @test 39.23237242 < spline_func(357555, 5646555) < 39.23237243
     
 end
 
@@ -61,6 +61,6 @@ end
   spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 
   # Test function at arbitrary point
-  @test 39.23237242069 < spline_func(357555, 5646555) < 39.23237242070
+  @test 39.23237242 < spline_func(357555, 5646555) < 39.23237243
 
 end
