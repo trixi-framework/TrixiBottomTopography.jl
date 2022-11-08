@@ -15,4 +15,6 @@ Trixi2Vtk = "bc1476a1-1ca6-4cc3-950b-c312b255ff95"
 
 [compat]
 Trixi2Vtk = "0.3"
+Plots = "1"
+Trixi = "0.4"
 julia = "1.7"
