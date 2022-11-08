@@ -1,1 +1,4 @@
 Manifest.toml
+thesis/
+out/
+solution_*

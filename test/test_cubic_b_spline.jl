@@ -12,7 +12,7 @@ using TrixiBottomTopography
   spline_func(x) = spline_interpolation(spline_struct, x)
 
   # Test function at arbitrary point
-  @test spline_func(357555) == 46.19366216271698
+  @test 19366216271 < spline_func(357555) < 46.19366216272
 
 end
 
@@ -29,7 +29,7 @@ end
   spline_func(x) = spline_interpolation(spline_struct, x)
 
   # Test function at arbitrary point
-  @test spline_func(357555) == 47.859311520029195
+  @test 47.85931152002 < spline_func(357555) < 47.85931152003
     
 end
 
@@ -45,7 +45,7 @@ end
   spline_func(x) = spline_interpolation(spline_struct, x)
 
   # Test function at arbitrary point
-  @test spline_func(5646555) == 47.929379673188045
+  @test 47.92937967318 < spline_func(5646555) < 47.92937967319
 
 end
 
@@ -61,6 +61,6 @@ end
   spline_func(x) = spline_interpolation(spline_struct, x)
 
   # Test function at arbitrary point
-  @test spline_func(5646555) == 47.719950394952015
+  @test 47.71995039495 < spline_func(5646555) < 47.71995039496
 
 end
