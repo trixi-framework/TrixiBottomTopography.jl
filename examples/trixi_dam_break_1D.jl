@@ -5,11 +5,6 @@ using LinearAlgebra
 using OrdinaryDiffEq
 using Trixi
 
-# Set polynomial degree for DGSEM
-ploydegree = 3
-# Set initial refinement level
-refinement = 4
-
 # Download one dimensional Rhine bottom data from gist
 Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
 
@@ -45,7 +40,7 @@ boundary_condition = boundary_condition_slip_wall
 # Get the DG approximation space
 
 volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
-solver = DGSEM(polydeg=ploydegree, surface_flux=(flux_hll, flux_nonconservative_fjordholm_etal),
+solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm_etal),
                volume_integral=VolumeIntegralFluxDifferencing(volume_flux))
 
 ###############################################################################
@@ -54,7 +49,7 @@ solver = DGSEM(polydeg=ploydegree, surface_flux=(flux_hll, flux_nonconservative_
 coordinates_min = spline_struct.x[1]
 coordinates_max = spline_struct.x[end]
 mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level=refinement,
+                initial_refinement_level=3,
                 n_cells_max=10_000,
                 periodicity = false)
 
