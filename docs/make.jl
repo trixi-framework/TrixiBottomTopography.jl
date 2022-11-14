@@ -19,6 +19,7 @@ makedocs(
             "Data Conversion" => "conversion.md",
             "B-spline structure" => "structure.md",
             "B-spline function" => "function.md",
+            "Trixi.jl example" => "Trixi.md",
         ],
         "Reference" => "reference.md",
         "Licence" => "licence.md"

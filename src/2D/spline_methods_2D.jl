@@ -5,28 +5,27 @@
 
 # Bilinaer B-spline interpolation
 @doc raw"""
-    spline_interpolation(b_spline::BilinearBSpline, u, v)
+    spline_interpolation(b_spline::BilinearBSpline, x, y)
 
-The inputs are the [`BilinearBSpline`](@ref) object and the variable `u` and `v` at which the spline 
-will be evaluated. Where `u` corresponds to a value in x-direction and `v` to a value in 
-y-direction.
+The inputs are the [`BilinearBSpline`](@ref) object and the variable `x` and `y` at which the spline 
+will be evaluated. 
 
-The parameters `i` and `j` give us the patch in which `(u,v)` is located.
+The parameters `i` and `j` give us the patch in which `(x,y)` is located.
 Which will also be used to get the correct control points from `Q`.
-(A patch is the area between two consecutive `x` and `y` values)
+(A patch is the area between two consecutive `b_spline.x` and `b_spline.y` values)
 
-`my` is  an interim variable which maps `u` to the interval ``[0,1]``
-for further calculations. `ny` does the same for `v`.
+`my` is  an interim variable which maps `x` to the interval ``[0,1]``
+for further calculations. `ny` does the same for `y`.
 
-To evaluate the spline at `(u,v)`, we have to calculate the following:
+To evaluate the spline at `(x,y)`, we have to calculate the following:
 ```math
 \begin{aligned}
-c_{i,j,1}(\mu_i(u),\nu_j(v)) = 
-		\begin{bmatrix} \mu_i(u)\\ 1 \end{bmatrix}^T
+c_{i,j,1}(\mu_i(x),\nu_j(y)) = 
+		\begin{bmatrix} \nu_j(y)\\ 1 \end{bmatrix}^T
 		\underbrace{\begin{bmatrix} -1 & 1\\ 1 & 0 \end{bmatrix}}_{\text{IP}}
 		\begin{bmatrix} Q_{i,j} & Q_{i,j+1}\\ Q_{i+1,j} & Q_{i+1,j+1} \end{bmatrix}
 		\underbrace{\begin{bmatrix} -1 & 1\\ 1 & 0 \end{bmatrix}}_{\text{IP}^T}
-		\begin{bmatrix} \nu_j(v) \\ 1\end{bmatrix}
+		\begin{bmatrix} \mu_i(x) \\ 1\end{bmatrix}
 \end{aligned}
 ```
 
@@ -35,19 +34,19 @@ A reference for the calculations in this script can be found in Chapter 2 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function spline_interpolation(b_spline::BilinearBSpline, u, v)
+function spline_interpolation(b_spline::BilinearBSpline, x, y)
 
-  x  = b_spline.x
-  y  = b_spline.y
-  h  = b_spline.h
-  Q  = b_spline.Q
-  IP = b_spline.IP
+  x_vec = b_spline.x
+  y_vec = b_spline.y
+  h     = b_spline.h
+  Q     = b_spline.Q
+  IP    = b_spline.IP
 
-  i = max(1, min(searchsortedlast(x, u), length(x) - 1))
-  j = max(1, min(searchsortedlast(y, v), length(y) - 1))
+  i = max(1, min(searchsortedlast(x_vec, x), length(x_vec) - 1))
+  j = max(1, min(searchsortedlast(y_vec, y), length(y_vec) - 1))
 
-  my = (u - x[i])/h
-  ny = (v - y[j])/h
+  my = (x - x_vec[i])/h
+  ny = (y - y_vec[j])/h
 
   Q_temp = [Q[i, j:(j+1)] Q[(i+1), j:(j+1)]]
 
@@ -58,24 +57,23 @@ end
 
 # Bicubic B-spline interpolation
 @doc raw"""
-    spline_interpolation(b_spline::BicubicBSpline, u, v)
+    spline_interpolation(b_spline::BicubicBSpline, x, y)
 
-The inputs are the [`BicubicBSpline`](@ref) object and the variable `u` and `v` at which the spline 
-will be evaluated. Where `u` corresponds to a value in x-direction and `v` to a value in 
-y-direction.
+The inputs are the [`BicubicBSpline`](@ref) object and the variable `x` and `y` at which the spline 
+will be evaluated. 
 
-The parameters `i` and `j` give us the patch in which `(u,v)` is located.
+The parameters `i` and `j` give us the patch in which `(x,y)` is located.
 Which will also be used to get the correct control points from `Q`.
-(A patch is the area between two consecutive `x` and `y` values)
+(A patch is the area between two consecutive `b_spline.x` and `b_spline.y` values)
 
-`my` is  an interim variable which maps `u` to the interval ``[0,1]``
-for further calculations. `ny` does the same for `v`.
+`my` is  an interim variable which maps `x` to the interval ``[0,1]``
+for further calculations. `ny` does the same for `y`.
 
-To evaluate the spline at `(u,v)`, we have to calculate the following:
+To evaluate the spline at `(x,y)`, we have to calculate the following:
 ```math
 \begin{aligned}
-c_{i,j,3}(\mu_i,\nu_j) = \frac{1}{36}
-\begin{bmatrix} \nu_j^3 \\ \nu_j^2 \\ \nu_j \\ 1 \end{bmatrix}^T
+c_{i,j,3}(\mu_i(x),\nu_j(y)) = \frac{1}{36}
+\begin{bmatrix} \nu_j^3(y) \\ \nu_j^2(y) \\ \nu_j(y) \\ 1 \end{bmatrix}^T
 \underbrace{\begin{bmatrix}
   -1 & 3 & -3 & 1\\
   3 & -6 & 3 & 0\\
@@ -94,7 +92,7 @@ c_{i,j,3}(\mu_i,\nu_j) = \frac{1}{36}
   -3 & 3 & 3 & 1\\
   1 & 0 & 0 & 0
 \end{bmatrix}}_{\text{IP}}
-\begin{bmatrix} \mu_i^3 \\ \mu_i^2 \\ \mu_i \\ 1 \end{bmatrix}
+\begin{bmatrix} \mu_i^3(x) \\ \mu_i^2(x) \\ \mu_i(x) \\ 1 \end{bmatrix}
 \end{aligned}
 ```
 
@@ -103,19 +101,19 @@ A reference for the calculations in this script can be found in Chapter 2 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function spline_interpolation(b_spline::BicubicBSpline, u, v)
+function spline_interpolation(b_spline::BicubicBSpline, x, y)
 
-  x  = b_spline.x
-  y  = b_spline.y
-  h  = b_spline.h
-  Q  = b_spline.Q
-  IP = b_spline.IP
+  x_vec = b_spline.x
+  y_vec = b_spline.y
+  h     = b_spline.h
+  Q     = b_spline.Q
+  IP    = b_spline.IP
 
-  i = max(1, min(searchsortedlast(x, u), length(x) - 1))
-  j = max(1, min(searchsortedlast(y, v), length(y) - 1))
+  i = max(1, min(searchsortedlast(x_vec, x), length(x_vec) - 1))
+  j = max(1, min(searchsortedlast(y_vec, y), length(y_vec) - 1))
 
-  my = (u - x[i])/h
-  ny = (v - y[j])/h
+  my = (x - x_vec[i])/h
+  ny = (y - y_vec[j])/h
 
   Q_temp = [Q[i, j:(j+3)] Q[(i+1), j:(j+3)] Q[(i+2), j:(j+3)] Q[(i+3), j:(j+3)]]
 

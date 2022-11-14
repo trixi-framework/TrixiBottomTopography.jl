@@ -10,7 +10,7 @@ Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4
 spline_struct = BicubicBSpline(Rhine_data)
 spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 
-equations = ShallowWaterEquations2D(gravity_constant=9.81, H0=55.0)
+equations = ShallowWaterEquations2D(gravity_constant=3.0, H0=55.0)
 
 function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
 

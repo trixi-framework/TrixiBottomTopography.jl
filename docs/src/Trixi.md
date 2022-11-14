@@ -1,0 +1,2 @@
+# Example using Trixi.jl
+

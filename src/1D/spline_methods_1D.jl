@@ -5,24 +5,24 @@
 
 # Linear B-spline interpolation
 @doc raw"""
-    spline_interpolation(b_spline::LinearBSpline, t)
+    spline_interpolation(b_spline::LinearBSpline, x)
 
-The inputs are the [`LinearBSpline`](@ref) object and a variable `t` at which the spline 
+The inputs are the [`LinearBSpline`](@ref) object and a variable `x` at which the spline 
 will be evaluated.
 
-The parameter `i` gives us the patch in which the variable `t` is located.
+The parameter `i` gives us the patch in which the variable `x` is located.
 This parameter will also be used to get the correct control points from `Q`.
-(A patch is the area between two consecutive `x` values. `h`)
+(A patch is the area between two consecutive `b_spline.x` values.)
 
-`kappa` is  an interim variable which maps `t` to the interval ``[0,1]``
+`kappa` is  an interim variable which maps `x` to the interval ``[0,1]``
 for further calculations.
 
-To evaluate the spline at `t`, we have to calculate the following:
+To evaluate the spline at `x`, we have to calculate the following:
 ```math
 \begin{aligned}
-c_{i,1}(\kappa_i) = 
+c_{i,1}(\kappa_i(x)) = 
 		\begin{bmatrix}
-			\kappa_i\\ 1
+			\kappa_i(x)\\ 1
 		\end{bmatrix}^T
 		\begin{bmatrix}
 			-1 & 1\\1 & 0
@@ -38,16 +38,16 @@ A reference for the calculations in this script can be found in Chapter 1 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function spline_interpolation(b_spline::LinearBSpline, t)
+function spline_interpolation(b_spline::LinearBSpline, x)
 
-  x  = b_spline.x
-  h  = b_spline.h
-  Q  = b_spline.Q
-  IP = b_spline.IP
+  x_vec = b_spline.x
+  h     = b_spline.h
+  Q     = b_spline.Q
+  IP    = b_spline.IP
 
-  i = max(1, min(searchsortedlast(x, t), length(x)-1))
+  i = max(1, min(searchsortedlast(x_vec, t), length(x_vec)-1))
 
-  kappa_i = (t - x[i])/h
+  kappa_i = (x - x_vec[i])/h
 
   c_i1 = [kappa_i, 1]' * IP * Q[i:(i+1)]
 
@@ -56,24 +56,24 @@ end
 
 # Cubic B-spline interpolation
 @doc raw"""
-    spline_interpolation(b_spline::CubicBSpline, t)
+    spline_interpolation(b_spline::CubicBSpline, x)
 
-The inputs are the [`CubicBSpline`](@ref) object and a variable `t` at which the spline 
+The inputs are the [`CubicBSpline`](@ref) object and a variable `x` at which the spline 
 will be evaluated.
 
-The parameter `i` gives us the patch in which the variable `t` is located.
+The parameter `i` gives us the patch in which the variable `x` is located.
 This parameter will also be used to get the correct control points from `Q`.
-(A patch is the area between two consecutive `x` values)
+(A patch is the area between two consecutive `b_spline.x` values)
 
 `kappa` is  an interim variable which maps `t` to the interval ``[0,1]``
 for further calculations.
 
-To evaluate the spline at `t`, we have to calculate the following:
+To evaluate the spline at `x`, we have to calculate the following:
 ```math
 \begin{aligned}
-c_{i,3}\left(\kappa_i(t) \right) = \frac{1}{6} 
+c_{i,3}\left(\kappa_i(x) \right) = \frac{1}{6} 
 		\begin{bmatrix}
-			\kappa_i(t)^3\\ \kappa_i(t)^2\\ \kappa_i(t) \\1
+			\kappa_i(x)^3\\ \kappa_i(x)^2\\ \kappa_i(x) \\1
 		\end{bmatrix}^T
 		\underbrace{\begin{bmatrix}
 			-1 & 3 & -3 & 1\\
@@ -92,16 +92,16 @@ A reference for the calculations in this script can be found in Chapter 1 of
    Cubic and bicubic spline interpolation in Python. 
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function spline_interpolation(b_spline::CubicBSpline, t)
+function spline_interpolation(b_spline::CubicBSpline, x)
 
-  x  = b_spline.x
-  h  = b_spline.h
-  Q  = b_spline.Q
-  IP = b_spline.IP
+  x_vec = b_spline.x
+  h     = b_spline.h
+  Q     = b_spline.Q
+  IP    = b_spline.IP
 
-  i = max(1, min(searchsortedlast(x, t), length(x) - 1))
+  i = max(1, min(searchsortedlast(x_vec, x), length(x_vec) - 1))
 
-  kappa_i = (t - x[i])/h
+  kappa_i = (x - x_vec[i])/h
 
   c_i3 = 1/6 * [kappa_i^3, kappa_i^2, kappa_i, 1]' * IP * Q[i:(i+3)]
 
