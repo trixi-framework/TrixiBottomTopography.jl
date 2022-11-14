@@ -45,7 +45,7 @@ function spline_interpolation(b_spline::LinearBSpline, x)
   Q     = b_spline.Q
   IP    = b_spline.IP
 
-  i = max(1, min(searchsortedlast(x_vec, t), length(x_vec)-1))
+  i = max(1, min(searchsortedlast(x_vec, x), length(x_vec)-1))
 
   kappa_i = (x - x_vec[i])/h
 
