@@ -3,7 +3,8 @@ import Pkg
 using TrixiBottomTopography
 
 # Define module-wide setups such that the respective modules are available in doctests
-DocMeta.setdocmeta!(TrixiBottomTopography, :DocTestSetup, :(using TrixiBottomTopography); recursive=true)
+DocMeta.setdocmeta!(TrixiBottomTopography, :DocTestSetup, :(using TrixiBottomTopography); 
+                    recursive=true)
 
 # Make documentation
 makedocs(
@@ -19,7 +20,10 @@ makedocs(
             "Data Conversion" => "conversion.md",
             "B-spline structure" => "structure.md",
             "B-spline function" => "function.md",
-            "Trixi.jl example" => "Trixi.md",
+        ],
+        "Trixi.jl examples" => [
+            "1D dam break" => "Trixi_1D.md",
+            "2D dam break" => "Trixi_2D.md",
         ],
         "Reference" => "reference.md",
         "Licence" => "licence.md"

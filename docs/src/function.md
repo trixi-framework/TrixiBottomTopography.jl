@@ -1,6 +1,6 @@
 # B-spline interpolation function
 
-If the the B-spline structure is defined, it can be used to define the B-spline interpolation function. In this chapter, we are goin to continue with the examples in the previous chapter for the one and two dimensional case.
+If the B-spline structure is defined, it can be used to define the B-spline interpolation function. In this chapter, we are going to continue with the examples in the previous chapter for the one and two dimensional case.
 
 ## One dimensional case
 

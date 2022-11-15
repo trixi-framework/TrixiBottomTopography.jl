@@ -91,7 +91,7 @@ For the bicubic case we can also set the optional parameters `end_condition` whi
 Cubic and bicubic spline interpolation in Python. 
 [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 
-Besides the end condition, in the bicubic case, we can also specify a `smoothing_factor`, which defines trade-off degree of the cubic B-spline interpolation of goodness of fit and minimizing the curvature by defining new `y` values. This proceedure is called **thin plate spline**. There is no general approach which `smoothing_factor` is best suited for the problem and has to be determined via trial and error. To understand the underlying maths, please see:
+Besides the end condition, in the bicubic case, we can also specify a `smoothing_factor`, which defines trade-off degree of the cubic B-spline interpolation of goodness of fit and minimizing the curvature by defining new `y` values. This procedure is called **thin plate spline**. There is no general approach which `smoothing_factor` is best suited for the problem and has to be determined via trial and error. To understand the underlying maths, please see:
 - Gianluca Donato and Serge Belongie (2001),
   Approximate Thin Plate Spline Mappings
   [DOI: 10.1007/3-540-47977-5_2](https://link.springer.com/content/pdf/10.1007/3-540-47977-5_2.pdf)

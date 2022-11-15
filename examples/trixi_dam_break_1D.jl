@@ -1,7 +1,6 @@
 # Include packages
 using TrixiBottomTopography
 using Plots
-using LinearAlgebra
 using OrdinaryDiffEq
 using Trixi
 
@@ -23,7 +22,7 @@ function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
   r = abs(x_norm)
 
   # Calculate primitive variables
-  H =  r < 50 ? 60.0 : 55.0#equations.H0+ 10 * exp((-(center-x[1])^2))
+  H =  r < 50 ? 60.0 : 55.0
   v = 0.0
   b = spline_func(x[1])
 
