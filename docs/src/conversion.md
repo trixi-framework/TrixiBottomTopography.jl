@@ -34,9 +34,9 @@ where the first column provides the corresponding ETRS89 East coordinates, the s
 
 ## Data format of `TrixiBottomTopography.jl`
 
-The provided `.xyz` files of DGM are not directly accepted by `TrixiBottomTopography.jl` to define B-spline interpolation structures. 
+The provided `.xyz` files of DGM are not directly accepted by `TrixiBottomTopography.jl` to define B-spline interpolation structures. To make them work with the package, this data has to be converted into `.txt` files where the data is organized in a specific format.
 
-This package requires `.txt` files in a specific data format. To interpolate one dimensional data, `TrixiBottomTopography.jl` requires the following form:
+For one dimensional interpolation, `TrixiBottomTopography.jl` requires the following form:
 ```
 # Number of x values
 n
@@ -49,7 +49,7 @@ y_1
 ...
 y_n
 ```
-To interpolate two dimensional data:
+And to interpolate two dimensional data:
 ```
 # Number of x values
 n
@@ -72,7 +72,7 @@ z_2,1
 ...
 z_m,n
 ```
-The `x, y` and `z` values have to be given in `Float64` format.
+The `x, y` and `z` values have to be set to `Float64` format.
 
 ## Conversion functions
 
@@ -131,6 +131,6 @@ convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y",
 Similar to the previous expression, this one has the additional attribute `directon = "y"` which tells [`convert_dgm_1d`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String}) that the data will be read from the `y` direction. (Click [here](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/data/rhine_data_1d_20_y.txt) to view the resulting file)
 
 ```julia
-onvert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
+convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
 ```
-The two dimensional version [`convert_dgm_2d`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_2d-Tuple{String,%20String}) works similar to the one dimensional case except that the optional attributes `direction` and `section` do not exist, but only `excerpt`. Setting `excerpt = 20` tells the function that only every `20`th value in the `x` and `y` direction of the source file `path_src_file` will be stored in `path_out_file_2d`. (Click [here](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/data/rhine_data_2d_20.txt) to view the resulting file)
+The two dimensional version [`convert_dgm_2d`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_2d-Tuple{String,%20String}) works similar to the one dimensional case except that the optional attributes `direction` and `section` do not exist, but only `excerpt`. Setting e.g. to `20` tells the function that only every `20`th value in the `x` and `y` direction of the source file `path_src_file` will be stored in `path_out_file_2d`. (Click [here](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/data/rhine_data_2d_20.txt) to view the resulting file)

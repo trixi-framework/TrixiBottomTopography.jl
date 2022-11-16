@@ -1,6 +1,6 @@
 # TrixiBottomTopography.jl
 
-TrixiBottomTopography.jl is a supplementary package to the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl) which enables to use real life geographical data for the bottom topography function of the shallow water equations.
+`TrixiBottomTopography.jl` is a supplementary package to the numerical solver [`Trixi.jl`](https://github.com/trixi-framework/Trixi.jl) which enables to use real life geographical data for the bottom topography function of the shallow water equations.
 
 The shallow water equations in one dimension
 ```math
@@ -24,7 +24,7 @@ require a (piecewise) differentiable function $b$ which describes the bottom top
 
 Geographical data is almost always given as scattered data points on a coordinate system with corresponding elevation. So to incorporate geographical data into the shallow water equations, we need to define a function, which remodels the topography from the data. 
 
-TrixiBottomTopography.jl does this by B-spline interpolation of the underlying data.
+`TrixiBottomTopography.jl` does this by B-spline interpolation of the underlying data.
 
 ## Functionalities
 

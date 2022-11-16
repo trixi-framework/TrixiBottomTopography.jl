@@ -23,7 +23,7 @@ makedocs(
         ],
         "Trixi.jl examples" => [
             "1D dam break" => "Trixi_1D.md",
-            "2D dam break" => "Trixi_2D.md",
+            # "2D dam break" => "Trixi_2D.md",
         ],
         "Reference" => "reference.md",
         "Licence" => "licence.md"

@@ -1,3 +1,8 @@
+###############################################################################
+# This example file creates a .gif file of a two dimensional dam break        #
+# where the bottom topography is chosen from the DGM data set.                #
+###############################################################################
+
 # Include packages
 using TrixiBottomTopography
 using Plots

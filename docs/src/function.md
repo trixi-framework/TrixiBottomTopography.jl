@@ -1,6 +1,6 @@
 # B-spline interpolation function
 
-If the B-spline structure is defined, it can be used to define the B-spline interpolation function. In this chapter, we are going to continue with the examples in the previous chapter for the one and two dimensional case.
+If the B-spline structure is defined, it can be used to define the B-spline interpolation function. In this chapter, we are going to continue with the examples from the previous chapter for the one and two dimensional case.
 
 ## One dimensional case
 
@@ -28,7 +28,7 @@ To define the B-spline interpolation function with respect to a variable `x`, we
 spline_func(x) = spline_interpolation(spline_struct, x)
 ```
 
-This defines the cubic B-spline interpolation function with not-a-knot end condition and smoothing with respect to variable `x`. If we want to visualize the interpolation function with 100 interpolation points, we define:
+This defines the cubic B-spline interpolation function with not-a-knot end condition and smoothing with respect to variable `x` because of how we defined `spline_struct` previously. If we want to visualize the interpolation function with 100 interpolation points, we define:
 ```julia
 # Define interpolation points
 n = 100
@@ -82,7 +82,7 @@ To define the B-spline interpolation function with respect to a variables `x` an
 # Define B-spline interpolation function
 spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 ```
-This defines the bicubic B-spline interpolation function with not-a-knot end condition and smoothing with respect to variables `x` and `y`. If we want to visualize the interpolation function with 100 interpolation points in each direction, we define:
+This defines the bicubic B-spline interpolation function with not-a-knot end condition and smoothing with respect to variables `x` and `y` because of how we defined `spline_struct` previously. If we want to visualize the interpolation function with 100 interpolation points in each direction, we define:
 
 ```julia
 # Define interpolation points
