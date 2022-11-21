@@ -64,7 +64,7 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
 ###############################################################################
 # ODE solvers
 
-tspan = (0.0, 0.0)
+tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 
 ###############################################################################
@@ -72,38 +72,14 @@ ode = semidiscretize(semi, tspan)
 
 # use a Runge-Kutta method with automatic (error based) time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
-            save_everystep=false);
-
-pd = PlotData1D(sol)
-      
-sol_vec = [pd]
-
-# Run for t = 1,...,100
-for i = 1:100
-
-  ###############################################################################
-  # ODE solvers
-
-  local tspan = (0.0, convert(Float64, i))
-  local ode = semidiscretize(semi, tspan)
-
-  ###############################################################################
-  # run the simulation
-
-  # use a Runge-Kutta method with automatic (error based) time step size control
-  local sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
-              save_everystep=false);
-
-  local pd = PlotData1D(sol)
-  
-  append!(sol_vec, [pd])
-end
+            save_everystep=true);
 
 # Create .gif animation of the solution
 pyplot()
-animation = @animate for k= 1:101
-    plot(sol_vec[k]["H"])
-    plot!(sol_vec[k]["b"], ylim=(38,65), title="t=$(k-1)", xlabel="ETRS89 East", ylabel="DHHN2016")
+animation = @animate for k= 1:2:length(sol.t)
+  pd = PlotData1D(sol.u[k], semi)
+  plot(pd["H"])
+  plot!(pd["b"], ylim=(38,65), title="t=$(sol.t[k])", xlabel="ETRS89 East", ylabel="DHHN2016")
 end
 
-gif(animation, "examples\\plots\\dam_break_1d.gif", fps=10)
+gif(animation, "examples\\plots\\dam_break_1d.gif", fps=15)

@@ -5,7 +5,7 @@
 
 # Include packages
 using TrixiBottomTopography
-using Plots
+# using Plots
 using LinearAlgebra
 using OrdinaryDiffEq
 using Trixi
@@ -62,47 +62,24 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver)#
 ###############################################################################
 # ODE solvers, callbacks etc.
 
-tspan = (0.0, 0.0)
+tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 
 ###############################################################################
 # run the simulation
 
 # use a Runge-Kutta method with automatic (error based) time step size control
-sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8, save_everystep=false);
+sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8, save_everystep=true);
 
-pd = PlotData2D(sol)
-
-sol_vec = [pd]
-
-for i = 1:100
-
-  ###############################################################################
-  # ODE solvers
-
-  local tspan = (0.0, convert(Float64, i))
-  local ode = semidiscretize(semi, tspan)
-
-  ###############################################################################
-  # run the simulation
-
-  # use a Runge-Kutta method with automatic (error based) time step size control
-  local sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
-              save_everystep=false);
-
-  local pd = PlotData2D(sol)
-  
-  append!(sol_vec, [pd])
-end
-
-
+# display(length(sol.t))
 
 # Create .gif animation of the solution
 pyplot()
-animation = @animate for k= 1:101
-    wireframe(sol_vec[k]["H"])
-    surface!(sol_vec[k]["b"], zlim=(38,65), camera = (30,20), title="t=$(k-1)",
-             xlabel="E", ylabel="N", zlabel="H")
+animation = @animate for k= 1:6:length(sol.t)
+  pd = PlotData2D(sol.u[k], semi)
+  wireframe(pd["H"])
+  surface!(pd["b"], zlim=(38,65), camera = (30,20), title="t=$(sol.t[k])",
+            xlabel="E", ylabel="N", zlabel="H")
 end
 
-gif(animation, "examples\\plots\\dam_break_2d.gif", fps=10)
+gif(animation, "examples\\plots\\dam_break_2d.gif", fps=15)
