@@ -5,13 +5,14 @@
 
 # Include packages
 using TrixiBottomTopography
-# using Plots
+using Plots
 using LinearAlgebra
 using OrdinaryDiffEq
 using Trixi
 
 Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
 
+# B-spline interpolation of the underlying data
 spline_struct = BicubicBSpline(Rhine_data)
 spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 
@@ -36,8 +37,6 @@ end
 
 initial_condition = initial_condition_wave
 
-# boundary_condition = boundary_condition_slip_wall
-
 ###############################################################################
 # Get the DG approximation space
 
@@ -52,12 +51,10 @@ coordinates_min = (spline_struct.x[1], spline_struct.y[1])
 coordinates_max = (spline_struct.x[end], spline_struct.y[end])
 mesh = TreeMesh(coordinates_min, coordinates_max,
                 initial_refinement_level=3,
-                n_cells_max=10_000)#,
-                # periodicity = false)
+                n_cells_max=10_000)
 
 # create the semi discretization object
-semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver)#,
-                                    # boundary_conditions = boundary_condition)
+semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver)
 
 ###############################################################################
 # ODE solvers, callbacks etc.
@@ -70,8 +67,6 @@ ode = semidiscretize(semi, tspan)
 
 # use a Runge-Kutta method with automatic (error based) time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8, save_everystep=true);
-
-# display(length(sol.t))
 
 # Create .gif animation of the solution
 pyplot()

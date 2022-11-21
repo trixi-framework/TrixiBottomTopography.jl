@@ -21,10 +21,7 @@ makedocs(
             "B-spline structure" => "structure.md",
             "B-spline function" => "function.md",
         ],
-        "Trixi.jl examples" => [
-            "1D dam break" => "Trixi_1D.md",
-            # "2D dam break" => "Trixi_2D.md",
-        ],
+        "Trixi.jl examples" => "Trixi.md",
         "Reference" => "reference.md",
         "Licence" => "licence.md"
     ],
