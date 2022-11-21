@@ -139,12 +139,12 @@ the Eucledian norm, `P` = `[1 x y]` and `O` = ``3\times 3`` zeros matrix.
 Afterwards the vector `rhs` is filled by setting `z` = `z_hat` and `o` = a vector with three zeros.
 
 Now the system is solved to redeem the vector `coeff`.
-This vector is then used to calculate the smoothed values for `z` and save them in `H_f` by 
+This vector is then used to calculate the smoothed values for `z` and save them in `z_smth` by 
 the following function:
 ```math
 \begin{align*}
-H\_f[i] = &a[1] + a[2]x\_hat[i] + a[3]y\_hat[i] \\
-        + &\sum_{j = 0}^p tps\_base\_func(\|(x\_hat[i], y\_hat[i]) - (x\_hat[j], y\_hat[j]) \|)
+z\_smth[i] = &a[1] + a[2]x\_hat[i] + a[3]y\_hat[i] \\
+        + &\sum_{j = 0}^p w[j] tps\_base\_func(\|(x\_hat[i], y\_hat[i]) - (x\_hat[j], y\_hat[j]) \|)
 \end{align*}
 ```
 here `p` is the number of entries in `z_hat`.
@@ -165,9 +165,9 @@ function calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
   m = length(y)
   p = length(z)
 
-  L   = zeros(p+3, p+3)
-  rhs = zeros(p+3, 1  )
-  H_f = zeros(p  , 1  )
+  L      = zeros(p+3, p+3)
+  rhs    = zeros(p+3, 1  )
+  z_smth = zeros(p  , 1  )
 
   # Fill K part of matrix L
   for i in 1:p
@@ -199,13 +199,13 @@ function calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
 
   # Fill matrix grid with smoothed z values
   for i in 1:p
-    H_f[i] = coeff[p+1] + coeff[p+2]*x_hat[i] + coeff[p+3]*y_hat[i]
+    z_smth[i] = coeff[p+1] + coeff[p+2]*x_hat[i] + coeff[p+3]*y_hat[i]
     p_i    = [x_hat[i], y_hat[i]]
     for k in 1:p
       p_k    = [x_hat[k], y_hat[k]]
-      H_f[i] = H_f[i] + coeff[k] * tps_base_func(norm(p_i .- p_k))
+      z_smth[i] = z_smth[i] + coeff[k] * tps_base_func(norm(p_i .- p_k))
     end
   end
 
-  return transpose(reshape(H_f, (n,m)))
+  return transpose(reshape(z_smth, (n,m)))
 end

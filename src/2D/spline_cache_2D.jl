@@ -5,24 +5,24 @@
 
 # Bilinear B Spline structure
 """
-    BilinearBSpline(x, y, h, Q, IP)
+    BilinearBSpline(x, y, Delta, Q, IP)
 
 Two dimensional bilinear B-spline structure which contains all important attributes to define
 a B-Spline interpolation function. 
 These attributes are:
 - `x`: Vector of values in x-direction
 - `y`: Vector of values in y-direction
-- `h`: Length of one side of a single patch in the given data set. A patch is the area between two 
-       consecutive `x` and `y` values. `h` corresponds to the distance between two consecutive 
-       values in x-direction. As we are only considering Cartesian grids, `h` is equal for all 
-       patches in x and y-direction
+- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between 
+           two consecutive `x` and `y` values. `Delta` corresponds to the distance between two 
+           consecutive values in x-direction. As we are only considering Cartesian grids, `Delta` is 
+           equal for all patches in x and y-direction
 - `Q`: Matrix which contains the control points
 - `IP`: Coefficients matrix
 """
-mutable struct BilinearBSpline{x_type, y_type, h_type, Q_type, IP_type}
+mutable struct BilinearBSpline{x_type, y_type, Delta_type, Q_type, IP_type}
   x::x_type
   y::y_type
-  h::h_type
+  Delta::Delta_type
   Q::Q_type
   IP::IP_type
 end
@@ -58,8 +58,8 @@ First of all the data is sorted which is done by
 [`sort_data`](@ref) to guarantee 
 that the `x` and `y` values are in ascending order with corresponding matrix `z`.
 
-The patch size `h` is calculated by subtracting the second by the first `x` value. This can be done 
-because we only consider equal space between consecutive `x` and `y` values. 
+The patch size `Delta` is calculated by subtracting the second by the first `x` value. This can be 
+done because we only consider equal space between consecutive `x` and `y` values. 
 (A patch is the area between two consecutive `x` and `y` values)
 
 For bilinear B-spline interpolation, the control points `Q` correspond with the `z` values.
@@ -95,7 +95,7 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
     
   x, y, z = sort_data(x,y,z)
 
-  h = x[2] - x[1]
+  Delta = x[2] - x[1]
 
   P = vcat(reshape(z', (m*n,1)))
   IP = [-1 1;
@@ -103,7 +103,7 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
 
   Q = reshape(P, (n, m)) 
 
-  BilinearBSpline(x, y, h, Q, IP)  
+  BilinearBSpline(x, y, Delta, Q, IP)  
 end
 
 # Read from file
@@ -153,24 +153,24 @@ end
 
 # Bicubic B-spline structure
 """
-  BicubicBSpline(x, y, h, Q, IP)
+  BicubicBSpline(x, y, Delta, Q, IP)
 
 Two dimensional cubic B-spline structure which contains all important attributes to define
 a B-Spline interpolation function. 
 These attributes are:
 - `x`: Vector of values in x-direction
 - `y`: Vector of values in y-direction
-- `h`: Length of one side of a single patch in the given data set. A patch is the area between two 
-       consecutive `x` and `y` values. `h` corresponds to the distance between two consecutive 
-       values in x-direction. As we are only considering Cartesian grids, `h` is equal for all 
-       patches in x and y-direction 
+- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between 
+           two consecutive `x` and `y` values. `h` corresponds to the distance between two 
+           consecutive values in x-direction. As we are only considering Cartesian grids, `Delta` 
+           is equal for all patches in x and y-direction 
 - `Q`: Matrix which contains the control points  
 - `IP`: Coefficients matrix
 """
-mutable struct BicubicBSpline{x_type, y_type, h_type, Q_type, IP_type}
+mutable struct BicubicBSpline{x_type, y_type, Delta_type, Q_type, IP_type}
   x::x_type
   y::y_type
-  h::h_type
+  Delta::Delta_type
   Q::Q_type
   IP::IP_type
 end
@@ -210,8 +210,8 @@ First of all the data is sorted which is done by
 [`sort_data`](@ref) to guarantee 
 that the `x` and `y` values are in ascending order with corresponding matrix `z`.
 
-The patch size `h` is calculated by subtracting the second by the first `x` value. This can be done 
-because we only consider equal space between consecutive `x` and `y` values. 
+The patch size `Delta` is calculated by subtracting the second by the first `x` value. This can be 
+done because we only consider equal space between consecutive `x` and `y` values. 
 (A patch is the area between two consecutive `x` and `y` values)
 
 If a `smoothing_factor` ``>`` 0.0 is set, the function [`calc_tps`](@ref) 
@@ -296,7 +296,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
     z = calc_tps(smoothing_factor, x, y, z)
   end
 
-  h = x[2] - x[1]
+  Delta = x[2] - x[1]
   boundary_elmts = 4 + 2*m + 2*n
   inner_elmts = m*n
   P = vcat(reshape(z', (inner_elmts,1)), zeros(boundary_elmts))
@@ -399,7 +399,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
     Q_temp = 36 * (Phi\P)
     Q      = reshape(Q_temp, (n+2, m+2)) 
 
-    BicubicBSpline(x, y, h, Q, IP)
+    BicubicBSpline(x, y, Delta, Q, IP)
 
   ###################################
   ## Not-a-knot boundary condition ##
@@ -523,7 +523,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
     Q_temp = 36 * (Phi\P)
     Q      = reshape(Q_temp, (n+2, m+2)) 
 
-    BicubicBSpline(x, y, h, Q, IP)
+    BicubicBSpline(x, y, Delta, Q, IP)
   else
     @error("Only free and not-a-knot boundary conditions are implemented!")
   end

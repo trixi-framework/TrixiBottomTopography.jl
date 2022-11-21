@@ -38,15 +38,15 @@ function spline_interpolation(b_spline::BilinearBSpline, x, y)
 
   x_vec = b_spline.x
   y_vec = b_spline.y
-  h     = b_spline.h
+  Delta = b_spline.Delta
   Q     = b_spline.Q
   IP    = b_spline.IP
 
   i = max(1, min(searchsortedlast(x_vec, x), length(x_vec) - 1))
   j = max(1, min(searchsortedlast(y_vec, y), length(y_vec) - 1))
 
-  my = (x - x_vec[i])/h
-  ny = (y - y_vec[j])/h
+  my = (x - x_vec[i])/Delta
+  ny = (y - y_vec[j])/Delta
 
   Q_temp = [Q[i, j:(j+1)] Q[(i+1), j:(j+1)]]
 
@@ -105,15 +105,15 @@ function spline_interpolation(b_spline::BicubicBSpline, x, y)
 
   x_vec = b_spline.x
   y_vec = b_spline.y
-  h     = b_spline.h
+  Delta = b_spline.Delta
   Q     = b_spline.Q
   IP    = b_spline.IP
 
   i = max(1, min(searchsortedlast(x_vec, x), length(x_vec) - 1))
   j = max(1, min(searchsortedlast(y_vec, y), length(y_vec) - 1))
 
-  my = (x - x_vec[i])/h
-  ny = (y - y_vec[j])/h
+  my = (x - x_vec[i])/Delta
+  ny = (y - y_vec[j])/Delta
 
   Q_temp = [Q[i, j:(j+3)] Q[(i+1), j:(j+3)] Q[(i+2), j:(j+3)] Q[(i+3), j:(j+3)]]
 

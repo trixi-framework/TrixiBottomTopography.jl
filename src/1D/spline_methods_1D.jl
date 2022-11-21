@@ -41,13 +41,13 @@ A reference for the calculations in this script can be found in Chapter 1 of
 function spline_interpolation(b_spline::LinearBSpline, x)
 
   x_vec = b_spline.x
-  h     = b_spline.h
+  Delta = b_spline.Delta
   Q     = b_spline.Q
   IP    = b_spline.IP
 
   i = max(1, min(searchsortedlast(x_vec, x), length(x_vec)-1))
 
-  kappa_i = (x - x_vec[i])/h
+  kappa_i = (x - x_vec[i])/Delta
 
   c_i1 = [kappa_i, 1]' * IP * Q[i:(i+1)]
 
@@ -95,13 +95,13 @@ A reference for the calculations in this script can be found in Chapter 1 of
 function spline_interpolation(b_spline::CubicBSpline, x)
 
   x_vec = b_spline.x
-  h     = b_spline.h
+  Delta = b_spline.Delta
   Q     = b_spline.Q
   IP    = b_spline.IP
 
   i = max(1, min(searchsortedlast(x_vec, x), length(x_vec) - 1))
 
-  kappa_i = (x - x_vec[i])/h
+  kappa_i = (x - x_vec[i])/Delta
 
   c_i3 = 1/6 * [kappa_i^3, kappa_i^2, kappa_i, 1]' * IP * Q[i:(i+3)]
 

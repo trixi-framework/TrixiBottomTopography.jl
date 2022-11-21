@@ -5,21 +5,22 @@
 
 # Linear B Spline structure
 """
-    LinearBSpline(x, h, Q, IP)
+    LinearBSpline(x, Delta, Q, IP)
 
 One dimensional linear B-spline structure which contains all important attributes to define
 a B-Spline interpolation function. 
 These attributes are:
 - `x`: Vector of values in x-direction
-- `h`: Length of a single patch in the given data set. A patch is the area between two consecutive 
-       `x` values. `h` corresponds to the distance between two consecutive values in x-direction. 
-       As we are only considering Cartesian grids, `h` is equal for all patches
+- `Delta`: Length of a single patch in the given data set. A patch is the area between two 
+           consecutive `x` values. `Delta` corresponds to the distance between two consecutive 
+           values in x-direction. 
+       As we are only considering Cartesian grids, `Delta` is equal for all patches
 - `Q`: Vector which contains the control points
 - `IP`: Coefficients matrix
 """
-mutable struct LinearBSpline{x_type, h_type, Q_type, IP_type}
+mutable struct LinearBSpline{x_type, Delta_type, Q_type, IP_type}
   x::x_type
-  h::h_type
+  Delta::Delta_type
   Q::Q_type
   IP::IP_type
 end
@@ -38,8 +39,8 @@ Linear B-spline interpolation is only possible if we have at least two values in
 First of all the data is sorted which is done by [`sort_data`](@ref) to 
 guarantee that the `x` values are in ascending order.
 
-The patch size `h` is calculated by subtracting the second and first `x` value. This can be done because
-we only consider equally spaced `x` values. 
+The patch size `Delta` is calculated by subtracting the second and first `x` value. This can be 
+done because we only consider equally spaced `x` values. 
 (A patch is the area between two consecutive `x` values)
 
 For linear B-spline interpolation, the control points `Q` correspond with the values in `y`.
@@ -71,14 +72,14 @@ function LinearBSpline(x::Vector, y::Vector)
 
   x,y = sort_data(x,y)
 
-  h = x[2] - x[1]
+  Delta = x[2] - x[1]
 
   IP = [-1 1;
         1 0]
 
   Q = y
 
-  LinearBSpline(x, h, Q, IP)
+  LinearBSpline(x, Delta, Q, IP)
 end
 
 # Read from file
@@ -120,21 +121,22 @@ end
 
 # Cubic B Spline structure 
 """
-    CubicBSpline(x, h, Q, IP)
+    CubicBSpline(x, Delta, Q, IP)
 
 One dimensional cubic B-spline structure which contains all important attributes to define
 a B-Spline interpolation function. Similar to [`LinearBSpline`](@ref) 
 These attributes are:
 - `x`: Vector of values in x-direction
-- `h`: Length of a single patch in the given data set. A patch is the area between two consecutive 
-       `x` values. `h` corresponds to the distance between two consecutive values in x-direction. 
-       As we are only considering Cartesian grids, `h` is equal for all patches
+- `Delta`: Length of a single patch in the given data set. A patch is the area between two 
+           consecutive `x` values. `Delta` corresponds to the distance between two consecutive 
+           values in x-direction. As we are only considering Cartesian grids, `Delta` is equal 
+           for all patches
 - `Q`: Vector which contains the Control points
 - `IP`: Coefficients matrix
 """
-mutable struct CubicBSpline{x_type, h_type, Q_type, IP_type}
+mutable struct CubicBSpline{x_type, Delta_type, Q_type, IP_type}
   x::x_type
-  h::h_type
+  Delta::Delta_type
   Q::Q_type
   IP::IP_type
 end
@@ -153,15 +155,15 @@ The input values are:
                       values. By default this value is set to `0.0` which corresponds to no 
                       smoothing.
 
-First of all the data is sorted which is done by [`sort_data`](@ref) to guarantee that the `x` values
-are in ascending order.
+First of all the data is sorted which is done by [`sort_data`](@ref) to guarantee that the `x` 
+values are in ascending order.
 
-The patch size `h` is calculated by subtracting the second and first `x` value. This can be done because
-we only consider equally spaced `x` values. 
+The patch size `Delta` is calculated by subtracting the second and first `x` value. This can be 
+done because we only consider equally spaced `x` values. 
 (A patch is the area between two consecutive `x` values)
 
-If a `smoothing_factor`  > 0.0 is set, the function [`spline_smoothing`](@ref) calculates new `y` values
-which guarantee a B-Spline with less curvature.
+If a `smoothing_factor`  > 0.0 is set, the function [`spline_smoothing`](@ref) calculates new `y` 
+values which guarantee a B-Spline with less curvature.
 
 The coefficients matrix `IP` for linear B-splines is fixed to be
 ```math
@@ -247,7 +249,7 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
   
   x,y = sort_data(x,y)
 
-  h  = x[2] - x[1]
+  Delta  = x[2] - x[1]
 
   # Consider spline smoothing if required
   if smoothing_factor > 0.0
@@ -273,7 +275,7 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
     Phi_free        = sparse(Phi)
     Q_free = 6 * (Phi_free\P) 
 
-    CubicBSpline(x, h, Q_free, IP)
+    CubicBSpline(x, Delta, Q_free, IP)
 
   # Not-a-knot end condition
   elseif end_condition == "not-a-knot"
@@ -293,7 +295,7 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
 
     Q_knot = 6 * (Phi_knot\P) 
 
-    CubicBSpline(x, h, Q_knot, IP)
+    CubicBSpline(x, Delta, Q_knot, IP)
 
   else
     @error("Only free and not-a-knot conditions are implemented!")
