@@ -253,7 +253,7 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
 
   # Consider spline smoothing if required
   if smoothing_factor > 0.0
-    y = spline_smoothing(smoothing_factor, h, y)
+    y = spline_smoothing(smoothing_factor, Delta, y)
   end
 
   n  = length(x)
