@@ -1,4 +1,4 @@
-# [B-spline interpolation structure](@id Structure)
+# B-spline interpolation structure
 
 Once the underlying data is in the correct format, you can start defining B-spline
 structures which are later used to define the interpolation functions.
