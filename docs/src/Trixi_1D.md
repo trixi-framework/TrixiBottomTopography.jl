@@ -194,4 +194,4 @@ gif(animation, "examples\\plots\\dam_break_1d.gif", fps=10)
 ```
 This is the resulting .gif.
 
-![gif](https://raw.githubusercontent.com/maxbertrand1996/TrixiBottomTopography.jl/main/examples/plots/dam_break_1d.gif)
+![gif](https://user-images.githubusercontent.com/25242486/203405815-dd95f4d9-f9cb-46ce-96a7-aea00bba0cad.gif)
