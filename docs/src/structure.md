@@ -64,19 +64,25 @@ To understand the underlying maths of the smoothing spline procedure, please see
 - Germán Rodríguez (2001),
   [Smoothing and non-parametric regression](https://docplayer.net/6006594-Smoothing-and-non-parametric-regression.html)
 
-In the next chapter, we are going to continue with the presented example.
-
 ## Two dimensional structures
 
-For the one dimensional case, the structures [`BilinearBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline) and [`BicubicBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline) are implemented which contain all relevant values to define bilinear and bicubic B-spline interpolation functions. These are:
+For the two dimensional case, the structures [`BilinearBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline)
+and [`BicubicBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline)
+are implemented which contain all relevant values to define bilinear and bicubic B-spline interpolation functions. These are:
+- `x`: Vector of values in x-direction.
+- `y`: Vector of values in y-direction.
+- `h`: Length of one side of a single patch in the given data set. A patch is the area between two consecutive `x` and `y` values. `h` corresponds to the distance between two consecutive values in x-direction. The implementation only considers Cartesian grids, so `h` is equal for all patches in x and y-direction.
+- `Q`: Matrix which contains the control points.
+- `IP`: Coefficients matrix.
 
-- `x`: Vector of values in x-direction
-- `y`: Vector of values in y-direction
-- `h`: Length of one side of a single patch in the given data set. A patch is the area between two consecutive `x` and `y` values. `h` corresponds to the distance between two consecutive values in x-direction. Only considering Cartesian grids, therefore `h` is equal for all patches in x and y-direction
-- `Q`: Matrix which contains the control points
-- `IP`: Coefficients matrix
-
-To populate the structure, the outer constructor functions [`BilinearBSpline(data_path)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline-Tuple{String}) and [`BicubicBSpline(data_path)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline-Tuple{String}) are imlpemented which use the files in `data_path` to obtain the values which will be stored in the corresponding structure, as well as [`BilinearBSpline(x,y,z)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T}) and [`BicubicBSpline(x,y,z)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T}) which use given vectors `x` and `y` and matrix `z`. `x`, `y` and ``z` are organized in the following form:
+To populate the structure, the outer constructor functions [`BilinearBSpline(data_path)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline-Tuple{String})
+and [`BicubicBSpline(data_path)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline-Tuple{String})
+are implemented. They use the files in `data_path` to obtain the values which will be stored
+in the corresponding structure.
+Further, [`BilinearBSpline(x,y,z)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T})
+and [`BicubicBSpline(x,y,z)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T})
+which use given vectors `x` and `y` and matrix `z`.
+The `x`, `y` and `z` data are organized in the following form:
 
 ```math
 \begin{aligned}
@@ -91,7 +97,10 @@ To populate the structure, the outer constructor functions [`BilinearBSpline(dat
 \end{aligned}
 ```
 
-To get a better idea of the constructor functions, we are taking a look at example [rhine\_data\_bicubic-nak.jl](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/rhine_data_bicubic-nak.jl) of this repo which reads in two dimensional bottom topography data from a `.txt` file and does a bicubic B-spline interpolation with not-a-knot end condition and smoothing of the data.
+To give a better idea of the constructor functions, we consider the example [rhine\_data\_bicubic-nak.jl](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/rhine_data_bicubic-nak.jl) of this repo.
+This example reads in two dimensional bottom topography data from a `.txt` file and
+creates a bicubic B-spline interpolation with not-a-knot end condition
+and smoothing of the data.
 
 ```julia
 # Include packages
@@ -108,12 +117,22 @@ data = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
 spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
 ```
 
-For the bicubic case we can also set the optional parameters `end_condition` which defines (as in the one dimensional case) the end condition of the spline. Again there are  the `not-a-knot` and the `free` end condition implemented. By default, `end_condition` is set to `free`. If you are not familiar with the differences between these end conditions, see Chapter 2 of
-- Quentin Agrapart & Alain Batailly (2020), Cubic and bicubic spline interpolation in Python. [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
+For the bicubic spline we can set the optional parameters `end_condition`, which defines (as in the one dimensional case) the end condition of the spline.
+Again, the available end conditions are the `not-a-knot` and the `free` end condition.
+By default, `end_condition` is set to `free`.
+If you are not familiar with the differences and influence of these end conditions,
+see Chapter 2 of
+- Quentin Agrapart & Alain Batailly (2020), Cubic and bicubic spline interpolation in Python.
+  [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 
-Besides the end condition we can also specify a `smoothing_factor` for the bicubic, which defines a trade-off degree of the cubic B-spline interpolation between goodness of fit and minimizing the curvature by defining new `z` values. This procedure is called **thin plate spline**. There is no general approach which `smoothing_factor` is best suited for the problem and has to be determined via trial and error. To understand the underlying maths, please see:
+Besides the end condition we can also specify a `smoothing_factor` for the bicubic spline.
+Just as in the one dimensional constructor, this smoothing provides a trade-off
+of the bicubic B-spline interpolation between how well the it models (or fits) the
+original topography data and minimizing the curvature of of the spline
+by defining new `z` values.
+This procedure is called **thin plate spline**. There is no general approach which `smoothing_factor` is best suited for the problem and it must be determined via
+trial and error by the user. To understand the underlying maths of the thin plate spline,
+please see:
 - Gianluca Donato and Serge Belongie (2001),
   Approximate Thin Plate Spline Mappings
   [DOI: 10.1007/3-540-47977-5_2](https://link.springer.com/content/pdf/10.1007/3-540-47977-5_2.pdf)
-
-In the next chapter, we are going to continue with the presented example.
