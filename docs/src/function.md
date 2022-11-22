@@ -1,11 +1,13 @@
 # B-spline interpolation function
 
 If the B-spline structure is defined, it can be used to define the B-spline interpolation function.
-In this chapter, we will continue with the examples from the [Structure](@ref) section for the one and two dimensional case.
+In this chapter, we will continue with the examples from the [B-spline structure]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/structure/")
+section for the one and two dimensional case.
 
 ## One dimensional case
 
-In the [Structure](@ref) section we began with the example file
+In the [B-spline structure]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/structure/")
+section we began with the example file
 [rhine\_data\_cubic-nak.jl](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/9f6c7e967a3b094dbfa43688d25a8998fce40014/examples/rhine_data_cubic-nak.jl)
 from the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/9f6c7e967a3b094dbfa43688d25a8998fce40014/examples)
 where we already defined the B-spline structure for the cubic B-spline interpolation with not-a-knot end condition and smoothing.
@@ -68,7 +70,8 @@ gives the following representation:
 
 ## Two dimensional case
 
-In the [Structure](@ref) section we examined the example file
+In the [B-spline structure]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/structure/")
+section we examined the example file
 [rhine\_data\_bicubic-nak.jl](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/rhine_data_bicubic-nak.jl)
 from the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/9f6c7e967a3b094dbfa43688d25a8998fce40014/examples)
 where we already created the B-spline structure for the bicubic B-spline interpolation
