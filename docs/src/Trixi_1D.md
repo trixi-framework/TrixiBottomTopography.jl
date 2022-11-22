@@ -1,28 +1,37 @@
 # One dimensional dam brack
 
-As mentioned in the [Home](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/) section of this documentation, `TrixiBottomTopography.jl` was initially developed as a supplementary package for the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl) to enable the user to use real life geographical data for the bottom topography function of the shallow water equations.
+As mentioned in the [Home](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/)
+section of this documentation, `TrixiBottomTopography.jl` was initially developed as a
+supplementary package for the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
+to enable the user to use real life geographical data for the bottom topography
+function of the shallow water equations.
 
-In this section a one  example is presented which uses the functionalities of `TrixiBottomTopography.jl` with [Trixi.jl](https://github.com/trixi-framework/Trixi.jl) to simulate a dam break problem.
+In this section a one dimensional example is presented which uses the functionalities of
+`TrixiBottomTopography.jl` with [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
+to simulate a dam break problem.
 
 The underlying example file can be found [here](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_1D.jl).
 
-First, all the necessary packages have to be included into the file.
+First, all the necessary packages must be included at the beginning of the file.
 ```julia
 # Include packages
 using TrixiBottomTopography
 using Plots
 using OrdinaryDiffEq
 using Trixi
-``` 
-- `Plots`  is responsible for visualizing the dam break problem 
-- `OrdinaryDiffEq` always has to be added when working with `Trixi`
+```
+- `Plots` is responsible for visualizing the approximate solution of the dam break problem.
+- `OrdinaryDiffEq` always has to be added when working with `Trixi`.
 
-Next up the underlying bottom topography data is downloaded from a gist.
+Next, the underlying bottom topography data is downloaded from a gist.
 ```julia
 # Download one dimensional Rhine bottom data from gist
 Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
 ```
-Then the downloaded data can be used to define the B-spline interpolation function as described in [B-spline structure]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/structure/") and [B-spline function]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/function/"). In this case a cubic B-spline interpolation function with free end condition is chosen.
+The downloaded data is then used to define the B-spline interpolation function as described in
+[B-spline structure]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/structure/")
+and [B-spline function]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/function/").
+In this case a cubic B-spline interpolation function with free end condition is chosen.
 ```julia
 # B-spline interpolation of the underlying data
 spline_struct = CubicBSpline(Rhine_data)
@@ -32,10 +41,15 @@ Now that the B-spline interpolation function is determined, the one dimensional 
 ```julia
 # Defining one dimensional shallow water equations
 equations = ShallowWaterEquations1D(gravity_constant=1.0, H0=55.0)
-``` 
-Here the gravity constant has been chosen to be $1.0$ and the initial total water height $H_0$ has been set to $55.0$.
+```
+Here the gravity constant has been chosen to be $1.0$ and the background
+total water height $H_0$ has been set to $55.0$.
 
-Next up the initial condition for the dam break problem can be defined. At time $t=0$, a part of the water hight in the center of the domain with a diameter of $100$ is set to $60.0$ while the rest of the domain stays at the initial water height $55.0$. Additionally we can see that the bottom topography `b` is defined by the B-spline interpolation function `spline_func` and is set in the inital condition.
+Next the initial condition for the dam break problem can be defined.
+At time $t=0$, a part of the water hight in the center of the domain with a diameter of $100$
+is set to $60.0$ while the rest of the domain stays at the background water height $55.0$.
+Additionally we can see that the bottom topography `b` is defined by the
+B-spline interpolation function `spline_func` and is set in the initial condition.
 ```julia
 # Defining initial condition for the dam break problem
 function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
@@ -52,7 +66,9 @@ function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
   return prim2cons(SVector(H, v, b), equations)
 end
 ```
-Afterwards the initial condition can be set as well as the boundary condition. In this case a reflective wall condition is chosen, which is already implemented in `Trixi.jl` for the one dimensional shallow water equations.
+After the initial condition we can set the boundary conditions.
+In this case a reflective wall condition is chosen, which is already implemented
+in `Trixi.jl` for the one dimensional shallow water equations.
 ```julia
 # Setting initaial condition
 initial_condition = initial_condition_dam_break
@@ -60,9 +76,14 @@ initial_condition = initial_condition_dam_break
 # Setting the boundary to be a reflective wall
 boundary_condition = boundary_condition_slip_wall
 ```
-The upcoming code parts are very `Trixi.jl` specific and will not be covered in full detail. To get a more profound understanding of the routines, please see the [Trixi.jl documentation](https://trixi-framework.github.io/Trixi.jl/stable/).
+The upcoming code parts will not be covered in full detail.
+To get a more profound understanding of the routines, please see the
+[Trixi.jl documentation](https://trixi-framework.github.io/Trixi.jl/stable/).
 
-The following code snippet sets up the DGSEM solver. Here we can be specify which flux functions for the surface and volume fluxes will be taken, as well as the polynomial degree (`polydeg`).
+The following code snippet sets up the discontinous Galerking spectral element method (DGSEM).
+In this solver-type, we can specify which flux functions for the surface and volume fluxes
+will be taken, as well as the polynomial degree (`polydeg`) of the polynomials used
+in the approximation space.
 ```julia
 ###############################################################################
 # Get the DG approximation space
@@ -71,14 +92,20 @@ volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
 solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm_etal),
                volume_integral=VolumeIntegralFluxDifferencing(volume_flux))
 ```
-Afterwards the underlying mesh is specified. In this case a [`TreeMesh`](https://trixi-framework.github.io/Trixi.jl/stable/meshes/tree_mesh/) is chosen, which is a Cartesian mesh. Here the domain borders have to be defined, as well as the number of initial cells ($2$ to the power of `inital_refinement_level`). Also we have to determine if the domain is periodic. Because in this example boundary conditions were defined, the periodicity is set to `false`.
+After the solver comes the specification of the mesh in the approximation.
+In this case a [`TreeMesh`](https://trixi-framework.github.io/Trixi.jl/stable/meshes/tree_mesh/) is chosen, which is a Cartesian mesh.
+Here the domain borders must be defined, as well as the number of initial elements
+($2$ to the power of `inital_refinement_level`).
+Also, we have to indicate if the domain is periodic.
+In this example boundary conditions were defined, thus the periodicity is set to `false`.
 
-If the underlying mesh is set up, a semidiscretization object can be set up calling `SemiDiscretizationHyperbolic` which collects all the building blocks needed to set up the semi discretization:
-- The underlying mesh
-- The set of equations
-- The initial condition
-- The solver (in this case DGSEM)
-- The boundary conditions 
+Once the underlying mesh is constructed, a semidiscretization object can be created
+by calling `SemiDiscretizationHyperbolic`. This collects all the building blocks needed to set up the semi discretization:
+- The underlying mesh.
+- The set of equations.
+- The initial condition.
+- The solver (in this case DGSEM).
+- The boundary conditions.
 ```julia
 ###############################################################################
 # Get the TreeMesh and setup a periodic mesh
@@ -102,7 +129,10 @@ Now an ordinary differential equations object is set up using a specified time r
 tspan = (0.0, 0.0)
 ode = semidiscretize(semi, tspan)
 ```
-The ordinary differential equations object `ode` is solved by the function `sol` which is part of the `OrdinaryDiffEq` package. Here the time stepping method can be specified (in this case `RDPK3SpFSAL49()`) as well as some tolerances which are responsible for an error based time step control. 
+The ordinary differential equations object `ode` is solved by the function `sol`
+which is part of the `OrdinaryDiffEq` package. Here the time stepping method can
+be specified (in this case `RDPK3SpFSAL49()`) as well as some tolerances which
+are responsible for an error based time step control.
 ```julia
 ###############################################################################
 # run the simulation
@@ -111,15 +141,23 @@ The ordinary differential equations object `ode` is solved by the function `sol`
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
             save_everystep=false);
 ```
-At this point the calculations would normally be finished. But to have a nice visualization of the dam break problem, we want to create a .gif file of the solution. To do so, a rather unorthodox approach is chosen. 
+At this point the calculations would normally be finished.
+But to have a nice visualization of the dam break problem, we want to create a .gif
+file of the solution. To do so, a rather unorthodox approach is chosen and outlined below.
 
-Creating a `PlotData1D` object of the solution enables to plot the solution in a nice interpolated way. The only drawback is that we can only plot the final solution and not the interim steps. To get around this, a for loop is started which increases `tspan` by one in every step and performs the ODE calculation again and again. The solutions are saved in the vector `sol_vec`.
+Creating a `PlotData1D` object of the solution enables the user to plot the solution
+in a nice interpolated way. The only drawback is that we can only plot the final solution and
+not the interim steps as the solution evolves. To get around this, a for loop is started which
+increases `tspan` in every time step and performs the ODE calculation over and over again.
+The solutions are saved in the vector `sol_vec`.
 
-Although this seems a bit overkill, the calculation is actually so fast that this does not have a huge impact on the overall calculation time, as the longest part is taken up by creating the .gif file from the solutions vector.
+Although this seems a bit overkill, the calculations in one spatial dimension are actually
+so fast that this does not have a huge impact on the overall calculation time.
+In fact, the longest part is taken up by creating the .gif file from the solutions vector.
 
 ```julia
 pd = PlotData1D(sol)
-      
+
 sol_vec = [pd]
 
 # Run for t = 1,...,100
@@ -139,11 +177,11 @@ for i = 1:100
               save_everystep=false);
 
   local pd = PlotData1D(sol)
-  
+
   append!(sol_vec, [pd])
 end
 ```
-From the variable `sol_vec`, the .gif fiile can be created using the macro `@animate`.
+From the variable `sol_vec`, the .gif file can be created using the macro `@animate`.
 ```julia
 # Create .gif animation of the solution
 pyplot()
