@@ -103,7 +103,7 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
 
   Q = reshape(P, (n, m))
 
-  BilinearBSpline(x, y, h, Q, IP)
+  BilinearBSpline(x, y, Delta, Q, IP)
 end
 
 # Read from file
