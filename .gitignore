@@ -2,3 +2,5 @@ Manifest.toml
 thesis/
 out/
 solution_*
+*.png
+*.gif
