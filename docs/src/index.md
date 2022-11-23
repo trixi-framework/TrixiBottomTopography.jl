@@ -43,7 +43,7 @@ A detailed description of these functionalities can be found on the following pa
 Some examples which use the implemented functionalities, see the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/main/examples) of this repository.
 
 ## Authors
-TrixiBottomTopography.jl was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany).
+TrixiBottomTopography.jl was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [](https://lakemper.eu/) (RWTH Aachen University, Germany).
 
 ## License and contributing
 TrixiBottomTopography.jl is published under the MIT license (see [License](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/licence/)).

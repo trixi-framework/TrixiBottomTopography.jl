@@ -312,7 +312,7 @@ The input values are:
 - `end_condition`: String which can either be `free` or `not-a-knot` and defines which
                    end condition should be considered.
                    By default this is set to `free`
-- `smoothing_factor`: Float64 ``\geq`` 0.0 which specifies the degree of smoothing of the `y` values.
+- `smoothing_factor`: Float64 ``\\geq`` 0.0 which specifies the degree of smoothing of the `y` values.
                       By default this value is set to `0.0` which corresponds to no smoothing.
 
 The .txt file has to have the following structure to be interpreted by this function:
