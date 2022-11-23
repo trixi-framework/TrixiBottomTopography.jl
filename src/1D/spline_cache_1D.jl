@@ -11,9 +11,10 @@ One dimensional linear B-spline structure which contains all important attribute
 a B-Spline interpolation function.
 These attributes are:
 - `x`: Vector of values in x-direction
-- `h`: Length of a single patch in the given data set. A patch is the area between two consecutive
-       `x` values. The value `h` corresponds to the distance between two consecutive values in x-direction.
-       As we are only considering Cartesian grids, `h` is equal for all patches
+- `Delta`: Length of a single patch in the given data set. A patch is the area between two 
+           consecutive `x` values. The value `Delta` corresponds to the distance between two 
+           consecutive values in x-direction. As we are only considering Cartesian grids, 
+           `Delta` is equal for all patches
 - `Q`: Vector which contains the control points
 - `IP`: Coefficients matrix
 """
@@ -38,7 +39,7 @@ Linear B-spline interpolation is only possible if the data set has at least two 
 First the data is sorted via [`sort_data`](@ref) to
 guarantee that the `x` values are in ascending order.
 
-The patch size `h` is calculated by subtracting the second and first `x` values.
+The patch size `Delta` is calculated by subtracting the second and first `x` values.
 This can be done because we only consider equally spaced `x` values.
 A patch is the area between two consecutive `x` values.
 
@@ -126,9 +127,10 @@ One dimensional cubic B-spline structure that contains all important attributes 
 a B-Spline interpolation function. Similar to [`LinearBSpline`](@ref)
 These attributes are:
 - `x`: Vector of values in x-direction
-- `h`: Length of a single patch in the given data set. A patch is the area between two consecutive
-       `x` values. The value `h` corresponds to the distance between two consecutive values in x-direction.
-       As we are only considering Cartesian grids, `h` is equal for all patches
+- `Delta`: Length of a single patch in the given data set. A patch is the area between two 
+           consecutive `x` values. The value `Delta` corresponds to the distance between two 
+           consecutive values in x-direction. As we are only considering Cartesian grids, `Delta` 
+           is equal for all patches
 - `Q`: Vector which contains the Control points
 - `IP`: Coefficients matrix
 """
@@ -156,8 +158,8 @@ The input values are:
 First the data is sorted via [`sort_data`](@ref) to guarantee that the `x` values
 are in ascending order.
 
-The patch size `h` is calculated by subtracting the second and first `x` value. This can be done because
-we only consider equally spaced `x` values.
+The patch size `Delta` is calculated by subtracting the second and first `x` value. This can be done 
+because we only consider equally spaced `x` values.
 (A patch is the area between two consecutive `x` values)
 
 If a `smoothing_factor` > 0.0 is set, the function [`spline_smoothing`](@ref) calculates new `y` values

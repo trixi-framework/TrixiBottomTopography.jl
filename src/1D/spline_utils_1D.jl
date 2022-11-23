@@ -27,7 +27,7 @@ end
 
 The inputs to this function are:
 - `lambda`: Smoothing factor which specifies the degree of the smoothing that should take place
-- `h`: Step size of a patch (A patch is the area between two consecutive `x` values)
+- `Delta`: Step size of a patch (A patch is the area between two consecutive `x` values)
 - `y`: Data values to be smoothed
 
 The goal is to find a new interpolation values ``\hat{y}`` for ``y``, so that for given ``\lambda``,
@@ -76,14 +76,14 @@ function spline_smoothing(lambda::Number, Delta::Number, y::Vector)
 
   Delta_vec = repeat([Delta], n-2)
 
-  Delta_ii   =  1 ./ h_vec
-  Delta_iip1 = -2 ./ h_vec
-  Delta_iip2 =  1 ./ h_vec
-
-  Delta             =  zeros(n-2, n)
-  Delta[:, 1:(n-2)] =  diagm(Delta_ii)
-  Delta[:, 2:(n-1)] += diagm(Delta_iip1)
-  Delta[:, 3: n   ] += diagm(Delta_iip2)
+  Delta_2_ii   =  1 ./ Delta_vec
+  Delta_2_iip1 = -2 ./ Delta_vec
+  Delta_2_iip2 =  1 ./ Delta_vec
+  
+  Delta_2             =  zeros(n-2, n)
+  Delta_2[:, 1:(n-2)] =  diagm(Delta_2_ii)
+  Delta_2[:, 2:(n-1)] += diagm(Delta_2_iip1)
+  Delta_2[:, 3: n   ] += diagm(Delta_2_iip2)
 
   W_im1i =  Delta_vec[1:end-1] ./ 6
   W_ii   = (2*Delta_vec) ./ 3
@@ -93,3 +93,4 @@ function spline_smoothing(lambda::Number, Delta::Number, y::Vector)
 
   return inv(diagm(ones(n)) + lambda*K) * y
 end
+

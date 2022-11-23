@@ -11,9 +11,9 @@ are available. They contain all relevant values to define linear and cubic B-spl
 interpolation functions corresponding to linear and cubic B-spline interpolation.
 These are:
 - `x`: A vector of values in x-direction.
-- `h`: The length of a single patch in the given data set. A patch is the area between two consecutive
-       `x` values. `h` corresponds to the distance between two consecutive values in x-direction.
-       As we are only considering Cartesian grids, `h` is equal for all patches.
+- `Delta`: The length of a single patch in the given data set. A patch is the area between two consecutive
+           `x` values. `Delta` corresponds to the distance between two consecutive values in x-direction.
+           As we are only considering Cartesian grids, `Delta` is equal for all patches.
 - `Q`: A vector which contains the control points.
 - `IP`: The coefficients matrix.
 
@@ -72,7 +72,7 @@ and [`BicubicBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.j
 are implemented which contain all relevant values to define bilinear and bicubic B-spline interpolation functions. These are:
 - `x`: Vector of values in x-direction.
 - `y`: Vector of values in y-direction.
-- `h`: Length of one side of a single patch in the given data set. A patch is the area between two consecutive `x` and `y` values. `h` corresponds to the distance between two consecutive values in x-direction. The implementation only considers Cartesian grids, so `h` is equal for all patches in x and y-direction.
+- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between two consecutive `x` and `y` values. `Delta` corresponds to the distance between two consecutive values in x-direction. The implementation only considers Cartesian grids, so `Delta` is equal for all patches in x and y-direction.
 - `Q`: Matrix which contains the control points.
 - `IP`: Coefficients matrix.
 
