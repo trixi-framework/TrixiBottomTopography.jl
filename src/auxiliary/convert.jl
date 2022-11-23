@@ -8,20 +8,19 @@ data files into one dimensional readable files.
 
 Inputs:
 - `path_read`: String of the path of the DGM data which should be converted
-- `path_write`: String of the path where the new file shuold be saved. 
+- `path_write`: String of the path where the new file shuold be saved.
               (Needs to also include the name of the file)
-- `excerpt`: Optional integer that specifies which portion of the data should be written down. E.g. 
-           if excerpt is set to 10, only every 10th `x` and `y` value are considered with their 
-           corresponsing `z` values. The default value is 1 which means that every value is written 
-           down.
-- `direction`: Optional String which specifies if the one dimensional data should be read from the 
-             `x` or `y` direction. By default this is set to the `x` direction
+- `excerpt`: Optional integer that specifies a stride through of the data that will be extracted. E.g.
+           if excerpt is set to 10, only every 10th `x` and `y` value are considered with their
+           corresponsing `z` values. The default value is 1 which means that every value is taken.
+- `direction`: Optional String that specifies if the one dimensional data should be read from the
+             `x` or `y` direction. By default this is set to the `x` direction.
 - `section`: Optional interger which can be between 1 and 1000 and soecifies which section of the
-           other dimension should be chosen. By default this values is set to 1 which means 
+           other dimension should be chosen. By default this values is set to 1 which means
            that if direction is set to `x`, the corresponding `z` values are taken with respect to the
-           first `y` value. 
+           first `y` value.
 """
-function convert_dgm_1d(path_read::String, path_write::String; 
+function convert_dgm_1d(path_read::String, path_write::String;
                         excerpt = 1, direction = "x", section = 1)
 
   # Check if section has an accepted value
@@ -40,14 +39,14 @@ function convert_dgm_1d(path_read::String, path_write::String;
 
   if direction == "x"
 
-    # Create interim vectors which save all x and z values 
-    # accordingly 
+    # Create interim vectors which save all x and z values
+    # accordingly
     x_all = zeros(length_data)
     z_all = zeros(length_data)
 
     # Save the values in the corresponding vectors
     for i in 1:length_data
-    
+
       line = split(data[i], " ")
 
       x_all[i] = parse(Float64, line[1])
@@ -61,14 +60,14 @@ function convert_dgm_1d(path_read::String, path_write::String;
 
   elseif direction == "y"
 
-    # Create interim vectors which save all x and z values 
-    # accordingly 
+    # Create interim vectors which save all x and z values
+    # accordingly
     y_all = zeros(length_data)
     z_all = zeros(length_data)
 
     # Save the values in the corresponding vectors
     for i in 1:length_data
-    
+
       line = split(data[i], " ")
 
       y_all[i] = parse(Float64, line[2])
@@ -124,12 +123,11 @@ data files into two dimensional readable files.
 
 Inputs:
 - `path_read`: String of the path of the DGM data which should be converted
-- `path_write`: String of the path where the new file shuold be saved. 
+- `path_write`: String of the path where the new file shuold be saved.
               (Needs to also include the name of the file)
-- `excerpt`: Optional integer that specifies which portion of the data should be written down. E.g. 
-           if excerpt is set to 10, only every 10th `x` and `y` value are considered with their 
-           corresponsing `z` values. The default value is 1 which means that every value is written 
-           down.
+- `excerpt`: Optional integer that specifies a stride through of the data that will be extracted. E.g.
+           if excerpt is set to 10, only every 10th `x` and `y` value are considered with their
+           corresponsing `z` values. The default value is 1 which means that every value is taken.
 """
 function convert_dgm_2d(path_read::String, path_write::String; excerpt = 1)
 
@@ -142,14 +140,14 @@ function convert_dgm_2d(path_read::String, path_write::String; excerpt = 1)
   length_data    = length(data)
   dimension_data = Int(sqrt(length_data))
 
-  # Create interim vectors which save all x, y and z values accordingly 
+  # Create interim vectors which save all x, y and z values accordingly
   x_all = zeros(length_data)
   y_all = zeros(length_data)
   z_all = zeros(length_data)
 
   # Save the values in the corresponding vectors
   for i in 1:length_data
-    
+
     line = split(data[i], " ")
 
     x_all[i] = parse(Float64, line[1])
@@ -162,7 +160,7 @@ function convert_dgm_2d(path_read::String, path_write::String; excerpt = 1)
   x_uniq = x_all[1:excerpt:dimension_data]
   y_uniq = y_all[1:(excerpt*dimension_data):length_data]
   z_uniq = reshape(z_all, (dimension_data, dimension_data)
-                  )[1:excerpt:dimension_data, 
+                  )[1:excerpt:dimension_data,
                     1:excerpt:dimension_data]
 
   # Write the data to the file
