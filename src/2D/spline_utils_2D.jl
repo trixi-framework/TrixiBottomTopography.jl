@@ -1,7 +1,7 @@
 
-##################################################
-### Help functions for 2D spline interpolation ###
-##################################################
+####################################################
+### Helper functions for 2D spline interpolation ###
+####################################################
 
 # Sort data so that x and y values are ascending and that the matrix z contains
 # the corresponding values.
@@ -9,9 +9,9 @@
     sort_data(x::Vector, y::Vector, z::Matrix)
 
 This function sorts the inputs vectors `x` and `y` in a ascending order
-and also reorders the input matrix `z` accordingly. 
+and also reorders the input matrix `z` accordingly.
 
-Therefore first the `x` values are sorted with the matrix `z` accordingly and
+Therefore, first the `x` values are sorted with the matrix `z` accordingly and
 afterwards the `y` values are sorted with the matrix `z` accordingly.
 
 The sorted `x`, `y` and `z` values are returned.
@@ -31,7 +31,7 @@ function sort_data(x::Vector, y::Vector, z::Matrix)
 
   y_sorted = sorted_data_y[:,1]
   z_sorted = sorted_data_y[:,2:end]
-  
+
   return x_sorted, y_sorted, Matrix(z_sorted)
 end
 
@@ -56,7 +56,7 @@ function tps_base_func(r::Number)
   else
     return r*r*log(r)
   end
-    
+
 end
 
 # restructure input data to be able to use the thin plate spline functionality
@@ -66,7 +66,7 @@ end
 This function restructures the input values
 - `x`: a vector with `n` values in x-direction
 - `y`: a vector with `m` values in y-direction
-- `z`: a  `m` ``\times`` `n` matrix with values in z-direction where the values of `z` correspond 
+- `z`: a  `m` ``\times`` `n` matrix with values in z-direction where the values of `z` correspond
        to the indexing `(y,x)`
 
 The output is of the following form:
@@ -89,7 +89,7 @@ function restructure_data(x::Vector, y::Vector, z::Matrix)
 
   x_mat = repeat(x, 1, length(y))
   y_mat = repeat(y, 1, length(x))
-  
+
   p = length(z)
 
   x_vec = vec(reshape(x_mat , (p, 1)))
@@ -99,19 +99,19 @@ function restructure_data(x::Vector, y::Vector, z::Matrix)
   return [x_vec y_vec z_vec]
 end
 
-# Thin plate spline approximation  
+# Thin plate spline approximation
 @doc raw"""
     calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
 
 The inputs to this function are:
-- `lambda`: a smoothing factor which specifies the degree of the smoothing that should take place
-- `x`: a vector of `x` values 
-- `y`: a vector of `x` values
-- `z`: a matrix with the `z` values to be smoothed where the values of `z` correspond to the
+- `lambda`: Smoothing factor which specifies the degree of the smoothing that should take place
+- `x`: Vector of `x` values
+- `y`: Vector of `x` values
+- `z`: Matrix with the `z` values to be smoothed where the values of `z` correspond to the
        indexing `(y,x)`
 
 This function uses the thin plate spline approach to perform the smoothing.
-To do so the following linear equations system has to be solved for `coeff`:
+To do so, the following linear equations system has to be solved for `coeff`:
 ```math
 \begin{aligned}
 		\underbrace{
@@ -129,17 +129,17 @@ To do so the following linear equations system has to be solved for `coeff`:
 		\end{bmatrix}}_{\text{:= rhs}}
 \end{aligned}
 ```
-First of all the inputs are restructured using the function [`restructure_data`](@ref) and
+First, the inputs are restructured using the function [`restructure_data`](@ref) and
 saved in the variables `x_hat`, `y_hat` and `z_hat`.
 
-Then the matrix `L` can be filled by setting 
-`K` = [`tps_base_func`](@ref)`(||(x_hat[i], y_hat[i]) - (x_hat[j], y_hat[j])||)` where `|| ||` is 
+Then the matrix `L` can be filled by setting
+`K` = [`tps_base_func`](@ref)`(||(x_hat[i], y_hat[i]) - (x_hat[j], y_hat[j])||)` where `|| ||` is
 the Eucledian norm, `P` = `[1 x y]` and `O` = ``3\times 3`` zeros matrix.
 
 Afterwards the vector `rhs` is filled by setting `z` = `z_hat` and `o` = a vector with three zeros.
 
 Now the system is solved to redeem the vector `coeff`.
-This vector is then used to calculate the smoothed values for `z` and save them in `H_f` by 
+This vector is then used to calculate the smoothed values for `z` and save them in `H_f` by
 the following function:
 ```math
 \begin{align*}
@@ -182,7 +182,7 @@ function calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
 
   # Fill rest of matrix L
   L[1:p,1:p] = L[1:p,1:p] + lambda * diagm(ones(p))
-  
+
   L[1:p,p+1] = ones(p)
   L[1:p,p+2] = x_hat
   L[1:p,p+3] = y_hat
