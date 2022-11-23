@@ -54,6 +54,6 @@ z_int_pts = fill_sol_mat(spline_func, x_int_pts, y_int_pts)
 # Plotting
 pyplot()
 surface(x_int_pts, y_int_pts, z_int_pts, camera=(-30,30),
-        xlabel="ETRS89\n East", ylabel="ETRS89\n North", zlabel="DHHN2016\n Height", 
+        xlabel="E", ylabel="N", zlabel="H", 
         label="Bottom topography", 
         title="Bilinear B-spline interpolation")

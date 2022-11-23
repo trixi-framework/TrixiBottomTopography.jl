@@ -31,4 +31,4 @@ pyplot()
 plot(x_int_pts, y_int_pts,
      xlabel="ETRS89 East", ylabel="DHHN2016 Height",
      label="Bottom topography", 
-     title="Cubic B-spline interpolation with not-a-knot end condition and smoothing")
+     title="Cubic B-spline interpolation\nwith not-a-knot end condition and smoothing")

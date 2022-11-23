@@ -131,7 +131,7 @@ gif(animation, "examples\\plots\\dam_break_1d.gif", fps=15)
 ```
 This is the resulting .gif animation.
 
-![gif](https://raw.githubusercontent.com/maxbertrand1996/TrixiBottomTopography.jl/main/examples/plots/dam_break_1d.gif)
+![gif](https://user-images.githubusercontent.com/101979498/203507054-2faca609-2628-4fea-9a4c-5788d02a237b.gif)
 
 ## Two dimensional dam break
 
@@ -247,6 +247,6 @@ gif(animation, "examples\\plots\\dam_break_2d.gif", fps=15)
 
 This is the resulting .gif animation.
 
-![gif](https://raw.githubusercontent.com/maxbertrand1996/TrixiBottomTopography.jl/main/examples/plots/dam_break_2d.gif)
+![gif](https://user-images.githubusercontent.com/101979498/203507057-f4fa5ef2-e852-493d-8df6-497c1e2a9a51.gif)
 
 For the bottom topography the boundaries of the domain look a bit weird. The reason for that is a bug in `PlotData2D` of `Trixi.jl`. Once this has been addressed, the plotted bottom topography will have a similar look to the one in [the previous section](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).

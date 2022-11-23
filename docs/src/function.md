@@ -55,7 +55,7 @@ plot(x_int_pts, y_int_pts,
 
 gives the following representation:
 
-![image](https://raw.githubusercontent.com/maxbertrand1996/TrixiBottomTopography.jl/main/assets/images/Cubic_nak_smth.png)
+![image](https://user-images.githubusercontent.com/101979498/203507053-6699ae13-3a72-4410-8388-92b2e95c21e1.png)
 
 ## Two dimensional case
 
@@ -140,4 +140,4 @@ surface(x_int_pts, y_int_pts, z_int_pts, camera=(-30,30),
 
 gives the following representation:
 
-![image](https://raw.githubusercontent.com/maxbertrand1996/TrixiBottomTopography.jl/main/assets/images/Bicubic_nak_smth.png)
+![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)

@@ -1,7 +1,8 @@
 using TrixiBottomTopography
+using Downloads: download
 
 # Define file paths
-path_src_file = "data/dgm1_32_357_5646_1_nw.xyz"
+path_src_file = download("https://gist.githubusercontent.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5/raw/f09b43f604adf9e2cfb45a7d998418f1e72f251d/dgm1_32_357_5646_1_nw.xyz")
 path_out_file_1d_1_x_1 = "data/rhine_1d_1_x_1.txt"
 path_out_file_1d_1_y_1 = "data/rhine_1d_1_y_1.txt"
 path_out_file_1d_1_x_100 = "data/rhine_1d_1_x_100.txt"
