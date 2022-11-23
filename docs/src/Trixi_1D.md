@@ -194,4 +194,4 @@ gif(animation, "examples\\plots\\dam_break_1d.gif", fps=10)
 ```
 This is the resulting .gif.
 
-![gif](https://user-images.githubusercontent.com/25242486/203405815-dd95f4d9-f9cb-46ce-96a7-aea00bba0cad.gif)
+![gif](https://user-images.githubusercontent.com/101979498/203507054-2faca609-2628-4fea-9a4c-5788d02a237b.gif)

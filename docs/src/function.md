@@ -66,7 +66,7 @@ plot(x_int_pts, y_int_pts,
 
 gives the following representation:
 
-![image](https://user-images.githubusercontent.com/25242486/203404950-ea7ce46c-94d0-4e2b-9784-8f443f9c9f5e.png)
+![image](https://user-images.githubusercontent.com/101979498/203507053-6699ae13-3a72-4410-8388-92b2e95c21e1.png)
 
 ## Two dimensional case
 
@@ -162,4 +162,4 @@ surface(x_int_pts, y_int_pts, z_int_pts, camera=(-30,30),
 
 gives the following representation:
 
-![image](https://user-images.githubusercontent.com/25242486/203404936-9496f739-62b1-444a-8c00-2f98a38bb297.png)
+![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)
