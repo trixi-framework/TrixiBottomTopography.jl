@@ -5,9 +5,9 @@ If you have the underlying data in the correct format, you can start defining B-
 
 For the one dimensional case, the structures [`LinearBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.LinearBSpline) and [`CubicBspline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline) are implemented which contain all relevant values to define linear and cubic B-spline interpolation functions corresponding to linear and cubic B-spline interpolation. These are:
 - `x`: A vector of values in x-direction
-- `h`: The length of a single patch in the given data set. A patch is the area between two consecutive 
-       `x` values. `h` corresponds to the distance between two consecutive values in x-direction. 
-       As we are only considering Cartesian grids, `h` is equal for all patches
+- `Delta`: The length of a single patch in the given data set. A patch is the area between two consecutive 
+       `x` values. `Delta` corresponds to the distance between two consecutive values in x-direction. 
+       As we are only considering Cartesian grids, `Delts` is equal for all patches
 - `Q`: A vector which contains the control points
 - `IP`: The coefficients matrix
 
@@ -45,7 +45,7 @@ For the one dimensional case, the structures [`BilinearBSpline`](https://maxbert
 
 - `x`: Vector of values in x-direction
 - `y`: Vector of values in y-direction
-- `h`: Length of one side of a single patch in the given data set. A patch is the area between two consecutive `x` and `y` values. `h` corresponds to the distance between two consecutive values in x-direction. Only considering Cartesian grids, therefore `h` is equal for all patches in x and y-direction
+- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between two consecutive `x` and `y` values. `Delta` corresponds to the distance between two consecutive values in x-direction. Only considering Cartesian grids, therefore `Delta` is equal for all patches in x and y-direction
 - `Q`: Matrix which contains the control points
 - `IP`: Coefficients matrix
 
