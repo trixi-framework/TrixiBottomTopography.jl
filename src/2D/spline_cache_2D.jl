@@ -7,15 +7,15 @@
 """
     BilinearBSpline(x, y, Delta, Q, IP)
 
-Two dimensional bilinear B-spline structure which contains all important attributes to define
-a B-Spline interpolation function. 
+Two dimensional bilinear B-spline structure that contains all important attributes to define
+a B-Spline interpolation function.
 These attributes are:
 - `x`: Vector of values in x-direction
 - `y`: Vector of values in y-direction
-- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between 
-           two consecutive `x` and `y` values. `Delta` corresponds to the distance between two 
-           consecutive values in x-direction. As we are only considering Cartesian grids, `Delta` is 
-           equal for all patches in x and y-direction
+- `h`: Length of one side of a single patch in the given data set. A patch is the area between two
+       consecutive `x` and `y` values. The value `h` corresponds to the distance between two consecutive
+       values in x-direction. As we are only considering Cartesian grids, `h` is equal for all
+       patches in x and y-direction
 - `Q`: Matrix which contains the control points
 - `IP`: Coefficients matrix
 """
@@ -33,10 +33,10 @@ end
 
 This function calculates the inputs for the structure [`BilinearBSpline`](@ref).
 The input values are:
-- `x`: A vector which contains equally spaced values in x-direction
-- `y`: A vector which contains equally spaced values in y-direction where the spacing between the
+- `x`: Vector that contains equally spaced values in x-direction
+- `y`: Vector that contains equally spaced values in y-direction where the spacing between the
        y-values has to be the same as the spacing between the x-values
-- `z`: A matrix which contains the corresponding values in z-direction.
+- `z`: Matrix that contains the corresponding values in z-direction.
        Where the values are ordered in the following way:
 ```math
 \begin{aligned}
@@ -50,17 +50,17 @@ The input values are:
   \end{matrix}
 \end{aligned}
 ```
-Bilinear B-spline interpolation is only possible if we have at least two values in `x` 
+Bilinear B-spline interpolation is only possible if we have at least two values in `x`
 and two values in `y` and the dimensions of vectors `x` and `y` correspond with the dimensions
 of the matrix `z`.
 
-First of all the data is sorted which is done by 
-[`sort_data`](@ref) to guarantee 
+First of all the data is sorted which is done by
+[`sort_data`](@ref) to guarantee
 that the `x` and `y` values are in ascending order with corresponding matrix `z`.
 
-The patch size `Delta` is calculated by subtracting the second by the first `x` value. This can be 
-done because we only consider equal space between consecutive `x` and `y` values. 
-(A patch is the area between two consecutive `x` and `y` values)
+The patch size `h` is calculated by subtracting the second by the first `x` value. This can be done
+because we only consider equal space between consecutive `x` and `y` values.
+A patch is the area between two consecutive `x` and `y` values.
 
 For bilinear B-spline interpolation, the control points `Q` correspond with the `z` values.
 
@@ -76,7 +76,7 @@ The coefficients matrix `IP` for bilinear B-splines is fixed to be
 
 A reference for the calculations in this script can be found in Chapter 2 of
 -  Quentin Agrapart & Alain Batailly (2020),
-   Cubic and bicubic spline interpolation in Python. 
+   Cubic and bicubic spline interpolation in Python.
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
@@ -92,7 +92,7 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
     @error("To perform bilinear B-spline interpolation, we need x and y vectors which
             contain at least 2 values each.")
   end
-    
+
   x, y, z = sort_data(x,y,z)
 
   Delta = x[2] - x[1]
@@ -101,17 +101,17 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
   IP = [-1 1;
          1 0];
 
-  Q = reshape(P, (n, m)) 
+  Q = reshape(P, (n, m))
 
-  BilinearBSpline(x, y, Delta, Q, IP)  
+  BilinearBSpline(x, y, h, Q, IP)
 end
 
 # Read from file
 """
     BilinearBSpline(path::String)
 
-A function which reads in the `x`, `y` and `z` values for 
-[`BilinearBSpline`](@ref) from a .txt 
+A function which reads in the `x`, `y` and `z` values for
+[`BilinearBSpline`](@ref) from a .txt
 file. The input values are:
 - `path`: String of a path of the specific .txt file
 
@@ -137,7 +137,7 @@ function BilinearBSpline(path::String)
 
   n = parse(Int64, lines[2])
   m = parse(Int64, lines[4])
-  
+
   x     = [parse(Float64, val) for val in lines[6:5+n]]
   y     = [parse(Float64, val) for val in lines[(7+n):(6+n+m)]]
   z_tmp = [parse(Float64, val) for val in lines[(8+n+m):end]]
@@ -155,16 +155,16 @@ end
 """
   BicubicBSpline(x, y, Delta, Q, IP)
 
-Two dimensional cubic B-spline structure which contains all important attributes to define
-a B-Spline interpolation function. 
+Two dimensional cubic B-spline structure that contains all important attributes to define
+a B-Spline interpolation function.
 These attributes are:
 - `x`: Vector of values in x-direction
 - `y`: Vector of values in y-direction
-- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between 
-           two consecutive `x` and `y` values. `h` corresponds to the distance between two 
-           consecutive values in x-direction. As we are only considering Cartesian grids, `Delta` 
-           is equal for all patches in x and y-direction 
-- `Q`: Matrix which contains the control points  
+- `h`: Length of one side of a single patch in the given data set. A patch is the area between two
+       consecutive `x` and `y` values. The value `h` corresponds to the distance between two consecutive
+       values in x-direction. As we are only considering Cartesian grids, `h` is equal for all
+       patches in x and y-direction
+- `Q`: Matrix which contains the control points
 - `IP`: Coefficients matrix
 """
 mutable struct BicubicBSpline{x_type, y_type, Delta_type, Q_type, IP_type}
@@ -181,10 +181,10 @@ end
 
 This function calculates the inputs for the structure [`BicubicBSpline`](@ref).
 The input values are:
-- `x`: A vector which contains equally spaced values in x-direction
-- `y`: A vector which contains equally spaced values in y-direction where the spacing between the
+- `x`: Vector that contains equally spaced values in x-direction
+- `y`: Vector that contains equally spaced values in y-direction where the spacing between the
        y-values has to be the same as the spacing between the x-values
-- `z`: A matrix which contains the corresponding values in z-direction.
+- `z`: Matrix that contains the corresponding values in z-direction.
        Where the values are ordered in the following way:
 ```math
 \begin{aligned}
@@ -198,24 +198,23 @@ The input values are:
   \end{matrix}
 \end{aligned}
 ```
-- `end_condition`: a string which can either be `free` or `not-a-knot` and defines which 
-                   end condition should be considered. By default this is set to `free`.
+- `end_condition`: a string which can either be "free" or "not-a-knot" and defines which
+                   end condition should be considered. By default this is set to "free".
 - `smoothing_factor`: a Float64 ``\geq`` 0.0 which specifies the degree of smoothing of the `z` values.
                       By default this value is set to 0.0 which corresponds to no smoothing.
 
-Bicubic B-spline interpolation is only possible if the dimensions of vectors `x` and `y` correspond 
+Bicubic B-spline interpolation is only possible if the dimensions of vectors `x` and `y` correspond
 with the dimensions of the matrix `z`.
 
-First of all the data is sorted which is done by 
-[`sort_data`](@ref) to guarantee 
+First, the data is sorted via [`sort_data`](@ref) to guarantee
 that the `x` and `y` values are in ascending order with corresponding matrix `z`.
 
-The patch size `Delta` is calculated by subtracting the second by the first `x` value. This can be 
-done because we only consider equal space between consecutive `x` and `y` values. 
-(A patch is the area between two consecutive `x` and `y` values)
+The patch size `h` is calculated by subtracting the second by the first `x` value. This can be done
+because we only consider equal space between consecutive `x` and `y` values.
+A patch is the area between two consecutive `x` and `y` values.
 
-If a `smoothing_factor` ``>`` 0.0 is set, the function [`calc_tps`](@ref) 
-calculates new values for `z` which guarantee a resulting parametric B-spline surface 
+If a `smoothing_factor` ``>`` 0.0 is set, the function [`calc_tps`](@ref)
+calculates new values for `z` which guarantee a resulting parametric B-spline surface
 with less curvature.
 
 The coefficients matrix `IP` for bicubic B-splines is fixed to be
@@ -231,30 +230,30 @@ The coefficients matrix `IP` for bicubic B-splines is fixed to be
 ```
 To get the matrix of control points `Q` which is necessary to set up an interpolation function,
 we need to define a matrix `Phi` which maps the control points to a vector `P`. This can be done
-by solving the following linear equations system for `Q`.
+by solving the following system of linear equations for `Q`.
 ```math
 \underbrace{
   \begin{bmatrix}
     z_{1,1} \\ z_{1,2} \\ \vdots \\ z_{1,n} \\ z_{2,1} \\ \vdots \\ z_{m,n} \\ 0 \\ \vdots \\ 0
   \end{bmatrix}
   }_{\text{:=P} \in \mathbb{R}^{(m+2)(n+2)\times 1}} = \frac{1}{36}
-  \Phi \cdot 
+  \Phi \cdot
   \underbrace{\begin{bmatrix}
     Q_{1,1} \\ Q_{1,2} \\ \vdots \\ Q_{1,n+2} \\ Q_{2,1} \\ \vdots \\ Q_{m+2,n+2}
   \end{bmatrix}}_{\text{:= Q} \in \mathbb{R}^{(m+2) \times (n+2)}}
 ```
-For the first `n` ``\cdot`` `m` lines, the matrix `Phi` is the same for the `free` end and the
-`not-a-knot` end condition. These lines have to address the following condition:
+For the first `n` ``\cdot`` `m` lines, the matrix `Phi` is the same for the "free" end and the
+"not-a-knot" end condition. These lines have to address the following condition:
 ```math
 \begin{align*}
-			z_{j,i} = \frac{1}{36} \Big( &Q_{j,i} + 4Q_{j+1,i} + Q_{j+2,i} + 4Q_{j,i+1} + 16Q_{j+1,i+1}\\ 
-			&+ 4Q_{j+2,i+1} + Q_{j,i+2} + 4Q_{j+1,i+2} + Q_{j+2,i+2} \Big) 
+			z_{j,i} = \frac{1}{36} \Big( &Q_{j,i} + 4Q_{j+1,i} + Q_{j+2,i} + 4Q_{j,i+1} + 16Q_{j+1,i+1}\\
+			&+ 4Q_{j+2,i+1} + Q_{j,i+2} + 4Q_{j+1,i+2} + Q_{j+2,i+2} \Big)
 		\end{align*}
 ```
 for i = 1,...,n and j = 1,...,m.
 
-The `free` end condition needs at least two values for the `x` and `y` vectors.
-The free end condition has the following additional requirements for the control points which have 
+The "free" end condition needs at least two values for the `x` and `y` vectors.
+The "free" end condition has the following additional requirements for the control points which have
 to be addressed by `Phi`:
 - ``Q_{j,1} - 2Q_{j,2} + Q_{j,3} = 0`` for j = 2,...,m+1
 - ``Q_{j,n} - 2Q_{j,n+1} + Q_{j,n+2} = 0`` for j = 2,...,m+1
@@ -265,7 +264,7 @@ to be addressed by `Phi`:
 - ``Q_{1,n+2} - 2Q_{2,n+1} + Q_{3,n} = 0``
 - ``Q_{m,n} - 2Q_{m+1,n+1} + Q_{m+2,n+2} = 0``
 
-The `not-a-knot` end condition needs at least four values for the `x` and `y` vectors.
+The "not-a-knot" end condition needs at least four values for the `x` and `y` vectors.
 - Continuity of the third `x` derivative between the leftmost and second leftmost patch
 - Continuity of the third `x` derivative between the rightmost and second rightmost patch
 - Continuity of the third `y` derivative between the patch at the top and the patch below
@@ -277,7 +276,7 @@ The `not-a-knot` end condition needs at least four values for the `x` and `y` ve
 
 A reference for the calculations in this script can be found in Chapter 2 of
 -  Quentin Agrapart & Alain Batailly (2020),
-   Cubic and bicubic spline interpolation in Python. 
+   Cubic and bicubic spline interpolation in Python.
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)
@@ -300,7 +299,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   boundary_elmts = 4 + 2*m + 2*n
   inner_elmts = m*n
   P = vcat(reshape(z', (inner_elmts,1)), zeros(boundary_elmts))
-  
+
   IP = [-1  3 -3 1;
          3 -6  3 0;
         -3  0  3 0;
@@ -328,13 +327,13 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
       idx += 1
     end
   end
-  
+
   ########################
   ## Free end condition ##
   ########################
   if end_condition == "free"
     if (n < 2) || (m < 2)
-      @error("To perform bicubic B-spline interpolation with the free end condition, 
+      @error("To perform bicubic B-spline interpolation with the free end condition,
               we need x and y vectors which contain at least 2 values each.")
     end
 
@@ -373,11 +372,11 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
       Phi[i, idx + 2*(n+2) + 2] =  1
       idx += 1
     end
-  
-    i = inner_elmts + boundary_elmts - 3   
-  
+
+    i = inner_elmts + boundary_elmts - 3
+
     # Q_{1,1} - 2Q_{2,2} + Q_{3,3} = 0
-    Phi[(i  ),               1] =  1 
+    Phi[(i  ),               1] =  1
     Phi[(i  ),       (n+2) + 2] = -2
     Phi[(i  ), (  2)*(n+2) + 3] =  1
 
@@ -385,19 +384,19 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
     Phi[(i+1),       (n+2)    ] =  1
     Phi[(i+1), (  2)*(n+2) - 1] = -2
     Phi[(i+1), (  3)*(n+2) - 2] =  1
-    
+
     # Q_{1,n+2} - 2Q_{2,n+1} + Q_{3,n} = 0
     Phi[(i+2), (m-1)*(n+2) + 3] =  1
     Phi[(i+2), (m  )*(n+2) + 2] = -2
     Phi[(i+2), (m+1)*(n+2) + 1] =  1
-    
+
     # Q_{m,n} - 2Q_{m+1,n+1} + Q_{m+2,n+2} = 0
     Phi[(i+3), (m  )*(n+2) - 2] =  1
     Phi[(i+3), (m+1)*(n+2) - 1] = -2
     Phi[(i+3), (m+2)*(n+2)    ] =  1
 
     Q_temp = 36 * (Phi\P)
-    Q      = reshape(Q_temp, (n+2, m+2)) 
+    Q      = reshape(Q_temp, (n+2, m+2))
 
     BicubicBSpline(x, y, Delta, Q, IP)
 
@@ -406,10 +405,10 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   ###################################
   elseif end_condition == "not-a-knot"
     if (n < 4) || (m < 4)
-      @error("To perform bicubic B-spline interpolation with the not-a-knot end condition, 
+      @error("To perform bicubic B-spline interpolation with the not-a-knot end condition,
               we need x and y vectors which contain at least 4 values each.")
     end
-      
+
     # Continuity of the third `x` derivative between the leftmost and second leftmost patch
     idx = 0
     for i in (inner_elmts+1):(inner_elmts+m)
@@ -494,26 +493,26 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
       idx += 1
     end
 
-    i = inner_elmts + boundary_elmts - 3   
-  
+    i = inner_elmts + boundary_elmts - 3
+
     # Q_{1,1} - Q_{1,2} - Q_{2,1} + Q_{2,2} = 0
     Phi[(i  ),               1] =  1
     Phi[(i  ),               2] = -1
     Phi[(i  ),       (n+2) + 1] = -1
     Phi[(i  ),       (n+2) + 2] =  1
-    
+
     # Q_{m-1,1} + Q_{m,1} + Q_{m-1,2} - Q_{m,2} = 0
     Phi[(i+1),       (n+2) - 1] = -1
     Phi[(i+1),       (n+2)    ] =  1
     Phi[(i+1),     2*(n+2) - 1] =  1
     Phi[(i+1),     2*(n+2)    ] = -1
-    
+
     # Q_{1,n-1} + Q_{2,n} + Q_{1,n-1} - Q_{2,n} = 0
     Phi[(i+2), (m  )*(n+2) + 1] = -1
     Phi[(i+2), (m  )*(n+2) + 2] =  1
     Phi[(i+2), (m+1)*(n+2) + 1] =  1
     Phi[(i+2), (m+1)*(n+2) + 2] = -1
-    
+
     # Q_{m-1,n-1} - Q_{m,n-1} - Q_{m-1,n} + Q_{m,n} = 0
     Phi[(i+3), (m+1)*(n+2) - 1] =  1
     Phi[(i+3), (m+1)*(n+2)    ] = -1
@@ -521,7 +520,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
     Phi[(i+3), (m+2)*(n+2)    ] =  1
 
     Q_temp = 36 * (Phi\P)
-    Q      = reshape(Q_temp, (n+2, m+2)) 
+    Q      = reshape(Q_temp, (n+2, m+2))
 
     BicubicBSpline(x, y, Delta, Q, IP)
   else
@@ -533,14 +532,14 @@ end
 """
     BicubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
 
-A function which reads in the `x`, `y` and `z` values for 
-[`bicubic_b_spline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)`](@ref) 
+A function which reads in the `x`, `y` and `z` values for
+[`bicubic_b_spline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)`](@ref)
 from a .txt file. The input values are:
 - `path`: String of a path of the specific .txt file
-- `end_condition`: a string which can either be `free` or `not-a-knot` and defines which 
+- `end_condition`: String which can either be "free" or "not-a-knot" and defines which
                    end condition should be considered.
-                   By default this is set to `free`
-- `smoothing_factor`: a Float64 ``\\geq`` 0.0 which specifies the degree of smoothing of the `y` values.
+                   By default this is set to "free"
+- `smoothing_factor`: Float64 ``\\geq`` 0.0 which specifies the degree of smoothing of the `y` values.
                       By default this value is set to 0.0 which corresponds to no smoothing.
 
 The .txt file has to have the following structure to be interpreted by this function:
@@ -565,13 +564,13 @@ function BicubicBSpline(path::String; end_condition = "free", smoothing_factor =
 
   n = parse(Int64, lines[2])
   m = parse(Int64, lines[4])
-  
+
   x     = [parse(Float64, val) for val in lines[6:(5+n)]]
   y     = [parse(Float64, val) for val in lines[(7+n):(6+n+m)]]
   z_tmp = [parse(Float64, val) for val in lines[(8+n+m):end]]
 
   z = transpose(reshape(z_tmp, (n, m)))
 
-  BicubicBSpline(x, y, Matrix(z); end_condition = end_condition, 
+  BicubicBSpline(x, y, Matrix(z); end_condition = end_condition,
                    smoothing_factor = smoothing_factor)
 end

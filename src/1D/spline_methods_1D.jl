@@ -7,20 +7,20 @@
 @doc raw"""
     spline_interpolation(b_spline::LinearBSpline, x)
 
-The inputs are the [`LinearBSpline`](@ref) object and a variable `x` at which the spline 
+The inputs are the [`LinearBSpline`](@ref) object and a variable `x` at which the spline
 will be evaluated.
 
-The parameter `i` gives us the patch in which the variable `x` is located.
-This parameter will also be used to get the correct control points from `Q`.
-(A patch is the area between two consecutive `b_spline.x` values.)
+The parameter `i` indicates the patch in which the variable `x` is located.
+This parameter is also used to get the correct control points from `Q`.
+A patch is the area between two consecutive `b_spline.x` values.
 
-`kappa` is  an interim variable which maps `x` to the interval ``[0,1]``
+`kappa` is an interim variable which maps `x` to the interval ``[0,1]``
 for further calculations.
 
 To evaluate the spline at `x`, we have to calculate the following:
 ```math
 \begin{aligned}
-c_{i,1}(\kappa_i(x)) = 
+c_{i,1}(\kappa_i(x)) =
 		\begin{bmatrix}
 			\kappa_i(x)\\ 1
 		\end{bmatrix}^T
@@ -35,7 +35,7 @@ c_{i,1}(\kappa_i(x)) =
 
 A reference for the calculations in this script can be found in Chapter 1 of
 -  Quentin Agrapart & Alain Batailly (2020),
-   Cubic and bicubic spline interpolation in Python. 
+   Cubic and bicubic spline interpolation in Python.
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function spline_interpolation(b_spline::LinearBSpline, x)
@@ -51,19 +51,19 @@ function spline_interpolation(b_spline::LinearBSpline, x)
 
   c_i1 = [kappa_i, 1]' * IP * Q[i:(i+1)]
 
-  return c_i1  
+  return c_i1
 end
 
 # Cubic B-spline interpolation
 @doc raw"""
     spline_interpolation(b_spline::CubicBSpline, x)
 
-The inputs are the [`CubicBSpline`](@ref) object and a variable `x` at which the spline 
+The inputs are the [`CubicBSpline`](@ref) object and a variable `x` at which the spline
 will be evaluated.
 
-The parameter `i` gives us the patch in which the variable `x` is located.
-This parameter will also be used to get the correct control points from `Q`.
-(A patch is the area between two consecutive `b_spline.x` values)
+The parameter `i` indicates the patch in which the variable `x` is located.
+This parameter is also used to get the correct control points from `Q`.
+A patch is the area between two consecutive `b_spline.x` values.
 
 `kappa` is  an interim variable which maps `t` to the interval ``[0,1]``
 for further calculations.
@@ -71,7 +71,7 @@ for further calculations.
 To evaluate the spline at `x`, we have to calculate the following:
 ```math
 \begin{aligned}
-c_{i,3}\left(\kappa_i(x) \right) = \frac{1}{6} 
+c_{i,3}\left(\kappa_i(x) \right) = \frac{1}{6}
 		\begin{bmatrix}
 			\kappa_i(x)^3\\ \kappa_i(x)^2\\ \kappa_i(x) \\1
 		\end{bmatrix}^T
@@ -89,7 +89,7 @@ c_{i,3}\left(\kappa_i(x) \right) = \frac{1}{6}
 
 A reference for the calculations in this script can be found in Chapter 1 of
 -  Quentin Agrapart & Alain Batailly (2020),
-   Cubic and bicubic spline interpolation in Python. 
+   Cubic and bicubic spline interpolation in Python.
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function spline_interpolation(b_spline::CubicBSpline, x)

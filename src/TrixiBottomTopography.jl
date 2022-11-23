@@ -2,8 +2,8 @@
     TrixiBottomTopography
 
 **TrixiBottomTopography** is a supporting framework for Trixi.jl, which can
-be used to approximate bottom topography functions using B-splines from 
-real life data.
+be used to approximate bottom topography functions using B-splines from
+real world data.
 """
 module TrixiBottomTopography
 
@@ -20,7 +20,7 @@ module TrixiBottomTopography
   include("2D/spline_cache_2D.jl")
   include("2D/spline_methods_2D.jl")
   include("2D/spline_utils_2D.jl")
- 
+
   # Include auxiliary functions
   include("auxiliary/convert.jl")
 

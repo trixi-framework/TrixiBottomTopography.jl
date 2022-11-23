@@ -3,7 +3,7 @@ import Pkg
 using TrixiBottomTopography
 
 # Define module-wide setups such that the respective modules are available in doctests
-DocMeta.setdocmeta!(TrixiBottomTopography, :DocTestSetup, :(using TrixiBottomTopography); 
+DocMeta.setdocmeta!(TrixiBottomTopography, :DocTestSetup, :(using TrixiBottomTopography);
                     recursive=true)
 
 # Make documentation
