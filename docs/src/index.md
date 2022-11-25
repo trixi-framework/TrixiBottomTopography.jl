@@ -45,7 +45,7 @@ To see a first example of `TrixiBottomTopography.jl`, a default example has been
 julia> using TrixiBottomTopography
 ```
 Then call the `T`rixi`B`ottom`T`opograpy `default example`
-```
+```julia
 julia> TBT_default_example()
 ```
 If the implementation was successful, the following window appears:
@@ -55,9 +55,9 @@ If the implementation was successful, the following window appears:
 Further examples can be found in the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/main/examples) of this repository.
 
 ## Authors
-TrixiBottomTopography.jl was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
+`TrixiBottomTopography.jl` was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
 
 ## License and contributing
-TrixiBottomTopography.jl is published under the MIT license (see [License](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/licence/)).
+`TrixiBottomTopography.jl` is published under the MIT license (see [License](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/licence/)).
 We are very happy to accept contributions from everyone, preferably in the form of
 a PR.
