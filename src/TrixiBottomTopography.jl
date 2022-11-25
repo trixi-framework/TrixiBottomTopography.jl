@@ -23,6 +23,7 @@ module TrixiBottomTopography
 
   # Include auxiliary functions
   include("auxiliary/convert.jl")
+  include("auxiliary/default_example.jl")
 
   # Export the functions which are used for B-spline interpolation
   export LinearBSpline, CubicBSpline
@@ -31,5 +32,8 @@ module TrixiBottomTopography
 
   # Export the functions which are used DGM data conversion
   export convert_dgm_1d, convert_dgm_2d
+
+  # Export default example
+  export TBT_default_example
 
 end

@@ -40,10 +40,22 @@ A detailed description of these functionalities can be found on the following pa
 
 ## Examples
 
-Some examples which use the implemented functionalities, see the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/main/examples) of this repository.
+To see a first example of `TrixiBottomTopography.jl`, a default example has been implemented. First load the package
+```julia
+julia> using TrixiBottomTopography
+```
+Then call the `T`rixi`B`ottom`T`opograpy `default example`
+```
+julia> TBT_default_example()
+```
+If the implementation was successful, the following window appears:
+
+![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)
+
+Further examples can be found in the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/main/examples) of this repository.
 
 ## Authors
-TrixiBottomTopography.jl was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [](https://lakemper.eu/) (RWTH Aachen University, Germany).
+TrixiBottomTopography.jl was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
 
 ## License and contributing
 TrixiBottomTopography.jl is published under the MIT license (see [License](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/licence/)).
