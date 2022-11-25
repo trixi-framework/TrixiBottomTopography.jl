@@ -17,7 +17,7 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Overview" => [
-            "Data Conversion" => "conversion.md",
+            "Data conversion" => "conversion.md",
             "B-spline structure" => "structure.md",
             "B-spline function" => "function.md",
         ],

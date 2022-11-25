@@ -5,7 +5,7 @@
 
 # Linear B-spline interpolation
 @doc raw"""
-    spline_interpolation(b_spline::LinearBSpline, x)
+    spline_interpolation(b_spline::LinearBSpline, x::Number)
 
 The inputs are the [`LinearBSpline`](@ref) object and a variable `x` at which the spline
 will be evaluated.
@@ -38,7 +38,7 @@ A reference for the calculations in this script can be found in Chapter 1 of
    Cubic and bicubic spline interpolation in Python.
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function spline_interpolation(b_spline::LinearBSpline, x)
+function spline_interpolation(b_spline::LinearBSpline, x::Number)
 
   x_vec = b_spline.x
   Delta = b_spline.Delta
@@ -56,7 +56,7 @@ end
 
 # Cubic B-spline interpolation
 @doc raw"""
-    spline_interpolation(b_spline::CubicBSpline, x)
+    spline_interpolation(b_spline::CubicBSpline, x::Number)
 
 The inputs are the [`CubicBSpline`](@ref) object and a variable `x` at which the spline
 will be evaluated.
@@ -92,7 +92,7 @@ A reference for the calculations in this script can be found in Chapter 1 of
    Cubic and bicubic spline interpolation in Python.
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function spline_interpolation(b_spline::CubicBSpline, x)
+function spline_interpolation(b_spline::CubicBSpline, x::Number)
 
   x_vec = b_spline.x
   Delta = b_spline.Delta

@@ -6,7 +6,7 @@ structures which are later used to define the interpolation functions.
 ## One dimensional structures
 
 For the one dimensional case, the structures [`LinearBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.LinearBSpline)
-and [`CubicBspline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline)
+and [`CubicBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline)
 are available. They contain all relevant values to define linear and cubic B-spline
 interpolation functions corresponding to linear and cubic B-spline interpolation.
 These are:
