@@ -1,7 +1,7 @@
 # TrixiBottomTopography.jl
-[![Docs-dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/)
-[![Build Status](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/maxbertrand1996/TrixiBottomTopography.jl/badge.svg?branch=main)](https://coveralls.io/github/maxbertrand1996/TrixiBottomTopography.jl?branch=main)
+[![Docs-dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/)
+[![Build Status](https://github.com/trixi-framework/TrixiBottomTopography.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/trixi-framework/TrixiBottomTopography.jl/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/trixi-framework/TrixiBottomTopography.jl/badge.svg?branch=main)](https://coveralls.io/github/trixi-framework/TrixiBottomTopography.jl?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
 
 `TrixiBottomTopography.jl` is a supplementary package to the numerical solver [Trixi.jl]( https://github.com/trixi-framework/Trixi.jl) which enables to use real life geographical data for the bottom topography function of the shallow water equations.
@@ -37,7 +37,7 @@ This package contains the following three main functionalities:
 - Setting up a B-spline interpolation structure in one and two dimensions which contains all the relevant information to define a B-spline interpolation function with additional specifications
 - Using the B-spline structure to set up a B-spline interpolation function
 
-A detailed description of the functionalities can be found in the [documentation](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/) to this package.
+A detailed description of the functionalities can be found in the [documentation](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/) to this package.
 
 ## Examples
 
@@ -53,7 +53,7 @@ If the implementation was successful, the following window appears:
 
 ![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)
 
-Further examples can be found in the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/main/examples) of this repository.
+Further examples can be found in the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples) of this repository.
 
 ## Authors
 `TrixiBottomTopography.jl` was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
