@@ -1,6 +1,6 @@
 # Examples with Trixi.jl
 
-As mentioned in the [Home](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/)
+As mentioned in the [Home](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/)
 section of this documentation, `TrixiBottomTopography.jl` was initially developed as a
 supplementary package for the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
 to enable the user to use real life geographical data for the bottom topography
@@ -10,7 +10,7 @@ In this section a one dimensional example is presented which uses the functional
 `TrixiBottomTopography.jl` with [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
 to simulate a dam break problem.
 
-The underlying example file can be found [here](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_1D.jl).
+The underlying example file can be found [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_1D.jl).
 
 First, all the necessary packages must be included at the beginning of the file.
 ```julia
@@ -29,8 +29,8 @@ Next, the underlying bottom topography data is downloaded from a gist.
 Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
 ```
 The downloaded data is then used to define the B-spline interpolation function as described in
-[B-spline structure]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/structure/")
-and [B-spline function]("https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/function/").
+[B-spline structure]("https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/")
+and [B-spline function]("https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/").
 In this case a cubic B-spline interpolation function with free end condition is chosen.
 ```julia
 # B-spline interpolation of the underlying data
@@ -163,7 +163,7 @@ This is the resulting .gif animation.
 
 ## Two dimensional dam break
 
-The underlying example file can be found [here](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_2D.jl).
+The underlying example file can be found [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_2D.jl).
 
 The two dimensional example is very similar to the one dimensional case.
 
@@ -277,4 +277,4 @@ This is the resulting .gif animation.
 
 ![gif](https://user-images.githubusercontent.com/101979498/203507057-f4fa5ef2-e852-493d-8df6-497c1e2a9a51.gif)
 
-For the bottom topography the boundaries of the domain look a bit weird. The reason for that is a bug in `PlotData2D` of `Trixi.jl`. Once this has been addressed, the plotted bottom topography will have a similar look to the one in [the previous section](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).
+For the bottom topography the boundaries of the domain look a bit weird. The reason for that is a bug in `PlotData2D` of `Trixi.jl`. Once this has been addressed, the plotted bottom topography will have a similar look to the one in [the previous section](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).
