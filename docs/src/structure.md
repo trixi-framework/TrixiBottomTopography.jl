@@ -5,8 +5,8 @@ structures which are later used to define the interpolation functions.
 
 ## One dimensional structures
 
-For the one dimensional case, the structures [`LinearBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.LinearBSpline)
-and [`CubicBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline)
+For the one dimensional case, the structures [`LinearBSpline`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.LinearBSpline)
+and [`CubicBSpline`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline)
 are available. They contain all relevant values to define linear and cubic B-spline
 interpolation functions corresponding to linear and cubic B-spline interpolation.
 These are:
@@ -17,15 +17,15 @@ These are:
 - `Q`: A vector which contains the control points.
 - `IP`: The coefficients matrix.
 
-To populate the structure, the outer constructor functions [`LinearBSpline(data_path)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.LinearBSpline-Tuple{String})
-and [`CubicBSpline(data_path)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline-Tuple{String})
+To populate the structure, the outer constructor functions [`LinearBSpline(data_path)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.LinearBSpline-Tuple{String})
+and [`CubicBSpline(data_path)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline-Tuple{String})
 are implemented. These constructors use the files in `data_path` to obtain the values which
 will be stored in the corresponding structure,
-as well as [`LinearBSpline(x,y)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.LinearBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T})
-and [`CubicBSpline(x,y)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T}) which use given vectors `x` and `y`.
+as well as [`LinearBSpline(x,y)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.LinearBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T})
+and [`CubicBSpline(x,y)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.CubicBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T}) which use given vectors `x` and `y`.
 
-To get a better idea of the constructor functions, we consider the example [rhine\_data\_cubic-nak.jl](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/9f6c7e967a3b094dbfa43688d25a8998fce40014/examples/rhine_data_cubic-nak.jl)
-from the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/9f6c7e967a3b094dbfa43688d25a8998fce40014/examples) of this repo.
+To get a better idea of the constructor functions, we consider the example [rhine\_data\_cubic-nak.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/rhine_data_cubic-nak.jl)
+from the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples) of this repo.
 This particular example reads one dimensional bottom topography data from a `.txt` file
 and constructs a cubic B-spline interpolation with not-a-knot end condition
 and smoothing of the data.
@@ -67,8 +67,8 @@ To understand the underlying maths of the smoothing spline procedure, please see
 
 ## Two dimensional structures
 
-For the two dimensional case, the structures [`BilinearBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline)
-and [`BicubicBSpline`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline)
+For the two dimensional case, the structures [`BilinearBSpline`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline)
+and [`BicubicBSpline`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline)
 are implemented which contain all relevant values to define bilinear and bicubic B-spline interpolation functions. These are:
 - `x`: Vector of values in x-direction.
 - `y`: Vector of values in y-direction.
@@ -76,12 +76,12 @@ are implemented which contain all relevant values to define bilinear and bicubic
 - `Q`: Matrix which contains the control points.
 - `IP`: Coefficients matrix.
 
-To populate the structure, the outer constructor functions [`BilinearBSpline(data_path)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline-Tuple{String})
-and [`BicubicBSpline(data_path)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline-Tuple{String})
+To populate the structure, the outer constructor functions [`BilinearBSpline(data_path)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline-Tuple{String})
+and [`BicubicBSpline(data_path)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline-Tuple{String})
 are implemented. They use the files in `data_path` to obtain the values which will be stored
 in the corresponding structure.
-Further, [`BilinearBSpline(x,y,z)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T})
-and [`BicubicBSpline(x,y,z)`](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T})
+Further, [`BilinearBSpline(x,y,z)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BilinearBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T})
+and [`BicubicBSpline(x,y,z)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.BicubicBSpline-Tuple{Vector{T}%20where%20T,%20Vector{T}%20where%20T,%20Matrix{T}%20where%20T})
 which use given vectors `x` and `y` and matrix `z`.
 The `x`, `y` and `z` data are organized in the following form:
 
@@ -98,7 +98,7 @@ The `x`, `y` and `z` data are organized in the following form:
 \end{aligned}
 ```
 
-To give a better idea of the constructor functions, we consider the example [rhine\_data\_bicubic-nak.jl](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/rhine_data_bicubic-nak.jl) of this repo.
+To give a better idea of the constructor functions, we consider the example [rhine\_data\_bicubic-nak.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/rhine_data_bicubic-nak.jl) of this repo.
 This example reads in two dimensional bottom topography data from a `.txt` file and
 creates a bicubic B-spline interpolation with not-a-knot end condition
 and smoothing of the data.

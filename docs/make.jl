@@ -11,7 +11,7 @@ makedocs(
     sitename = "TrixiBottomTopography.jl",
     format = Documenter.HTML(
         # Set canonical URL to GitHub pages URL
-        canonical = "https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev"
+        canonical = "https://trixi-framework.github.io/TrixiBottomTopography.jl/dev"
     ),
     modules = [TrixiBottomTopography],
     pages = [
@@ -33,7 +33,7 @@ makedocs(
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
 # for more information.
 deploydocs(
-    repo = "https://github.com/maxbertrand1996/TrixiBottomTopography.jl",
+    repo = "https://trixi-framework.github.io/TrixiBottomTopography.jl",
     devbranch = "main",
     push_preview = true
 )

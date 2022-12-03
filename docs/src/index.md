@@ -52,12 +52,12 @@ If the implementation was successful, the following window appears:
 
 ![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)
 
-Further examples can be found in the [examples folder](https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/main/examples) of this repository.
+Further examples can be found in the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples) of this repository.
 
 ## Authors
 `TrixiBottomTopography.jl` was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
 
 ## License and contributing
-`TrixiBottomTopography.jl` is published under the MIT license (see [License](https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/licence/)).
+`TrixiBottomTopography.jl` is published under the MIT license (see [License](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/LICENSE)).
 We are very happy to accept contributions from everyone, preferably in the form of
 a PR.
