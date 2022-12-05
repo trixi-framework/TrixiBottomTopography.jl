@@ -140,9 +140,9 @@ be specified (in this case, `RDPK3SpFSAL49()`) as well as some tolerances respon
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
             save_everystep=true);
 ```
-At this point, the calculations would generally be finished. However, to visualize the dam break problem, we want to create a .gif file of the solution. To do so, we have set the `save_everystep` attribute to `true`. This means that the solution for every time step will be callable afterward.
+At this point, the calculations would generally be finished. However, to visualize the dam break problem, we want to create a .gif file of the solution. To do so, we have set the `save_everystep` attribute to `true`. This means that the solution for every time step will be callable afterwards.
 
-First of all, a plotting backend is chosen. Here we use `pyplot()` as the resulting plots look very clear. Then we define an `animation` loop using the macro `@animate` over every second of the interim solutions. Inside the loop, the `PlotData2D` functionality from `Trixi.jl` is called to create a plotting object. Afterward, this plotting object can be plotted using the known `plot` command.
+First of all, a plotting backend is chosen. Here we use `pyplot()` as the resulting plots look very clear. Then we define an `animation` loop using the macro `@animate` over every second of the interim solutions. Inside the loop, the `PlotData2D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards, this plotting object can be plotted using the known `plot` command.
 
 The `gif` function uses `animation` to create a .gif from the plots for every second-time step and saves it in the specified location. Additionally, the frames per second rate can be set in the `fps` attribute.
 ```julia
@@ -187,7 +187,7 @@ spline_struct = BicubicBSpline(Rhine_data)
 spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 ```
 
-Then the two dimensional shallow water equations are defined, where the gravitational constant has been chosen to be `3.0` and the initial water height `55.0`. Afterward, the initial condition is defined. Similar to the one dimensional case, in the center of the domain, a circular part with a diameter of `100.0` is chosen where the initial water height is chosen to be `10.0` units higher.
+Then the two dimensional shallow water equations are defined, where the gravitational constant has been chosen to be `3.0` and the initial water height `55.0`. Afterwards, the initial condition is defined. Similar to the one dimensional case, in the center of the domain, a circular part with a diameter of `100.0` is chosen where the initial water height is chosen to be `10.0` units higher.
 
 ```julia
 equations = ShallowWaterEquations2D(gravity_constant=3.0, H0=55.0)
