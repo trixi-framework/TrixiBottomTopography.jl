@@ -1,13 +1,13 @@
 # B-spline interpolation function
 
 If the B-spline structure is defined, it can be used to define the B-spline interpolation function.
-In this chapter, we will continue with the examples from the [B-spline structure]("https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/")
+In this chapter, we will continue with the examples from the [B-spline structure](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/)
 section for the one and two dimensional case.
 
 ## One dimensional case
 
-In the [B-spline structure]("https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/")
-section we began with the example file
+In the [B-spline structure](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/)
+section, we began with the example file
 [rhine\_data\_cubic-nak.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/rhine_data_cubic-nak.jl)
 from the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples)
 where we already defined the B-spline structure for the cubic B-spline interpolation with not-a-knot end condition and smoothing.
@@ -27,7 +27,7 @@ data = string(dir_path, "/examples/data/rhine_data_1d_20_x.txt")
 spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 ```
 
-To define the B-spline interpolation function with respect to a variable `x`,
+To define the B-spline interpolation function for a variable `x`,
 we use the `spline_interpolation` function. For the one dimensional case,
 this function is implemented as [`spline_interpolation(linear_struct, x)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{LinearBSpline,%20Any})
 and [`spline_interpolation(cubic_struct, x)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{CubicBSpline,%20Any}).
@@ -39,7 +39,7 @@ spline_func(x) = spline_interpolation(spline_struct, x)
 
 This defines the cubic B-spline interpolation function with not-a-knot end condition
 and smoothing with respect to variable `x` from the previously created `spline_struct`.
-If we want to visualize the interpolation function with 100 interpolation points, we define:
+If we want to visualize the interpolation function with 100 interpolation points, we define the following:
 ```julia
 # Define interpolation points
 n = 100
@@ -53,7 +53,7 @@ and evaluate to obtain the corresponding `y` values by:
 y_int_pts = spline_func.(x_int_pts)
 ```
 
-Plotting the interpolated points, can be done via
+Plotting the interpolated points can be done via
 
 ```julia
 # Plotting
@@ -70,8 +70,8 @@ gives the following representation:
 
 ## Two dimensional case
 
-In the [B-spline structure]("https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/")
-section we examined the example file
+In the [B-spline structure](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/)
+section, we examined the example file
 [rhine\_data\_bicubic-nak.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/rhine_data_bicubic-nak.jl)
 from the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples)
 where we already created the B-spline structure for the bicubic B-spline interpolation
@@ -92,8 +92,8 @@ data = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
 spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
 ```
 
-To define the B-spline interpolation function with respect to a variables `x` and `y`,
-we use the `spline_interpolation` function which for the two dimensional case.
+To define the B-spline interpolation function for variables `x` and `y`,
+we use the `spline_interpolation` function for the two dimensional case.
 This functionality is implemented as [`spline_interpolation(bilinear_struct, x, y)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{BilinearBSpline,%20Any,%20Any})
 and [`spline_interpolation(bicubic_struct, x, y)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{BicubicBSpline,%20Any,%20Any}).
 
@@ -102,7 +102,7 @@ and [`spline_interpolation(bicubic_struct, x, y)`](https://trixi-framework.githu
 spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 ```
 This defines the bicubic B-spline interpolation function with not-a-knot end condition
-and smoothing with respect to variables `x` and `y` due to the previously constructed `spline_struct`. If we want to visualize the bicubic interpolation function with 100
+and smoothing for variables `x` and `y` due to the previously constructed `spline_struct`. If we want to visualize the bicubic interpolation function with 100
 interpolation points in each spatial direction, we define:
 
 ```julia
