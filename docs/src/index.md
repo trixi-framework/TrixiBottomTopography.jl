@@ -1,8 +1,6 @@
 # TrixiBottomTopography.jl
 
-`TrixiBottomTopography.jl` is a supplementary package to the numerical solver [`Trixi.jl`]
-(https://github.com/trixi-framework/Trixi.jl) which enables the use of real life geographical
-data for the bottom topography function of the shallow water equations.
+`TrixiBottomTopography.jl` is a supplementary package to the numerical solver [Trixi.jl]( https://github.com/trixi-framework/Trixi.jl), which enables to use real world geographical data for the bottom topography function of the shallow water equations.
 
 The shallow water equations in one dimension
 ```math
@@ -21,13 +19,12 @@ and two dimensions
 = \begin{pmatrix} 0\\ -ghb_x \\ -ghb_y \end{pmatrix}
 \end{aligned}
 ```
-require a (piecewise) differentiable function $b$ which describes the bottom topography.
 
-Geographical data is almost always given as scattered data points on a coordinate system with
-corresponding elevation. So to incorporate geographical data into the shallow water equations,
-we must define a function that remodels the topography from the data.
+require a (piecewise) differentiable function $b$, which describes the bottom topography.
 
-`TrixiBottomTopography.jl` performs this remodeling by B-spline interpolation of the underlying data.
+Geographical data is almost always given as scattered data points on a coordinate system with the corresponding elevation. So to incorporate geographical data into the shallow water equations, we need to define a function that remodels the topography from the data.
+
+`TrixiBottomTopography.jl` does this by B-spline interpolation of the underlying data.
 
 ## Functionalities
 
@@ -36,11 +33,24 @@ This package contains the following three main functionalities:
 - Setting up a B-spline interpolation structure in one and two dimensions which contains all the relevant information to define a B-spline interpolation function with additional specifications
 - Using the B-spline structure to set up a B-spline interpolation function
 
-A detailed description of these functionalities can be found on the following pages.
+A detailed description of the functionalities can be found in the [documentation](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/) to this package.
+
+## Installation
+If you have not yet installed Julia, please [follow the instructions for your operating system](https://julialang.org/downloads/platform/). TrixiBottomTopography works with Julia v1.7.
+
+As TrixiBottomTopography is **not** a registered Julia package, you have to download it locally 
+```
+git clone https://github.com/trixi-framework/TrixiBottomTopography.jl.git
+```
+and run it from within the cloned directory
+```
+julia --project=@.
+```
+to make use of the implemented functionalities.
 
 ## Examples
 
-To see a first example of `TrixiBottomTopography.jl`, a default example has been implemented. First load the package
+To see a first example of `TrixiBottomTopography.jl` a default example has been implemented. First, load the package
 ```julia
 julia> using TrixiBottomTopography
 ```
@@ -58,6 +68,6 @@ Further examples can be found in the [examples folder](https://github.com/trixi-
 `TrixiBottomTopography.jl` was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
 
 ## License and contributing
-`TrixiBottomTopography.jl` is published under the MIT license (see [License](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/LICENSE)).
-We are very happy to accept contributions from everyone, preferably in the form of
+`TrixiBottomTopography.jl` is published under the MIT license (see [License](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/LICENSE)). We
+are pleased to accept contributions from everyone, preferably in the form of
 a PR.

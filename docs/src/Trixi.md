@@ -3,10 +3,10 @@
 As mentioned in the [Home](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/)
 section of this documentation, `TrixiBottomTopography.jl` was initially developed as a
 supplementary package for the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
-to enable the user to use real life geographical data for the bottom topography
+to enable the user to use real world geographical data for the bottom topography
 function of the shallow water equations.
 
-In this section a one dimensional example is presented which uses the functionalities of
+In this section, a one dimensional example is presented which uses the functionalities of
 `TrixiBottomTopography.jl` with [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
 to simulate a dam break problem.
 
@@ -29,9 +29,9 @@ Next, the underlying bottom topography data is downloaded from a gist.
 Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
 ```
 The downloaded data is then used to define the B-spline interpolation function as described in
-[B-spline structure]("https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/")
-and [B-spline function]("https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/").
-In this case a cubic B-spline interpolation function with free end condition is chosen.
+[B-spline structure](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/)
+and [B-spline function](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/).
+In this case, a cubic B-spline interpolation function with free end condition is chosen.
 ```julia
 # B-spline interpolation of the underlying data
 spline_struct = CubicBSpline(Rhine_data)
@@ -42,13 +42,13 @@ Now that the B-spline interpolation function is determined, the one dimensional 
 # Defining one dimensional shallow water equations
 equations = ShallowWaterEquations1D(gravity_constant=1.0, H0=55.0)
 ```
-Here the gravity constant has been chosen to be $1.0$ and the background
+Here the gravity constant has been chosen to be $1.0$, and the background
 total water height $H_0$ has been set to $55.0$.
 
-Next the initial condition for the dam break problem can be defined.
-At time $t=0$, a part of the water hight in the center of the domain with a diameter of $100$
+Next, the initial condition for the dam break problem can be defined.
+At time $t=0$, a part of the water height in the center of the domain with a diameter of $100$
 is set to $60.0$ while the rest of the domain stays at the background water height $55.0$.
-Additionally we can see that the bottom topography `b` is defined by the
+Additionally, we can see that the bottom topography `b` is defined by the
 B-spline interpolation function `spline_func` and is set in the initial condition.
 ```julia
 # Defining initial condition for the dam break problem
@@ -66,8 +66,8 @@ function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
   return prim2cons(SVector(H, v, b), equations)
 end
 ```
-After the initial condition we can set the boundary conditions.
-In this case a reflective wall condition is chosen, which is already implemented
+After the initial condition, we can set the boundary conditions.
+In this case, a reflective wall condition is chosen, which is already implemented
 in `Trixi.jl` for the one dimensional shallow water equations.
 ```julia
 # Setting initaial condition
@@ -76,12 +76,12 @@ initial_condition = initial_condition_dam_break
 # Setting the boundary to be a reflective wall
 boundary_condition = boundary_condition_slip_wall
 ```
-The upcoming code parts will not be covered in full detail.
+The upcoming code parts will **not** be covered in full detail.
 To get a more profound understanding of the routines, please see the
 [Trixi.jl documentation](https://trixi-framework.github.io/Trixi.jl/stable/).
 
-The following code snippet sets up the discontinous Galerking spectral element method (DGSEM).
-In this solver-type, we can specify which flux functions for the surface and volume fluxes
+The following code snippet sets up the discontinuous Galerkin spectral element method (DGSEM).
+In this solver type, we can specify which flux functions for the surface and volume fluxes
 will be taken, as well as the polynomial degree (`polydeg`) of the polynomials used
 in the approximation space.
 ```julia
@@ -93,14 +93,14 @@ solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm
                volume_integral=VolumeIntegralFluxDifferencing(volume_flux))
 ```
 After the solver comes the specification of the mesh in the approximation.
-In this case a [`TreeMesh`](https://trixi-framework.github.io/Trixi.jl/stable/meshes/tree_mesh/) is chosen, which is a Cartesian mesh.
+In this case, a [`TreeMesh`](https://trixi-framework.github.io/Trixi.jl/stable/meshes/tree_mesh/) is chosen, which is a Cartesian mesh.
 Here the domain borders must be defined, as well as the number of initial elements
 ($2$ to the power of `inital_refinement_level`).
 Also, we have to indicate if the domain is periodic.
-In this example boundary conditions were defined, thus the periodicity is set to `false`.
+In this example, boundary conditions were defined. Thus the periodicity is set to `false`.
 
 Once the underlying mesh is constructed, a semidiscretization object can be created
-by calling `SemiDiscretizationHyperbolic`. This collects all the building blocks needed to set up the semi discretization:
+by calling `SemiDiscretizationHyperbolic`. This collects all the building blocks needed to set up the semidiscretization:
 - The underlying mesh.
 - The set of equations.
 - The initial condition.
@@ -121,7 +121,7 @@ mesh = TreeMesh(coordinates_min, coordinates_max,
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
                                     boundary_conditions = boundary_condition)
 ```
-Now an ordinary differential equations object is set up using a specified time range `tspan` and the semidiscretization object `semi`.
+An ordinary differential equations object is set up using a specified time range, `tspan`, and the semidiscretization object, `semi`.
 ```julia
 ###############################################################################
 # ODE solvers
@@ -131,21 +131,20 @@ ode = semidiscretize(semi, tspan)
 ```
 The ordinary differential equations object `ode` is solved by the function `sol`
 which is part of the `OrdinaryDiffEq` package. Here the time stepping method can
-be specified (in this case `RDPK3SpFSAL49()`) as well as some tolerances which
-are responsible for an error based time step control.
+be specified (in this case, `RDPK3SpFSAL49()`) as well as some tolerances responsible for an error-based time step control.
 ```julia
 ###############################################################################
 # run the simulation
 
-# use a Runge-Kutta method with automatic (error based) time step size control
+# use a Runge-Kutta method with automatic (error-based) time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
             save_everystep=true);
 ```
-At this point the calculations would normally be finished. But to have a nice visualization of the dam break problem, we want to create a .gif file of the solution. To do so, we have set the `save_everystep` attribute to `true`. This means that the solution for every time step will be callable afterwards.
+At this point, the calculations would generally be finished. However, to visualize the dam break problem, we want to create a .gif file of the solution. To do so, we have set the `save_everystep` attribute to `true`. This means that the solution for every time step will be callable afterwards.
 
-First of all a plotting backend is chosen. Here we use `pyplot()` as the resulting plots look very clear. Then we define an `animation` loop using the macro `@animate` over every second of the interim solutions. Inside the loop the `PlotData2D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards this plotting object can be plotted using the known `plot` command.
+First of all, a plotting backend is chosen. Here we use `pyplot()` as the resulting plots look very clear. Then we define an `animation` loop using the macro `@animate` over every second of the interim solutions. Inside the loop, the `PlotData2D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards, this plotting object can be plotted using the known `plot` command.
 
-The `gif` function uses `animation` to create a .gif from the plots for every second time step and saves it in the specified location. Additionally the frames per second rate can be set in the `fps` attribute.
+The `gif` function uses `animation` to create a .gif from the plots for every second-time step and saves it in the specified location. Additionally, the frames per second rate can be set in the `fps` attribute.
 ```julia
 # Create .gif animation of the solution
 pyplot()
@@ -167,7 +166,7 @@ The underlying example file can be found [here](https://github.com/trixi-framewo
 
 The two dimensional example is very similar to the one dimensional case.
 
-First all the necessary packages are loaded as well as the underlying bottom topography data.
+First, all the necessary packages and the underlying bottom topography data are loaded.
 
 ```julia
 # Include packages
@@ -188,7 +187,7 @@ spline_struct = BicubicBSpline(Rhine_data)
 spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 ```
 
-Then the two dimensional shallow water equations are defined, where the gravitational constant has been chosen to be `3.0` and the initial water height `55.0`. Afterwards the initial condition is defined. Similar to the one dimensional case, in the centre of the domain a circular part with diameter of `100.0` is chosen where the initial water height is chosen to be `10.0` units higher.
+Then the two dimensional shallow water equations are defined, where the gravitational constant has been chosen to be `3.0` and the initial water height `55.0`. Afterwards, the initial condition is defined. Similar to the one dimensional case, in the center of the domain, a circular part with a diameter of `100.0` is chosen where the initial water height is chosen to be `10.0` units higher.
 
 ```julia
 equations = ShallowWaterEquations2D(gravity_constant=3.0, H0=55.0)
@@ -213,7 +212,7 @@ end
 initial_condition = initial_condition_wave
 ```
 
-As we can see, there is no boundary condition specified. This is because at this stage, `boundary_condition_slip_wall` has not been implemented into `Trixi.jl` for the two dimensional shallow water equations.
+As we can see, there is no boundary condition specified. This is because, at this stage, `boundary_condition_slip_wall` has not been implemented into `Trixi.jl` for the two dimensional shallow water equations.
 
 The DGSEM solver is set up as in the one dimensional case. 
 
@@ -239,7 +238,7 @@ mesh = TreeMesh(coordinates_min, coordinates_max,
                 n_cells_max=10_000)
 ```
 
-When calling the semidiscretization object again `boundary_conditions` does not have to be specified.
+When calling the semidiscretization object again, `boundary_conditions` does not have to be specified.
 
 ```julia
 # create the semi discretization object
@@ -277,4 +276,4 @@ This is the resulting .gif animation.
 
 ![gif](https://user-images.githubusercontent.com/101979498/203507057-f4fa5ef2-e852-493d-8df6-497c1e2a9a51.gif)
 
-For the bottom topography the boundaries of the domain look a bit weird. The reason for that is a bug in `PlotData2D` of `Trixi.jl`. Once this has been addressed, the plotted bottom topography will have a similar look to the one in [the previous section](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).
+For the bottom topography, the domain's boundaries look weird. The reason for that is a bug in `PlotData2D` of `Trixi.jl`. Once this has been addressed, the plotted bottom topography will look similar to the one in [the previous section](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).

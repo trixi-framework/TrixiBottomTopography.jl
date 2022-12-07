@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Often geographical data is provided in form of `.xyz` files. These files organized geographical
+Often geographical data is provided in the form of `.xyz` files. These files organized geographical
 data in three columns separated by `[space]` with an `x`, `y` and `z` component. For example:
 ```
 1.0 1.0 1.0
@@ -17,14 +17,14 @@ data in three columns separated by `[space]` with an `x`, `y` and `z` component.
 ```
 In the example above, we have `1.0, 2.0, 3.0` as possible `x` and `y` coordinate values.
 Such `.xyz` formatted files provide the corresponding `z` value for all possible `x-y` combinations.
-In this case this means that for example at `[2.0, 3.0]`, the corresponding `z` value is `6.0`.
+In this case, for example, at `[2.0, 3.0]`, the corresponding `z` value is `6.0`.
 
 ## DGM data set
 
 In the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples) of this repo, the underlying data has been received from
 [Geobasis NRW](https://www.bezreg-koeln.nrw.de/brk_internet/geobasis/hoehenmodelle/digitale_gelaendemodelle/gelaendemodell/index.html).
 They provide a [geographical data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/dgm1_xyz/dgm1_xyz/) of the whole German state of North Rhine-Westphalia called **DGM**.
-This data set contains patches of $1\,km^2$ where each patch has the elevation data for $1,000,000$ data points equally distributed as a grid with grid size of $1\,m$. The data is given as `.xyz` files:
+This data set contains patches of $1\,km^2$ where each patch has the elevation data for $1,000,000$ data points equally distributed as a grid with a grid size of $1\,m$. The data is given as `.xyz` files:
 ```
 357000.00 5646999.00 47.40
 357001.00 5646999.00 47.43
@@ -41,7 +41,7 @@ where the first column provides the corresponding ETRS89 East coordinates, the s
 
 The provided `.xyz` files of DGM are not directly accepted by `TrixiBottomTopography.jl` to
 define B-spline interpolation structures. To make the raw topography data work with the
-package, tit must be converted into `.txt` files and organized in a specific format.
+package, it must be converted into `.txt` files and organized in a specific format.
 
 For one dimensional interpolation, `TrixiBottomTopography.jl` requires the following form:
 ```
@@ -79,16 +79,16 @@ z_2,1
 ...
 z_m,n
 ```
-The `x, y` and `z` values have to be set to `Float64` format.
+The `x, y` and `z` values must be set to `Float64` format.
 
 ## Conversion functions
 
-To make matters easier `TrixiBottomTopography.jl` provides the functions [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String})
+To make matters easier, `TrixiBottomTopography.jl` provides the functions [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String})
 for one dimensional interpolation and [`convert_dgm_2d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_2d-Tuple{String,%20String}) for two dimensional interpolation.
 
 To explain these functions, we consider the example file [`convert_data.jl`](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/convert_data.jl).
 
-First we import our package to be able to use the functions.
+First, we import our package to be able to use the functions.
 
 ```julia
 # Include packages
@@ -96,7 +96,7 @@ using TrixiBottomTopography
 ```
 
 Next, we define the path of the `.xyz` file `path_src_file` that we want to convert,
-as well as the paths of the files where we want to save the files.
+as well as the paths of the files where we want to save them files.
 
 ```julia
 # Get root directory
@@ -122,7 +122,7 @@ The source data from `path_src_file` looks as follows:
 ...       ...        ...
 ```
 
-[Here](https://gist.github.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5) you can see the full file.
+[Here](https://gist.github.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5), you can see the whole file.
 
 Now the data can be converted.
 
@@ -132,7 +132,7 @@ convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 20, section = 100)
 ```
 
 Calling this expression tells [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String}) that the source file is `path_src_file` and the converted file will be saved in the file `path_out_file_1d_x`.
-The optional attribute `excerpt` tells the function that only every `20`th point in the `x` direction (in this case in the ETRS89 East coordinate) will be considered. Setting `section` to `100` tells the function that the corresponding `z` values (DHHN2016 in this case) from the `100`th `y` coordinate (ETRS89 North) will be chosen. The full converted file produced by
+The optional attribute `excerpt` tells the function that only every `20`th point in the `x` direction (in this case, in the ETRS89 East coordinate) will be considered. Setting `section` to `100` tells the function that the corresponding `z` values (DHHN2016 in this case) from the `100`th `y` coordinate (ETRS89 North) will be chosen. The entire converted file produced by
 this routine is available [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/data/rhine_data_1d_20_x.txt).
 
 ```julia
