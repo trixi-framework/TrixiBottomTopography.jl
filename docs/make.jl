@@ -32,7 +32,7 @@ makedocs(
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
 # for more information.
 deploydocs(
-    repo = "https://trixi-framework.github.io/TrixiBottomTopography.jl",
+    repo = "github.com/trixi-framework/TrixiBottomTopography.jl.git",
     devbranch = "main",
     push_preview = true
 )
