@@ -534,7 +534,7 @@ end
     BicubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
 
 A function which reads in the `x`, `y` and `z` values for
-[`bicubic_b_spline(x::Vector, y::Vector, z::Matrix; end_condition = "free", smoothing_factor = 0.0)`](@ref)
+[`BilinearBSpline`](@ref)
 from a .txt file. The input values are:
 - `path`: String of a path of the specific .txt file
 - `end_condition`: String which can either be "free" or "not-a-knot" and defines which
