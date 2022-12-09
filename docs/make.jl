@@ -25,8 +25,7 @@ makedocs(
         "Reference" => "reference.md",
         "Licence" => "licence.md"
     ],
-    # strict = true # to make the GitHub action fail when doctests fail
-    strict = Documenter.except(:cross_references)
+    strict = true # to make the GitHub action fail when doctests fail
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
