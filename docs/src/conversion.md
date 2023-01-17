@@ -139,7 +139,7 @@ this routine is available [here](https://github.com/trixi-framework/TrixiBottomT
 convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y", section = 100)
 ```
 
-Similar to the previous expression, this one has the additional attribute `directon = "y"` which tells [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String}) that the data will be read from the `y` direction. (Click [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/data/rhine_data_1d_20_y.txt) to view the resulting file)
+Similar to the previous expression, this one has the additional attribute `direction = "y"` which tells [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String}) that the data will be read from the `y` direction. (Click [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/data/rhine_data_1d_20_y.txt) to view the resulting file)
 
 ```julia
 convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
