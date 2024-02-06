@@ -11,12 +11,12 @@ module TrixiBottomTopography
   using LinearAlgebra: norm, diagm, Tridiagonal, SymTridiagonal
   using SparseArrays: sparse, spzeros
 
-  # Include one dimesnional B-spline interpolation
+  # Include one dimensional B-spline interpolation
   include("1D/spline_cache_1D.jl")
   include("1D/spline_methods_1D.jl")
   include("1D/spline_utils_1D.jl")
 
-  # Include two dimesnional B-spline interpolation
+  # Include two dimensional B-spline interpolation
   include("2D/spline_cache_2D.jl")
   include("2D/spline_methods_2D.jl")
   include("2D/spline_utils_2D.jl")
