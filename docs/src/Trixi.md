@@ -95,7 +95,7 @@ solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm
 After the solver comes the specification of the mesh in the approximation.
 In this case, a [`TreeMesh`](https://trixi-framework.github.io/Trixi.jl/stable/meshes/tree_mesh/) is chosen, which is a Cartesian mesh.
 Here the domain borders must be defined, as well as the number of initial elements
-($2$ to the power of `inital_refinement_level`).
+($2$ to the power of `initial_refinement_level`).
 Also, we have to indicate if the domain is periodic.
 In this example, boundary conditions were defined. Thus the periodicity is set to `false`.
 
