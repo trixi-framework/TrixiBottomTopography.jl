@@ -134,7 +134,7 @@ saved in the variables `x_hat`, `y_hat` and `z_hat`.
 
 Then the matrix `L` can be filled by setting
 `K` = [`tps_base_func`](@ref)`(||(x_hat[i], y_hat[i]) - (x_hat[j], y_hat[j])||)` where `|| ||` is
-the Eucledian norm, `P` = `[1 x y]` and `O` = ``3\times 3`` zeros matrix.
+the Euclidian norm, `P` = `[1 x y]` and `O` = ``3\times 3`` zeros matrix.
 
 Afterwards the vector `rhs` is filled by setting `z` = `z_hat` and `o` = a vector with three zeros.
 
