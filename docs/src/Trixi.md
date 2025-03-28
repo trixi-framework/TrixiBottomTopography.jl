@@ -214,7 +214,7 @@ initial_condition = initial_condition_wave
 
 As we can see, there is no boundary condition specified. This is because, at this stage, `boundary_condition_slip_wall` has not been implemented into `Trixi.jl` for the two dimensional shallow water equations.
 
-The DGSEM solver is set up as in the one dimensional case. 
+The DGSEM solver is set up as in the one dimensional case.
 
 ```julia
 ###############################################################################

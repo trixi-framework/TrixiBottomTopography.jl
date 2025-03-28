@@ -22,9 +22,10 @@ In this case, for example, at `[2.0, 3.0]`, the corresponding `z` value is `6.0`
 ## DGM data set
 
 In the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples) of this repo, the underlying data has been received from
-[Geobasis NRW](https://www.bezreg-koeln.nrw.de/brk_internet/geobasis/hoehenmodelle/digitale_gelaendemodelle/gelaendemodell/index.html).
-They provide a [geographical data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/dgm1_xyz/dgm1_xyz/) of the whole German state of North Rhine-Westphalia called **DGM**.
-This data set contains patches of $1\,km^2$ where each patch has the elevation data for $1,000,000$ data points equally distributed as a grid with a grid size of $1\,m$. The data is given as `.xyz` files:
+[Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw).
+They provide a [geographical data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/) of the German state of North Rhine-Westphalia called **DGM**.
+This data set contains patches of $1\,km^2$ where each patch has the elevation data for $1,000,000$ data points equally distributed as a grid with a grid size of $1\,m$.
+As an example, the data can be given as `.xyz` files:
 ```
 357000.00 5646999.00 47.40
 357001.00 5646999.00 47.43
