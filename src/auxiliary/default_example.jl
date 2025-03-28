@@ -5,7 +5,7 @@ Function which calls the example file "rhine_data_bicubic-nak.jl" as a default e
 check if including the package has worked and to see a quick example.
 """
 function TBT_default_example()
-  
+
   # Get root directory
   dir_path = pkgdir(TrixiBottomTopography)
 

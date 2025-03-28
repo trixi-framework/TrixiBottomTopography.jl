@@ -79,7 +79,7 @@ function spline_smoothing(lambda::Number, Delta::Number, y::Vector)
   Delta_2_ii   =  1 ./ Delta_vec
   Delta_2_iip1 = -2 ./ Delta_vec
   Delta_2_iip2 =  1 ./ Delta_vec
-  
+
   Delta_2             =  zeros(n-2, n)
   Delta_2[:, 1:(n-2)] =  diagm(Delta_2_ii)
   Delta_2[:, 2:(n-1)] += diagm(Delta_2_iip1)
