@@ -12,9 +12,9 @@ a B-Spline interpolation function.
 These attributes are:
 - `x`: Vector of values in x-direction
 - `y`: Vector of values in y-direction
-- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between 
-           two consecutive `x` and `y` values. The value `Delta` corresponds to the distance 
-           between two consecutive values in x-direction. As we are only considering Cartesian 
+- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between
+           two consecutive `x` and `y` values. The value `Delta` corresponds to the distance
+           between two consecutive values in x-direction. As we are only considering Cartesian
            grids, `Delta` is equal for all patches in x and y-direction
 - `Q`: Matrix which contains the control points
 - `IP`: Coefficients matrix
@@ -58,7 +58,7 @@ First of all the data is sorted which is done by
 [`sort_data`](@ref) to guarantee
 that the `x` and `y` values are in ascending order with corresponding matrix `z`.
 
-The patch size `Delta` is calculated by subtracting the second by the first `x` value. This can be 
+The patch size `Delta` is calculated by subtracting the second by the first `x` value. This can be
 done because we only consider equal space between consecutive `x` and `y` values.
 A patch is the area between two consecutive `x` and `y` values.
 
@@ -160,9 +160,9 @@ a B-Spline interpolation function.
 These attributes are:
 - `x`: Vector of values in x-direction
 - `y`: Vector of values in y-direction
-- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between 
-           two consecutive `x` and `y` values. The value `Delta` corresponds to the distance between 
-           two consecutive values in x-direction. As we are only considering Cartesian grids, 
+- `Delta`: Length of one side of a single patch in the given data set. A patch is the area between
+           two consecutive `x` and `y` values. The value `Delta` corresponds to the distance between
+           two consecutive values in x-direction. As we are only considering Cartesian grids,
            `Delta` is equal for all patches in x and y-direction
 - `Q`: Matrix which contains the control points
 - `IP`: Coefficients matrix
@@ -200,8 +200,8 @@ The input values are:
 ```
 - `end_condition`: a string which can either be "free" or "not-a-knot" and defines which
                    end condition should be considered. By default this is set to "free".
-- `smoothing_factor`: a Float64 ``\geq`` 0.0 which specifies the degree of smoothing of the `z` 
-                      values. By default this value is set to 0.0 which corresponds to no 
+- `smoothing_factor`: a Float64 ``\geq`` 0.0 which specifies the degree of smoothing of the `z`
+                      values. By default this value is set to 0.0 which corresponds to no
                       smoothing.
 
 Bicubic B-spline interpolation is only possible if the dimensions of vectors `x` and `y` correspond
@@ -210,7 +210,7 @@ with the dimensions of the matrix `z`.
 First, the data is sorted via [`sort_data`](@ref) to guarantee
 that the `x` and `y` values are in ascending order with corresponding matrix `z`.
 
-The patch size `Delta` is calculated by subtracting the second by the first `x` value. This can be 
+The patch size `Delta` is calculated by subtracting the second by the first `x` value. This can be
 done because we only consider equal space between consecutive `x` and `y` values.
 A patch is the area between two consecutive `x` and `y` values.
 
@@ -285,7 +285,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   n = length(x)
   m = length(y)
 
-  if (size(z,2) != n | size(z,1) != m)
+  if (size(z,2) != n || size(z,1) != m)
     @error("The dimensions of z do not coincide with x and y.")
   end
 

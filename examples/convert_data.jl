@@ -1,8 +1,8 @@
-##########################################################################
-# This script converts the data from                                     #
-# https://www.opengeodata.nrw.de/produkte/geobasis/hm/dgm1_xyz/dgm1_xyz/ #
-# into data files which can be used by TrixiBottomTopography             #
-##########################################################################
+############################################################################
+# This script converts the data from                                       #
+# https://www.opengeodata.nrw.de/produkte/geobasis/hm/3dm_l_las/3dm_l_las/ #
+# into data files which can be used by TrixiBottomTopography               #
+############################################################################
 
 # Include packages
 using TrixiBottomTopography
