@@ -1,3 +1,5 @@
+# Authors
+
 TrixiBottomTopography.jl's development was initiated by Maximilian D. Bertrand.
 Its development and maintenance is coordinated by a group of *principal developers*,
 who are also its main contributors and who can be contacted in case of
