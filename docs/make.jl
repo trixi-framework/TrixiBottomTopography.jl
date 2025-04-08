@@ -48,12 +48,22 @@ open(joinpath(@__DIR__, "src", "contributing.md"), "w") do io
     end
 end
 
+# Copy contents form README to the starting page to not need to synchronize it manually
+readme_text = read(joinpath(dirname(@__DIR__), "README.md"), String)
+readme_text = replace(readme_text,
+                      "[LICENSE.md](LICENSE.md)" => "[License](@ref)",
+                      "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref)",
+                      "<p" => "```@raw html\n<p",
+                      "p>" => "p>\n```",
+                      r"\[comment\].*\n" => "")    # remove comments
+write(joinpath(@__DIR__, "src", "home.md"), readme_text)
+
 # Make documentation
 makedocs(
     sitename = "TrixiBottomTopography.jl",
     format = Documenter.HTML(
         # Set canonical URL to GitHub pages URL
-        canonical = "https://trixi-framework.github.io/TrixiBottomTopography.jl/dev"
+        canonical = "https://trixi-framework.github.io/TrixiBottomTopography.jl/stable"
     ),
     modules = [TrixiBottomTopography],
     pages = [
