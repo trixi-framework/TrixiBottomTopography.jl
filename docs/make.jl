@@ -14,42 +14,19 @@ write(joinpath(@__DIR__, "src", "authors.md"), authors_text)
 DocMeta.setdocmeta!(TrixiBottomTopography, :DocTestSetup, :(using TrixiBottomTopography);
                     recursive=true)
 
-# Copy some files from the repository root directory to the docs and modify them
-# as necessary
-# Based on: https://github.com/ranocha/SummationByPartsOperators.jl/blob/0206a74140d5c6eb9921ca5021cb7bf2da1a306d/docs/make.jl#L27-L41
-open(joinpath(@__DIR__, "src", "code_of_conduct.md"), "w") do io
-    # Point to source license file
-    println(io,
-            """
-            ```@meta
-            EditURL = "https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/CODE_OF_CONDUCT.md"
-            ```
-            """)
-    # Write the modified contents
-    println(io, "# [Code of Conduct](@id code-of-conduct)")
-    println(io, "")
-    for line in eachline(joinpath(dirname(@__DIR__), "CODE_OF_CONDUCT.md"))
-        line = replace(line, "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
-        println(io, "> ", line)
-    end
-end
+# Copy code of conduct to not need to synchronize it manually
+code_of_conduct_text = read(joinpath(dirname(@__DIR__), "CODE_OF_CONDUCT.md"), String)
+code_of_conduct_text = replace(code_of_conduct_text,
+                               "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
+write(joinpath(@__DIR__, "src", "code_of_conduct.md"), code_of_conduct_text)
+
 
 # Copy contributing information to not need to synchronize it manually
-open(joinpath(@__DIR__, "src", "contributing.md"), "w") do io
-    # Point to source license file
-    println(io,
-            """
-            ```@meta
-            EditURL = "https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/CONTRIBUTING.md"
-            ```
-            """)
-    # Write the modified contents
-    for line in eachline(joinpath(dirname(@__DIR__), "CONTRIBUTING.md"))
-        line = replace(line, "[LICENSE.md](LICENSE.md)" => "[License](@ref)")
-        line = replace(line, "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
-        println(io, line)
-    end
-end
+contributing_text = read(joinpath(dirname(@__DIR__), "CONTRIBUTING.md"), String)
+contributing_text = replace(contributing_text,
+                            "[LICENSE.md](LICENSE.md)" => "[License](@ref)",
+                            "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
+write(joinpath(@__DIR__, "src", "contributing.md"), contributing_text)
 
 # Copy contents form README to the starting page to not need to synchronize it manually
 readme_text = read(joinpath(dirname(@__DIR__), "README.md"), String)
