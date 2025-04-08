@@ -1,4 +1,5 @@
 # TrixiBottomTopography.jl
+[![Docs-stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable)
 [![Docs-dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/)
 [![Build Status](https://github.com/trixi-framework/TrixiBottomTopography.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/trixi-framework/TrixiBottomTopography.jl/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/trixi-framework/TrixiBottomTopography.jl/badge.svg?branch=main)](https://coveralls.io/github/trixi-framework/TrixiBottomTopography.jl?branch=main)
