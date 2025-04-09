@@ -66,7 +66,8 @@ Further examples can be found in the [examples folder](https://github.com/trixi-
 
 ## Authors
 `TrixiBottomTopography.jl` was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
+The full list of contributors can be found in [Authors](@ref trixi_bt_authors).
 
 ## License and contributing
-`TrixiBottomTopography.jl` is published under the MIT license (see [LICENSE.md](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/LICENSE.md)).
+`TrixiBottomTopography.jl` is published under the MIT license (see [License](@ref)).
 We are pleased to accept contributions from everyone, preferably in the form of a PR.

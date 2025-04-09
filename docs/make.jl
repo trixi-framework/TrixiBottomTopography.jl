@@ -6,7 +6,8 @@ using TrixiBottomTopography
 # Since the authors header exists twice we create a unique identifier for the docs section.
 authors_text = read(joinpath(dirname(@__DIR__), "AUTHORS.md"), String)
 authors_text = replace(authors_text,
-                       "in the [LICENSE.md](LICENSE.md) file" => "under [License](@ref)",
+                       "in the [LICENSE.md](LICENSE.md) file" => "under [License](@ref)")
+authors_text = replace(authors_text,
                        "# Authors" => "# [Authors](@id trixi_bt_authors)")
 write(joinpath(@__DIR__, "src", "authors.md"), authors_text)
 
@@ -24,17 +25,22 @@ write(joinpath(@__DIR__, "src", "code_of_conduct.md"), code_of_conduct_text)
 # Copy contributing information to not need to synchronize it manually
 contributing_text = read(joinpath(dirname(@__DIR__), "CONTRIBUTING.md"), String)
 contributing_text = replace(contributing_text,
-                            "[LICENSE.md](LICENSE.md)" => "[License](@ref)",
+                            "[LICENSE.md](LICENSE.md)" => "[License](@ref)")
+contributing_text = replace(contributing_text,
                             "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
 write(joinpath(@__DIR__, "src", "contributing.md"), contributing_text)
 
 # Copy contents form README to the starting page to not need to synchronize it manually
 readme_text = read(joinpath(dirname(@__DIR__), "README.md"), String)
 readme_text = replace(readme_text,
-                      "[LICENSE.md](LICENSE.md)" => "[License](@ref)",
-                      "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)",
-                      "<p" => "```@raw html\n<p",
-                      "p>" => "p>\n```",
+                      "[LICENSE.md](LICENSE.md)" => "[License](@ref)")
+readme_text = replace(readme_text,
+                      "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
+readme_text = replace(readme_text,
+                      "<p" => "```@raw html\n<p")
+readme_text = replace(readme_text,
+                      "p>" => "p>\n```")
+readme_text = replace(readme_text,
                       r"\[comment\].*\n" => "")    # remove comments
 write(joinpath(@__DIR__, "src", "home.md"), readme_text)
 

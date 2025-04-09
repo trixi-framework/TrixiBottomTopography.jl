@@ -2,7 +2,7 @@
 
 > MIT License
 >
-> Copyright (c) 2022-present Maximilian Dominique Bertrand and other contributors: AUTHORS.md
+> Copyright (c) 2022-present Maximilian Dominique Bertrand and other contributors: [Authors](@ref trixi_bt_authors)
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal

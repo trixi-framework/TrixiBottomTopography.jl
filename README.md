@@ -75,5 +75,5 @@ Further examples can be found in the [examples folder](https://github.com/trixi-
 The full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 
 ## License and contributing
-`TrixiBottomTopography.jl` is published under the MIT license (see [LICENSE.md](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/LICENSE.md)).
+`TrixiBottomTopography.jl` is published under the MIT license (see [LICENSE.md](LICENSE.md)).
 We are pleased to accept contributions from everyone, preferably in the form of a PR.
