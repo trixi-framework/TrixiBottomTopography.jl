@@ -42,13 +42,12 @@ readme_text = replace(readme_text,
                       "p>" => "p>\n```")
 readme_text = replace(readme_text,
                       r"\[comment\].*\n" => "")    # remove comments
-write(joinpath(@__DIR__, "src", "home.md"), readme_text)
+write(joinpath(@__DIR__, "src", "index.md"), readme_text)
 
 # Make documentation
 makedocs(;
          modules = [TrixiBottomTopography],
          authors = "Andrew R. Winters <andrew.ross.winters@liu.se>, Michael Schlottke-Lakemper <michael@sloede.com>",
-         repo = "https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/{commit}{path}#{line}",
          sitename = "TrixiBottomTopography.jl",
          format = Documenter.HTML(;
                                   # Disable pretty URLs during manual testing
@@ -65,13 +64,12 @@ makedocs(;
              "B-spline structure" => "structure.md",
              "B-spline function" => "function.md",
          ],
-         "Trixi.jl examples" => "Trixi.md",
-         "Reference" => "reference.md",
+         "Trixi.jl examples" => "trixi_jl_examples.md",
          "Authors" => "authors.md",
          "Contributing" => "contributing.md",
          "Code of Conduct" => "code_of_conduct.md",
-         "Licence" => "licence.md"],
-        )
+         "License" => "license.md",
+         "Reference" => "reference.md"])
 
 # Documenter can also automatically deploy documentation to gh-pages.
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
