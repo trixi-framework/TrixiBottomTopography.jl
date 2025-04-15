@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/trixi-framework/TrixiBottomTopography.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/trixi-framework/TrixiBottomTopography.jl/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/trixi-framework/TrixiBottomTopography.jl/badge.svg?branch=main)](https://coveralls.io/github/trixi-framework/TrixiBottomTopography.jl?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
-[![DOI](https://zenodo.org/badge/557345826.svg)](https://doi.org/10.5281/zenodo.15122147)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15122147.svg)](https://doi.org/10.5281/zenodo.15122147)
 
 `TrixiBottomTopography.jl` is a supplementary package to the numerical solvers [Trixi.jl](https://github.com/trixi-framework/Trixi.jl) and [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), which enables use of real world geographical data for the bottom topography function of the shallow water equations.
 
