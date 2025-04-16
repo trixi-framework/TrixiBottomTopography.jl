@@ -6,7 +6,7 @@
 # Include packages
 using TrixiBottomTopography
 using Plots
-using OrdinaryDiffEq
+using OrdinaryDiffEqLowStorageRK
 using Trixi
 
 # Download one dimensional Rhine bottom data from gist
