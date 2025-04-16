@@ -85,12 +85,12 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
   m = length(y)
 
   if (size(z,2) != n || size(z,1) != m)
-    @error("The dimensions of z do not coincide with x and y.")
+    throw(DimensionMismatch("The dimensions of z do not coincide with x and y."))
   end
 
   if (n < 2 || m < 2)
-    @error("To perform bilinear B-spline interpolation, we need x and y vectors which
-            contain at least 2 values each.")
+    throw(ArgumentError("To perform bilinear B-spline interpolation, we need x and y
+                         vectors which contain at least 2 values each."))
   end
 
   x, y, z = sort_data(x,y,z)
@@ -286,7 +286,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   m = length(y)
 
   if (size(z,2) != n || size(z,1) != m)
-      @error("The dimensions of z do not coincide with x and y.")
+      throw(DimensionMismatch("The dimensions of z do not coincide with x and y."))
   end
 
   x, y, z = sort_data(x,y,z)
