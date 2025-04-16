@@ -35,11 +35,8 @@ and smoothing of the data.
 using TrixiBottomTopography
 using Plots
 
-# Get root directory
-dir_path = pkgdir(TrixiBottomTopography)
-
 # Define data path
-data = string(dir_path, "/examples/data/rhine_data_1d_20_x.txt")
+data = joinpath(@__DIR__, "data", "rhine_data_1d_20_x.txt")
 
 # Define B-spline structure
 spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
@@ -108,11 +105,8 @@ and smoothing of the data.
 using TrixiBottomTopography
 using Plots
 
-# Get root directory
-dir_path = pkgdir(TrixiBottomTopography)
-
 # Define data path
-data = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
+data = joinpath(@__DIR__, "data", "rhine_data_2d_20.txt")
 
 # Define B-spline structure
 spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)

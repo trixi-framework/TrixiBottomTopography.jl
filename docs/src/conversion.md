@@ -100,14 +100,11 @@ Next, we define the path of the `.xyz` file `path_src_file` that we want to conv
 as well as the paths of the files where we want to save them files.
 
 ```julia
-# Get root directory
-dir_path = pkgdir(TrixiBottomTopography)
-
 # Define file paths
-path_src_file = string(dir_path, "/examples/data/dgm1_32_357_5646_1_nw.xyz")
-path_out_file_1d_x = string(dir_path, "/examples/data/rhine_data_1d_20_x.txt")
-path_out_file_1d_y = string(dir_path, "/examples/data/rhine_data_1d_20_y.txt")
-path_out_file_2d = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
+path_src_file = joinpath("examples", "data", "dgm1_32_357_5646_1_nw.xyz")
+path_out_file_1d_x = joinpath("examples", "data", "rhine_data_1d_20_x.txt")
+path_out_file_1d_y = joinpath("examples", "data", "rhine_data_1d_20_y.txt")
+path_out_file_2d = joinpath("examples", "data", "rhine_data_2d_20.txt")
 ```
 
 The source data from `path_src_file` looks as follows:
@@ -123,7 +120,7 @@ The source data from `path_src_file` looks as follows:
 ...       ...        ...
 ```
 
-[Here](https://gist.github.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5), you can see the whole file.
+[Here](https://gist.github.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5), you can see the entire file.
 
 Now the data can be converted.
 

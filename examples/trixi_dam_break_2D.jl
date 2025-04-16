@@ -10,7 +10,7 @@ using LinearAlgebra
 using OrdinaryDiffEq
 using Trixi
 
-Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
+Rhine_data = Trixi.download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
 
 # B-spline interpolation of the underlying data
 spline_struct = BicubicBSpline(Rhine_data)
@@ -65,7 +65,7 @@ ode = semidiscretize(semi, tspan)
 ###############################################################################
 # run the simulation
 
-# use a Runge-Kutta method with automatic (error based) time step size control
+# use a Runge-Kutta method with error based time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8, save_everystep=true);
 
 # Create .gif animation of the solution

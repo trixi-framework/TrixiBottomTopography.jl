@@ -1,6 +1,6 @@
 ##############################################################################
 # Script which uses the functionalities implemented in TrixiBottomTopography #
-# to polt a bilinear B-spline interpolated section of the Rhine river.       #
+# to plot a bilinear B-spline interpolated section of the Rhine river.       #
 ##############################################################################
 
 # Include packages
@@ -13,7 +13,7 @@ using Plots
 #  - x: vector of x values
 #  - y: vector of y values
 function fill_sol_mat(f, x, y)
-    
+
   # Get dimensions for solution matrix
   n = length(x)
   m = length(y)
@@ -32,11 +32,8 @@ function fill_sol_mat(f, x, y)
   return z
 end
 
-# Get root directory
-dir_path = pkgdir(TrixiBottomTopography)
-
 # Define data path
-data = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
+data = joinpath(@__DIR__, "data", "rhine_data_2d_20.txt")
 
 # Define B-spline structure
 spline_struct = BilinearBSpline(data)
@@ -54,6 +51,6 @@ z_int_pts = fill_sol_mat(spline_func, x_int_pts, y_int_pts)
 # Plotting
 pyplot()
 surface(x_int_pts, y_int_pts, z_int_pts, camera=(-30,30),
-        xlabel="E", ylabel="N", zlabel="H", 
-        label="Bottom topography", 
+        xlabel="E", ylabel="N", zlabel="H",
+        label="Bottom topography",
         title="Bilinear B-spline interpolation")
