@@ -29,7 +29,7 @@ function convert_dgm_1d(path_read::String, path_write::String;
   end
 
   # Check if `direction` is acceptable
-  if ( !(direction === "x") || !(direction === "y") )
+  if ( !(direction === "x") && !(direction === "y") )
     throw(ArgumentError("The input direction can either be \"x\" or \"y\""))
   end
 
