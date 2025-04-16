@@ -23,9 +23,14 @@ Inputs:
 function convert_dgm_1d(path_read::String, path_write::String;
                         excerpt = 1, direction = "x", section = 1)
 
-  # Check if section has an accepted value
-  if (section < 1 | section > 1000)
-    @error("The value for section must be between 1 and 1000!")
+  # Check if `section` has an acceptable value
+  if (section < 1 || section > 1000)
+    throw(ArgumentError("The value for section must be between 1 and 1000!"))
+  end
+
+  # Check if `direction` is acceptable
+  if ( !(direction === "x") || !(direction === "y") )
+    throw(ArgumentError("The input direction can either be \"x\" or \"y\""))
   end
 
   # Get file data
@@ -37,7 +42,7 @@ function convert_dgm_1d(path_read::String, path_write::String;
   length_data    = length(data)
   dimension_data = Int(sqrt(length_data))
 
-  if direction == "x"
+  if direction === "x"
 
     # Create interim vectors which save all x and z values
     # accordingly
@@ -58,7 +63,7 @@ function convert_dgm_1d(path_read::String, path_write::String;
     x_uniq = x_all[1:excerpt:dimension_data]
     y_uniq = reshape(z_all, (dimension_data, dimension_data))[1:excerpt:dimension_data, section]
 
-  elseif direction == "y"
+  else # direction === "y"
 
     # Create interim vectors which save all x and z values
     # accordingly
@@ -79,8 +84,6 @@ function convert_dgm_1d(path_read::String, path_write::String;
     x_uniq = y_all[1:(excerpt*dimension_data):length_data]
     y_uniq = reshape(z_all, (dimension_data, dimension_data))[section, 1:excerpt:dimension_data]
 
-  else
-    @error("The input direction can either be the String x or y")
   end
 
   # Write the data to the file
