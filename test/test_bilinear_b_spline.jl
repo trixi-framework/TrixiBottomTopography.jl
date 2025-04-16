@@ -1,7 +1,7 @@
 using TrixiBottomTopography
 
 # Define data path
-data = "data/rhine_2d_10.txt"
+data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
 
 # Define B-spline structure
 spline_struct = BilinearBSpline(data)

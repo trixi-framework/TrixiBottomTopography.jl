@@ -4,7 +4,7 @@ using TrixiBottomTopography
 @testset "Free end" begin
 
   # Define data path
-  data = "data/rhine_2d_10.txt"
+  data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data)
@@ -21,7 +21,7 @@ end
 @testset "Free end + smoothing" begin
 
   # Define data path
-  data = "data/rhine_2d_10.txt"
+  data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data; smoothing_factor = 9999)
@@ -30,14 +30,14 @@ end
 
   # Test function at arbitrary point
   @test 39.23237242 < spline_func(357555, 5646555) < 39.23237243
-    
+
 end
 
 # Not-a-knot end condition
 @testset "Not-a-knot end" begin
-    
+
   # Define data path
-  data = "data/rhine_2d_10.txt"
+  data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data; end_condition = "not-a-knot")
@@ -53,7 +53,7 @@ end
 @testset "Not-a-knot end + smoothing" begin
 
   # Define data path
-  data = "data/rhine_2d_10.txt"
+  data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
