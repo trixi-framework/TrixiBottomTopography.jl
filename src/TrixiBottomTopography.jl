@@ -8,7 +8,7 @@ real world data.
 module TrixiBottomTopography
 
   # Include necessary packages
-  using LinearAlgebra: norm, diagm, Tridiagonal, SymTridiagonal
+  using LinearAlgebra: norm, diagm, qr, Tridiagonal, SymTridiagonal
   using SparseArrays: sparse, spzeros
 
   # Include one dimensional B-spline interpolation

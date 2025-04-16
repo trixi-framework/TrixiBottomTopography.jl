@@ -84,13 +84,13 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
   n = length(x)
   m = length(y)
 
-  if (size(z,2) != n | size(z,1) != m)
-    @error("The dimensions of z do not coincide with x and y.")
+  if (size(z,2) != n || size(z,1) != m)
+    throw(DimensionMismatch("The dimensions of z do not coincide with x and y."))
   end
 
-  if (n < 2 || n < 2)
-    @error("To perform bilinear B-spline interpolation, we need x and y vectors which
-            contain at least 2 values each.")
+  if (n < 2 || m < 2)
+    throw(ArgumentError("To perform bilinear B-spline interpolation, we need x and y
+                         vectors which contain at least 2 values each."))
   end
 
   x, y, z = sort_data(x,y,z)
@@ -286,7 +286,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   m = length(y)
 
   if (size(z,2) != n || size(z,1) != m)
-    @error("The dimensions of z do not coincide with x and y.")
+      throw(DimensionMismatch("The dimensions of z do not coincide with x and y."))
   end
 
   x, y, z = sort_data(x,y,z)
@@ -396,7 +396,10 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
     Phi[(i+3), (m+1)*(n+2) - 1] = -2
     Phi[(i+3), (m+2)*(n+2)    ] =  1
 
-    Q_temp = 36 * (Phi\P)
+    # For the sparse matrix `Phi` using the built-in `qr` function
+    # is more numerically stable than the standard `LDLt` procedure
+    # used by default in Julia for the `\` operator.
+    Q_temp = 36 * (qr(Phi) \ P)
     Q      = reshape(Q_temp, (n+2, m+2))
 
     BicubicBSpline(x, y, Delta, Q, IP)
@@ -520,7 +523,10 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
     Phi[(i+3), (m+2)*(n+2) - 1] = -1
     Phi[(i+3), (m+2)*(n+2)    ] =  1
 
-    Q_temp = 36 * (Phi\P)
+    # For the sparse matrix `Phi` using the built-in `qr` function
+    # is more numerically stable than the standard `LDLt` procedure
+    # used by default in Julia for the `\` operator.
+    Q_temp = 36 * (qr(Phi) \ P)
     Q      = reshape(Q_temp, (n+2, m+2))
 
     BicubicBSpline(x, y, Delta, Q, IP)
