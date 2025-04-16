@@ -1,5 +1,6 @@
 Manifest.toml
 out/
+run/
 scratch/
 solution_*
 *.png
@@ -8,4 +9,4 @@ docs/build
 docs/src/authors.md
 docs/src/code_of_conduct.md
 docs/src/contributing.md
-docs/src/home.md
+docs/src/index.md

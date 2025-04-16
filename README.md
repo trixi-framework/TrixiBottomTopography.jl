@@ -1,8 +1,10 @@
 # TrixiBottomTopography.jl
+[![Docs-stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable)
 [![Docs-dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/)
 [![Build Status](https://github.com/trixi-framework/TrixiBottomTopography.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/trixi-framework/TrixiBottomTopography.jl/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/trixi-framework/TrixiBottomTopography.jl/badge.svg?branch=main)](https://coveralls.io/github/trixi-framework/TrixiBottomTopography.jl?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15122147.svg)](https://doi.org/10.5281/zenodo.15122147)
 
 `TrixiBottomTopography.jl` is a supplementary package to the numerical solvers [Trixi.jl](https://github.com/trixi-framework/Trixi.jl) and [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), which enables use of real world geographical data for the bottom topography function of the shallow water equations.
 
@@ -73,5 +75,5 @@ Further examples can be found in the [examples folder](https://github.com/trixi-
 The full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 
 ## License and contributing
-`TrixiBottomTopography.jl` is published under the MIT license (see [LICENSE.md](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/LICENSE.md)).
+`TrixiBottomTopography.jl` is published under the MIT license (see [LICENSE.md](LICENSE.md)).
 We are pleased to accept contributions from everyone, preferably in the form of a PR.
