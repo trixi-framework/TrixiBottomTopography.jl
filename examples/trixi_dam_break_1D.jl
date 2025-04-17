@@ -37,7 +37,7 @@ end
 # Setting initial condition
 initial_condition = initial_condition_dam_break
 
-# Setting the boundary to be a reflective wall
+# Setting the boundary to be a free-slip wall
 boundary_condition = boundary_condition_slip_wall
 
 ###############################################################################

@@ -35,7 +35,11 @@ function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
   return prim2cons(SVector(H, v1, v2, b), equations)
 end
 
+# Setting initial condition
 initial_condition = initial_condition_wave
+
+# Setting the boundary to be a free-slip wall
+boundary_condition = boundary_condition_slip_wall
 
 ###############################################################################
 # Get the DG approximation space
@@ -51,10 +55,12 @@ coordinates_min = (spline_struct.x[1], spline_struct.y[1])
 coordinates_max = (spline_struct.x[end], spline_struct.y[end])
 mesh = TreeMesh(coordinates_min, coordinates_max,
                 initial_refinement_level=3,
-                n_cells_max=10_000)
+                n_cells_max=10_000,
+                periodicity=false)
 
 # create the semi discretization object
-semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver)
+semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
+                                    boundary_conditions = boundary_condition)
 
 ###############################################################################
 # ODE solvers, callbacks etc.

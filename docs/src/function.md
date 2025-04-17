@@ -40,7 +40,7 @@ and smoothing with respect to variable `x` from the previously created `spline_s
 If we want to visualize the interpolation function with 100 interpolation points, we define the following:
 ```julia
 # Define interpolation points
-n = 100
+n = 200
 x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
 ```
 
@@ -53,21 +53,29 @@ y_int_pts = spline_func.(x_int_pts)
 
 Plotting the interpolated points can be done via
 
-TODO: plot call changed
 ```julia
-# Plotting
-pyplot()
-plot(x_int_pts, y_int_pts,
-     xlabel="ETRS89 East", ylabel="DHHN2016 Height",
-     label="Bottom topography",
-     title="Cubic B-spline interpolation with not-a-knot end condition and smoothing")
+plot_topography(x_int_pts, y_int_pts; xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
 ```
 
-gives the following representation:
-TODO: remake figure
-![image](https://user-images.githubusercontent.com/101979498/203507053-6699ae13-3a72-4410-8388-92b2e95c21e1.png)
+which gives the following representation:
 
-TODO: show alternative with the interpolation knots and make another figure
+![image](https://github.com/user-attachments/assets/ceb242a8-53a6-424f-abc9-39789d6e31d4)
+
+Alternatively, one can plot the interpolated bottom topography together
+with the interpolation knots as follows
+
+```julia
+# Get the original interpolation knots
+x_knots = spline_struct.x
+y_knots = spline_func.(x_knots)
+
+plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
+                                         xlabel = "ETRS89 East", ylabel = "DHHN2016 Height" )
+```
+
+which gives
+
+![image](https://github.com/user-attachments/assets/91c515f8-986b-42ff-bf5d-1927687a59c5)
 
 ## Two dimensional case
 
@@ -111,59 +119,47 @@ x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
 y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 ```
 
-To fill a matrix `z_int_pts` which contains the corresponding `z` values
-for `x_int_pts` and `y_int_pts`, we define a helper function `fill_sol_mat`:
-
-TODO: update this. Now this helper function has a different name and lives elsewhere
-```julia
-# Helper function to fill the solution matrix
-# Input parameters:
-#  - f: spline function
-#  - x: vector of x values
-#  - y: vector of y values
-function fill_sol_mat(f, x, y)
-
-  # Get dimensions for solution matrix
-  n = length(x)
-  m = length(y)
-
-  # Create empty solution matrix
-  z = zeros(n,m)
-
-  # Fill solution matrix
-  for i in 1:n, j in 1:m
-    # Evaluate spline functions
-    # at given x,y values
-    z[j,i] = f(x[i], y[j])
-  end
-
-  # Return solution matrix
-  return z
-end
-```
-
-and evaluate to obtain the `z_int_pts` values by setting:
+To fill a matrix `z_int_pts`, which contains the corresponding `z` values
+for `x_int_pts` and `y_int_pts`, we use the helper function
+[`evaluate_bicubicspline_interpolant`](@ref evaluate_bicubicspline_interpolant).
 
 ```julia
 # Get interpolated matrix
-z_int_pts = fill_sol_mat(spline_func, x_int_pts, y_int_pts)
+z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
 ```
 
 Plotting the interpolated values
 
-TODO: plot call changed
 ```julia
-# Plotting
-pyplot()
-surface(x_int_pts, y_int_pts, z_int_pts, camera=(-30,30),
-        xlabel="ETRS89\n East", ylabel="ETRS89\n North", zlabel="DHHN2016\n Height",
-        label="Bottom topography",
-        title="Cubic B-spline interpolation with not-a-knot end condition")
+  plot_topography(x_int_pts, y_int_pts, z_int_pts;
+                  xlabel="ETRS89\n East",
+                  ylabel="ETRS89\n North",
+                  zlabel="DHHN2016\n Height",
+                  azimuth_angle = 54 * pi / 180,
+                  elevation_angle = 27 * pi / 180)
 ```
 
 gives the following representation:
 TODO: remake figure
+![image](https://github.com/user-attachments/assets/1203483a-b414-45b1-a69a-c6e284eeb0c2)
 
-![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)
+Alternatively, one can plot the interpolated bottom topography together
+with the interpolation knots as follows
 
-TODO: show alternative with the interpolation knots and make another figure
+```julia
+# Get the original interpolation knots
+x_knots = spline_struct.x
+y_knots = spline_struct.y
+z_knots = evaluate_bicubicspline_interpolant(spline_func, x_knots, y_knots)
+
+plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
+                                         x_knots, y_knots, z_knots;
+                                         xlabel="ETRS89\n East",
+                                         ylabel="ETRS89\n North",
+                                         zlabel="DHHN2016\n Height",
+                                         azimuth_angle = 54 * pi / 180,
+                                         elevation_angle = 27 * pi / 180)
+```
+
+which gives
+![image](https://github.com/user-attachments/assets/ed082318-47ec-4680-8cd0-04997c3a95b4)

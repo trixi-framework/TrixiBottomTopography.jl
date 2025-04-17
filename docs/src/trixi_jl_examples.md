@@ -5,6 +5,13 @@ section of this documentation, `TrixiBottomTopography.jl` was initially develope
 supplementary package for the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
 to enable the user to use real world geographical data for the bottom topography
 function of the shallow water equations.
+`TrixiBottomTopography.jl` can also be used together with
+[`TrixiShallowWater.jl`](https://github.com/trixi-framework/TrixiShallowWater.jl)
+a solver suite specifically designed for shallow water flow applications.
+An example that combines `TrixiBottomTopography.jl` with wet/dry transitions and
+shock capturing to model a tsunami runup is available as a
+[tutorial](https://trixi-framework.github.io/TrixiShallowWater.jl/stable/tutorials/elixir_shallowwater_monai_tsunami/)
+in `TrixiShallowWater.jl`.
 
 In this section, a one dimensional example is presented which uses the functionalities of
 `TrixiBottomTopography.jl` with [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
@@ -26,7 +33,7 @@ using Trixi
 Next, the underlying bottom topography data is downloaded from a gist.
 ```julia
 # Download one dimensional Rhine bottom data from gist
-Rhine_data = Trixi.download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
+Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
 ```
 The downloaded data is then used to define the B-spline interpolation function as described in
 [B-spline structure](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/)
@@ -140,33 +147,46 @@ be specified (in this case, `RDPK3SpFSAL49()`) as well as some tolerances respon
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
             save_everystep=true);
 ```
-At this point, the calculations would generally be finished. However, to visualize the dam break problem, we want to create a .gif file of the solution. To do so, we have set the `save_everystep` attribute to `true`. This means that the solution for every time step will be callable afterwards.
+At this point, the calculation is finished. However, to visualize the dam break problem,
+we want to create an animation of the solution to show its evolution over time.
+To do so, we have set the `save_everystep` attribute to `true`.
+This means that the solution for every time step will be callable afterwards.
 
-First of all, a plotting backend is chosen. Here we use `pyplot()` as the resulting plots look very clear. Then we define an `animation` loop using the macro `@animate` over every second of the interim solutions. Inside the loop, the `PlotData2D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards, this plotting object can be plotted using the known `plot` command.
+We use the plotting backend [`Makie.jl`](https://docs.makie.org/stable/) for this purpose.
+To create an animation we use the `record` structure to save plots over every time step
+of the simulation and append them together into an animation.
+Inside the loop, the `PlotData1D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards, this plotting object is visualized using the `lines` command from Makie.
 
-TODO: figure out how this will work with the Makie strategy
-The `gif` function uses `animation` to create a .gif from the plots for every second-time step and saves it in the specified location. Additionally, the frames per second rate can be set in the `fps` attribute.
+Two `Observable` quantities are created, one to increment the number of plots and another
+for the time at which each solution occurs.
 ```julia
-# Create .gif animation of the solution
-pyplot()
-animation = @animate for k= 1:2:length(sol.t)
-  pd = PlotData1D(sol.u[k], semi)
-  plot(pd["H"])
-  plot!(pd["b"], ylim=(38,65), title="t=$(sol.t[k])", xlabel="ETRS89 East", ylabel="DHHN2016")
+# Create animation of the solution
+j = Makie.Observable(1)
+time = Makie.Observable(0.0)
+
+pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
+f = Makie.Figure()
+ax = Makie.Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",
+                title = @lift "time t = $(round($(time), digits=3))")
+
+Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 1])
+Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 3])
+Makie.ylims!(ax, 38, 65)
+# Maybe need to use .gif or so to work in Documenter.jl
+Makie.record(f, "animation.mp4", 1:length(pd_list)) do tt
+  j[] = tt
+  time[] = sol.t[tt]
 end
-
-gif(animation, "examples\\plots\\dam_break_1d.gif", fps=15)
 ```
-This is the resulting .gif animation.
+Below is the resulting animation.
 
-TODO: possibly update the animation
-![gif](https://user-images.githubusercontent.com/101979498/203507054-2faca609-2628-4fea-9a4c-5788d02a237b.gif)
+![gif](https://github.com/user-attachments/assets/44592cea-6823-406f-97cb-bcc8fe6fffe0)
 
 ## Two dimensional dam break
 
 The underlying example file can be found [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_2D.jl).
 
-The two dimensional example is very similar to the one dimensional case.
+The two dimensional example is similar to the one dimensional case.
 
 First, all the necessary packages and the underlying bottom topography data are loaded.
 
@@ -174,11 +194,10 @@ First, all the necessary packages and the underlying bottom topography data are 
 # Include packages
 using TrixiBottomTopography
 using CairoMakie
-using LinearAlgebra
 using OrdinaryDiffEqLowStorageRK
 using Trixi
 
-Rhine_data = Trixi.download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
+Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
 ```
 
 Using the data, a bicubic B-spline interpolation is performed on the data to define a bottom topography function.
@@ -198,7 +217,7 @@ function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
 
   inicenter = SVector(357490.0, 5646519.0)
   x_norm = x - inicenter
-  r = norm(x_norm)
+  r = sqrt(x_norm[1]^2 + x_norm[2]^2)
 
   # Calculate primitive variables
   H =  r < 50 ? 65.0 : 55.0
@@ -211,10 +230,15 @@ function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
   return prim2cons(SVector(H, v1, v2, b), equations)
 end
 
+# Setting initial condition
 initial_condition = initial_condition_wave
+
+# Setting the boundary to be a free-slip wall
+boundary_condition = boundary_condition_slip_wall
 ```
 
-As we can see, there is no boundary condition specified. This is because, at this stage, `boundary_condition_slip_wall` has not been implemented into `Trixi.jl` for the two dimensional shallow water equations.
+This assigns the initial conditions and boundary conditions to appropriate names that
+can be passed to the forthcoming semidiscretization.
 
 The DGSEM solver is set up as in the one dimensional case.
 
@@ -227,7 +251,9 @@ solver = DGSEM(polydeg=3, surface_flux=(flux_fjordholm_etal, flux_nonconservativ
                volume_integral=VolumeIntegralFluxDifferencing(volume_flux))
 ```
 
-Now the mesh has to be specified. Because we do not have any boundary conditions defined, we can only assume to have a periodic domain. Therefore `periodicity` does not have to be specified as it is set to `true` by default.
+Now the mesh has to be specified. As above, we use a Cartesian box mesh created as a `TreeMesh`
+in `Trixi.jl`. Because we have defined boundary conditions defined, we set the `periodicity`
+to be `false`.
 
 ```julia
 ###############################################################################
@@ -237,17 +263,19 @@ coordinates_min = (spline_struct.x[1], spline_struct.y[1])
 coordinates_max = (spline_struct.x[end], spline_struct.y[end])
 mesh = TreeMesh(coordinates_min, coordinates_max,
                 initial_refinement_level=3,
-                n_cells_max=10_000)
+                n_cells_max=10_000,
+                periodicity=false)
 ```
 
 When calling the semidiscretization object again, `boundary_conditions` does not have to be specified.
 
 ```julia
 # create the semi discretization object
-semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver)
+semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
+                                    boundary_conditions = boundary_condition)
 ```
 
-The solution of the PDE and the.gif animation is analogous to the one dimensional case except that we chose `PlotData2D` to create the plotting object instead of `PlotData1D` as we are in the two dimensional case now.
+The solution of the PDE and the animation is analogous to the one dimensional case except that we chose `PlotData2D` to create the plotting object instead of `PlotData1D` as we are in the two dimensional case now.
 
 ```julia
 ###############################################################################
@@ -259,24 +287,46 @@ ode = semidiscretize(semi, tspan)
 ###############################################################################
 # run the simulation
 
-# use a Runge-Kutta method with automatic (error based) time step size control
+# use a Runge-Kutta method with error based time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8, save_everystep=true);
 
-# Create .gif animation of the solution
-pyplot()
-animation = @animate for k= 1:6:length(sol.t)
-  pd = PlotData2D(sol.u[k], semi)
-  wireframe(pd["H"])
-  surface!(pd["b"], zlim=(38,65), camera = (30,20), title="t=$(sol.t[k])",
-            xlabel="E", ylabel="N", zlabel="H")
-end
+# Create an animation of the solution
+j = Makie.Observable(1)
+time = Makie.Observable(0.0)
 
-gif(animation, "examples\\plots\\dam_break_2d.gif", fps=15)
+pd_list = [PlotData2D(sol.u[i], semi) for i in 1:length(sol.t)]
+f = Makie.Figure()
+
+title_text = @lift "time t = $(round($(time), digits=3))"
+az = 130 * pi / 180
+el = 18 * pi / 180
+ax = Makie.Axis3(f[1, 1], xlabel = "E", ylabel = "N", zlabel = "H",
+                  title = title_text, azimuth = az, elevation = el)
+
+Makie.wireframe!(ax, pd_list[1].x, pd_list[1].y, @lift pd_list[ $(j) ].data[1];
+                  color = Makie.RGBA(0, 0.5, 1, 0.4))
+Makie.surface!(ax, pd_list[1].x, pd_list[1].y, @lift pd_list[ $(j) ].data[4];
+                colormap = :greenbrownterrain)
+Makie.zlims!(ax, 35, 70)
+
+Makie.record(f, "animation_2d.mp4", 1:length(pd_list)) do tt
+  j[] = tt
+  time[] = sol.t[tt]
+end
 ```
 
-TODO: figure out how to make the animation using the Makie strategy
-This is the resulting .gif animation.
+As in the 1D example, we use the plotting backend [`Makie.jl`](https://docs.makie.org/stable/).
+To create an animation we use the `record` structure to save plots over every time step
+of the simulation and append them together into an animation.
+Inside the loop, the `PlotData2D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards, this plotting object is visualized using the `wireframe` command to visualize
+the 2D water height evolution and `surface` to visualize bicubic B-spline approximation
+of the bottom topography.
+Two `Observable` quantities are created, one to increment the number of plots and another
+for the time at which each solution occurs.
 
-![gif](https://user-images.githubusercontent.com/101979498/203507057-f4fa5ef2-e852-493d-8df6-497c1e2a9a51.gif)
+TODO: figure out how to make the animation using the Makie strategy
+The the resulting animation is gven below
+
+![gif](https://github.com/user-attachments/assets/72db956e-a812-4bcb-a155-44424fb36e7a)
 
 For the bottom topography, the domain's boundaries look weird. The reason for that is a bug in `PlotData2D` of `Trixi.jl`. Once this has been addressed, the plotted bottom topography will look similar to the one in [the previous section](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).
