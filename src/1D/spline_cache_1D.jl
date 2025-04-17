@@ -62,20 +62,20 @@ A reference for the calculations in this script can be found in Chapter 1 of
 """
 function LinearBSpline(x::Vector, y::Vector)
   if length(x) != length(y)
-    @error("Vectors x and y have to contain the same number of values")
+    throw(DimensionMismatch("Vectors x and y have to contain the same number of values"))
   end
 
   if length(x) == 1
-    @error("To perform linear B-spline interpolation, we need an x vector that
-            contains at least 2 values.")
+    throw(ArgumentError("To perform linear B-spline interpolation, we need an x vector
+                         that contains at least 2 values."))
   end
 
-  x,y = sort_data(x,y)
+  x,y = sort_data(x, y)
 
   Delta = x[2] - x[1]
 
   IP = [-1 1;
-        1 0]
+         1 0]
 
   Q = y
 
@@ -243,8 +243,8 @@ A reference for the calculations in this script can be found in Chapter 1 of
 function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_factor = 0.0)
 
   if length(x) < 2
-    @error("To perform cubic B-spline interpolation, we need an x vector which
-            contains at least 2 values.")
+    throw(ArgumentError("To perform cubic B-spline interpolation, we need an x vector
+                         which contains at least 2 values."))
   end
 
   x,y = sort_data(x,y)
@@ -252,7 +252,7 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
   Delta  = x[2] - x[1]
 
   # Consider spline smoothing if required
-  if smoothing_factor > 0.0
+  if smoothing_factor > 0
     y = spline_smoothing(smoothing_factor, Delta, y)
   end
 
@@ -280,8 +280,9 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
   # Not-a-knot end condition
   elseif end_condition == "not-a-knot"
     if length(x) < 4
-      @error("To perform cubic B-spline interpolation with not-a-knot end condition,
-              we need an x vector which contains at least 4 values.")
+      throw(ArgumentError("To perform cubic B-spline interpolation with not-a-knot
+                           end condition, we need an x vector which contains
+                           at least 4 values."))
     end
 
     du = vcat(4, ones(n))
@@ -298,7 +299,8 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
     CubicBSpline(x, Delta, Q_knot, IP)
 
   else
-    @error("Only free and not-a-knot conditions are implemented!")
+    throw(ArgumentError("Only \"free\" and \"not-a-knot\" boundary conditions
+                         are available!"))
   end
 end
 

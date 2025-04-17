@@ -292,7 +292,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   x, y, z = sort_data(x,y,z)
 
   # Consider spline smoothing if required
-  if smoothing_factor > 0.0
+  if smoothing_factor > 0
     z = calc_tps(smoothing_factor, x, y, z)
   end
 
@@ -334,8 +334,9 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   ########################
   if end_condition == "free"
     if (n < 2) || (m < 2)
-      @error("To perform bicubic B-spline interpolation with the free end condition,
-              we need x and y vectors which contain at least 2 values each.")
+      throw(ArgumentError("To perform bicubic B-spline interpolation with
+                           the free end condition, we need x and y vectors
+                           which contain at least 2 values each."))
     end
 
     # Q_{j,1} - 2Q_{j,2} + Q_{j,3} = 0
@@ -409,8 +410,9 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   ###################################
   elseif end_condition == "not-a-knot"
     if (n < 4) || (m < 4)
-      @error("To perform bicubic B-spline interpolation with the not-a-knot end condition,
-              we need x and y vectors which contain at least 4 values each.")
+      throw(ArgumentError("To perform bicubic B-spline interpolation with
+                           the not-a-knot end condition, we need x and y vectors
+                           which contain at least 4 values each."))
     end
 
     # Continuity of the third `x` derivative between the leftmost and second leftmost patch
@@ -531,7 +533,8 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
 
     BicubicBSpline(x, y, Delta, Q, IP)
   else
-    @error("Only free and not-a-knot boundary conditions are implemented!")
+    throw(ArgumentError("Only \"free\" and \"not-a-knot\" boundary
+                         conditions are available!"))
   end
 end
 
