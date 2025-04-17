@@ -1,34 +1,29 @@
 ##############################################################################
 # Script which uses the functionalities implemented in TrixiBottomTopography #
-# to polt a one dimensional cubic B-spline interpolated section of the Rhine #
-# river with free end condition and smoothing.                               #
+# to plot a one dimensional cubic B-spline interpolated section of the Rhine #
+# river with free end condition.                                             #
 ##############################################################################
 
 # Include packages
 using TrixiBottomTopography
-using Plots
-
-# Get root directory
-dir_path = pkgdir(TrixiBottomTopography)
 
 # Define data path
-data = string(dir_path, "/examples/data/rhine_data_1d_20_x.txt")
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
 
 # Define B-spline structure
 spline_struct = CubicBSpline(data)
 # Define B-spline interpolation function
 spline_func(x) = spline_interpolation(spline_struct, x)
 
-# Define interpolation points
-n = 100
-x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
+# Evaluate the cubic B-spline on a new set of nodes and plot
+if isdefined(Main, :Makie)
+  # Define interpolation points
+  n = 200
+  x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
 
-# Get interpolated values
-y_int_pts = spline_func.(x_int_pts)
+  # Get interpolated values
+  y_int_pts = spline_func.(x_int_pts)
 
-# Plotting
-pyplot()
-plot(x_int_pts, y_int_pts,
-     xlabel="ETRS89 East", ylabel="DHHN2016 Height",
-     label="Bottom topography", 
-     title="Cubic B-spline interpolation with free end condition")
+  plot_topography(x_int_pts, y_int_pts; xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
+end

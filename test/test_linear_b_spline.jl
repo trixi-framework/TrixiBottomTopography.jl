@@ -1,7 +1,8 @@
 using TrixiBottomTopography
 
 # Define data path
-data = "data/rhine_1d_10_x_1.txt"
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, "test", "data", "rhine_1d_10_x_1.txt")
 
 # Define B-spline structure
 spline_struct = LinearBSpline(data)

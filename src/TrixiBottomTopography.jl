@@ -1,9 +1,9 @@
 """
     TrixiBottomTopography
 
-**TrixiBottomTopography** is a supporting framework for Trixi.jl, which can
-be used to approximate bottom topography functions using B-splines from
-real world data.
+**TrixiBottomTopography** is a supporting framework for Trixi.jl and
+TrixiShallowWater.jl, which can be used to approximate bottom topography
+functions using B-splines from real world data.
 """
 module TrixiBottomTopography
 
@@ -35,5 +35,12 @@ module TrixiBottomTopography
 
   # Export default example
   export TBT_default_example
+
+  # Note, Empty routines for visualization are included and exported. They are extended
+  # in `ext/TrixiBottomTopographyMakieExt.jl` where their implementations are found.
+  function evaluate_bicubicspline_interpolant end
+  function plot_topography end
+  function plot_topography_with_interpolation_knots end
+  export evaluate_bicubicspline_interpolant, plot_topography, plot_topography_with_interpolation_knots
 
 end
