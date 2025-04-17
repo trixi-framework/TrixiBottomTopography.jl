@@ -1,4 +1,4 @@
-# Package extension for adding Makie-based features to TrixiBottomTopographyMakieExt.jl
+# Package extension for adding Makie-based features to TrixiBottomTopography.jl
 module TrixiBottomTopographyMakieExt
 
 # Required for visualization code
