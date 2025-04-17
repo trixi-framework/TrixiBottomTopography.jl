@@ -68,6 +68,8 @@ If the implementation was successful, the following window appears:
 
 ![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)
 
+
+
 Further examples can be found in the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples) of this repository.
 
 ## Authors
