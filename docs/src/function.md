@@ -15,10 +15,11 @@ where we already defined the B-spline structure for the cubic B-spline interpola
 ```julia
 # Include packages
 using TrixiBottomTopography
-using Plots
+using CairoMakie
 
 # Define data path
-data = joinpath(@__DIR__, "data", "rhine_data_1d_20_x.txt")
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
 
 # Define B-spline structure
 spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
@@ -52,6 +53,7 @@ y_int_pts = spline_func.(x_int_pts)
 
 Plotting the interpolated points can be done via
 
+TODO: plot call changed
 ```julia
 # Plotting
 pyplot()
@@ -62,8 +64,10 @@ plot(x_int_pts, y_int_pts,
 ```
 
 gives the following representation:
-
+TODO: remake figure
 ![image](https://user-images.githubusercontent.com/101979498/203507053-6699ae13-3a72-4410-8388-92b2e95c21e1.png)
+
+TODO: show alternative with the interpolation knots and make another figure
 
 ## Two dimensional case
 
@@ -77,10 +81,11 @@ with not-a-knot end condition and smoothing.
 ```julia
 # Include packages
 using TrixiBottomTopography
-using Plots
+using CairoMakie
 
 # Define data path
-data = joinpath(@__DIR__, "data", "rhine_data_2d_20.txt")
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, "examples", "data", "rhine_data_2d_20.txt")
 
 # Define B-spline structure
 spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
@@ -109,6 +114,7 @@ y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 To fill a matrix `z_int_pts` which contains the corresponding `z` values
 for `x_int_pts` and `y_int_pts`, we define a helper function `fill_sol_mat`:
 
+TODO: update this. Now this helper function has a different name and lives elsewhere
 ```julia
 # Helper function to fill the solution matrix
 # Input parameters:
@@ -145,6 +151,7 @@ z_int_pts = fill_sol_mat(spline_func, x_int_pts, y_int_pts)
 
 Plotting the interpolated values
 
+TODO: plot call changed
 ```julia
 # Plotting
 pyplot()
@@ -155,5 +162,8 @@ surface(x_int_pts, y_int_pts, z_int_pts, camera=(-30,30),
 ```
 
 gives the following representation:
+TODO: remake figure
 
 ![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)
+
+TODO: show alternative with the interpolation knots and make another figure

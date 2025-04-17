@@ -4,7 +4,8 @@ using TrixiBottomTopography
 @testset "Free end" begin
 
   # Define data path
-  data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
+  root_dir = pkgdir(TrixiBottomTopography)
+  data = joinpath(root_dir, "test", "data", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data)
@@ -21,7 +22,8 @@ end
 @testset "Free end + smoothing" begin
 
   # Define data path
-  data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
+  root_dir = pkgdir(TrixiBottomTopography)
+  data = joinpath(root_dir, "test", "data", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data; smoothing_factor = 9999)
@@ -37,7 +39,8 @@ end
 @testset "Not-a-knot end" begin
 
   # Define data path
-  data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
+  root_dir = pkgdir(TrixiBottomTopography)
+  data = joinpath(root_dir, "test", "data", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data; end_condition = "not-a-knot")
@@ -53,7 +56,8 @@ end
 @testset "Not-a-knot end + smoothing" begin
 
   # Define data path
-  data = joinpath(@__DIR__, "data", "rhine_2d_10.txt")
+  root_dir = pkgdir(TrixiBottomTopography)
+  data = joinpath(root_dir, "test", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)

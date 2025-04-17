@@ -101,10 +101,11 @@ as well as the paths of the files where we want to save them files.
 
 ```julia
 # Define file paths
-path_src_file = joinpath("examples", "data", "dgm1_32_357_5646_1_nw.xyz")
-path_out_file_1d_x = joinpath("examples", "data", "rhine_data_1d_20_x.txt")
-path_out_file_1d_y = joinpath("examples", "data", "rhine_data_1d_20_y.txt")
-path_out_file_2d = joinpath("examples", "data", "rhine_data_2d_20.txt")
+root_dir = pkgdir(TrixiBottomTopography)
+path_src_file = joinpath(root_dir, "examples", "data", "dgm1_32_357_5646_1_nw.xyz")
+path_out_file_1d_x = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
+path_out_file_1d_y = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_y.txt")
+path_out_file_2d = joinpath(root_dir, "examples", "data", "rhine_data_2d_20.txt")
 ```
 
 The source data from `path_src_file` looks as follows:

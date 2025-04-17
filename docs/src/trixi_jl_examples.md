@@ -16,17 +16,17 @@ First, all the necessary packages must be included at the beginning of the file.
 ```julia
 # Include packages
 using TrixiBottomTopography
-using Plots
-using OrdinaryDiffEq
+using CairoMakie
+using OrdinaryDiffEqLowStorageRK
 using Trixi
 ```
 - `Plots` is responsible for visualizing the approximate solution of the dam break problem.
-- `OrdinaryDiffEq` always has to be added when working with `Trixi`.
+- `OrdinaryDiffEqLowStorageRK` must be added to load low-storage explicit Runge-Kutta methods to be used by `Trixi.jl`.
 
 Next, the underlying bottom topography data is downloaded from a gist.
 ```julia
 # Download one dimensional Rhine bottom data from gist
-Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
+Rhine_data = Trixi.download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
 ```
 The downloaded data is then used to define the B-spline interpolation function as described in
 [B-spline structure](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/)
@@ -136,7 +136,7 @@ be specified (in this case, `RDPK3SpFSAL49()`) as well as some tolerances respon
 ###############################################################################
 # run the simulation
 
-# use a Runge-Kutta method with automatic (error-based) time step size control
+# use a Runge-Kutta method with error-based time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
             save_everystep=true);
 ```
@@ -144,6 +144,7 @@ At this point, the calculations would generally be finished. However, to visuali
 
 First of all, a plotting backend is chosen. Here we use `pyplot()` as the resulting plots look very clear. Then we define an `animation` loop using the macro `@animate` over every second of the interim solutions. Inside the loop, the `PlotData2D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards, this plotting object can be plotted using the known `plot` command.
 
+TODO: figure out how this will work with the Makie strategy
 The `gif` function uses `animation` to create a .gif from the plots for every second-time step and saves it in the specified location. Additionally, the frames per second rate can be set in the `fps` attribute.
 ```julia
 # Create .gif animation of the solution
@@ -158,6 +159,7 @@ gif(animation, "examples\\plots\\dam_break_1d.gif", fps=15)
 ```
 This is the resulting .gif animation.
 
+TODO: possibly update the animation
 ![gif](https://user-images.githubusercontent.com/101979498/203507054-2faca609-2628-4fea-9a4c-5788d02a237b.gif)
 
 ## Two dimensional dam break
@@ -171,12 +173,12 @@ First, all the necessary packages and the underlying bottom topography data are 
 ```julia
 # Include packages
 using TrixiBottomTopography
-using Plots
+using CairoMakie
 using LinearAlgebra
-using OrdinaryDiffEq
+using OrdinaryDiffEqLowStorageRK
 using Trixi
 
-Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
+Rhine_data = Trixi.download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
 ```
 
 Using the data, a bicubic B-spline interpolation is performed on the data to define a bottom topography function.
@@ -272,6 +274,7 @@ end
 gif(animation, "examples\\plots\\dam_break_2d.gif", fps=15)
 ```
 
+TODO: figure out how to make the animation using the Makie strategy
 This is the resulting .gif animation.
 
 ![gif](https://user-images.githubusercontent.com/101979498/203507057-f4fa5ef2-e852-493d-8df6-497c1e2a9a51.gif)

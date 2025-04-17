@@ -38,11 +38,11 @@ This package contains the following three main functionalities:
 - Setting up a B-spline interpolation structure in one and two dimensions which contains all the relevant information to define a B-spline interpolation function with additional specifications
 - Using the B-spline structure to set up a B-spline interpolation function
 
-A detailed description of the functionalities can be found in the [documentation](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/) to this package.
+A detailed description of the functionalities can be found in the [documentation](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/) to this package.
 
 
 ## Installation
-If you have not yet installed Julia, please [follow the instructions for your operating system](https://julialang.org/downloads/platform/). TrixiBottomTopography works with Julia v1.7.
+If you have not yet installed Julia, please [follow the instructions for your operating system](https://julialang.org/downloads/platform/). TrixiBottomTopography works with Julia v1.10.
 
 As TrixiBottomTopography is **not** a registered Julia package, you have to download it locally
 ```
@@ -66,6 +66,7 @@ julia> TBT_default_example()
 ```
 If the implementation was successful, the following window appears:
 
+TODO: update figure withnew stratgey
 ![image](https://user-images.githubusercontent.com/101979498/203507049-279bc69b-3acc-4c55-888f-26e02c1edabe.png)
 
 Further examples can be found in the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples) of this repository.

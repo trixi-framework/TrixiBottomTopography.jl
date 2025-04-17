@@ -8,7 +8,8 @@
 using TrixiBottomTopography
 
 # Define data path
-data = joinpath(@__DIR__, "data", "rhine_data_1d_20_x.txt")
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
 
 # Define B-spline structure
 spline_struct = CubicBSpline(data)
