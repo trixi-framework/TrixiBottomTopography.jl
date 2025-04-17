@@ -131,16 +131,16 @@ z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts
 Plotting the interpolated values
 
 ```julia
-  plot_topography(x_int_pts, y_int_pts, z_int_pts;
-                  xlabel="ETRS89\n East",
-                  ylabel="ETRS89\n North",
-                  zlabel="DHHN2016\n Height",
-                  azimuth_angle = 54 * pi / 180,
-                  elevation_angle = 27 * pi / 180)
+plot_topography(x_int_pts, y_int_pts, z_int_pts;
+                xlabel="ETRS89\n East",
+                ylabel="ETRS89\n North",
+                zlabel="DHHN2016\n Height",
+                azimuth_angle = 54 * pi / 180,
+                elevation_angle = 27 * pi / 180)
 ```
 
 gives the following representation:
-TODO: remake figure
+
 ![image](https://github.com/user-attachments/assets/1203483a-b414-45b1-a69a-c6e284eeb0c2)
 
 Alternatively, one can plot the interpolated bottom topography together
