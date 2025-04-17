@@ -57,7 +57,7 @@ end
 
   # Define data path
   root_dir = pkgdir(TrixiBottomTopography)
-  data = joinpath(root_dir, "test", "rhine_2d_10.txt")
+  data = joinpath(root_dir, "test", "data", "rhine_2d_10.txt")
 
   # Define B-spline structure
   spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
