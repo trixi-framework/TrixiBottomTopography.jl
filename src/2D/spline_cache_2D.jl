@@ -332,7 +332,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   ########################
   ## Free end condition ##
   ########################
-  if end_condition === "free"
+  if end_condition == "free"
     if (n < 2) || (m < 2)
       throw(ArgumentError("To perform bicubic B-spline interpolation with
                            the free end condition, we need x and y vectors
@@ -408,7 +408,7 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
   ###################################
   ## Not-a-knot boundary condition ##
   ###################################
-  elseif end_condition === "not-a-knot"
+  elseif end_condition == "not-a-knot"
     if (n < 4) || (m < 4)
       throw(ArgumentError("To perform bicubic B-spline interpolation with
                            the not-a-knot end condition, we need x and y vectors

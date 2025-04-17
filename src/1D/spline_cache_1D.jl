@@ -264,7 +264,7 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
          1  4  1 0]
 
   # Free end condition
-  if end_condition === "free"
+  if end_condition == "free"
     du = vcat(-2, ones(n))
     dm = vcat(1, 4*ones(n), 1)
     dl = vcat(ones(n), -2)
@@ -278,7 +278,7 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
     CubicBSpline(x, Delta, Q_free, IP)
 
   # Not-a-knot end condition
-  elseif end_condition === "not-a-knot"
+  elseif end_condition == "not-a-knot"
     if length(x) < 4
       throw(ArgumentError("To perform cubic B-spline interpolation with not-a-knot
                            end condition, we need an x vector which contains
