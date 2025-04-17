@@ -172,15 +172,15 @@ ax = Makie.Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",
 Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 1])
 Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 3])
 Makie.ylims!(ax, 38, 65)
-# Maybe need to use .gif or so to work in Documenter.jl
-Makie.record(f, "animation.mp4", 1:length(pd_list)) do tt
+
+Makie.record(f, "animation.gif", 1:length(pd_list)) do tt
   j[] = tt
   time[] = sol.t[tt]
 end
 ```
 Below is the resulting animation.
 
-![gif](https://github.com/user-attachments/assets/44592cea-6823-406f-97cb-bcc8fe6fffe0)
+![gif](https://github.com/user-attachments/assets/741d2871-17a7-4715-9051-3f88e810585c)
 
 ## Two dimensional dam break
 
@@ -294,7 +294,7 @@ sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8, save_everystep=t
 j = Makie.Observable(1)
 time = Makie.Observable(0.0)
 
-pd_list = [PlotData2D(sol.u[i], semi) for i in 1:length(sol.t)]
+pd_list = [PlotData2D(sol.u[i], semi) for i in 1:5:length(sol.t)]
 f = Makie.Figure()
 
 title_text = @lift "time t = $(round($(time), digits=3))"
@@ -309,9 +309,9 @@ Makie.surface!(ax, pd_list[1].x, pd_list[1].y, @lift pd_list[ $(j) ].data[4];
                 colormap = :greenbrownterrain)
 Makie.zlims!(ax, 35, 70)
 
-Makie.record(f, "animation_2d.mp4", 1:length(pd_list)) do tt
+Makie.record(f, "animation_2d.gif", 1:length(pd_list)) do tt
   j[] = tt
-  time[] = sol.t[tt]
+  time[] = sol.t[5*tt]
 end
 ```
 
@@ -324,9 +324,8 @@ of the bottom topography.
 Two `Observable` quantities are created, one to increment the number of plots and another
 for the time at which each solution occurs.
 
-TODO: figure out how to make the animation using the Makie strategy
-The the resulting animation is gven below
+The the resulting animation is given below
 
-![gif](https://github.com/user-attachments/assets/72db956e-a812-4bcb-a155-44424fb36e7a)
+![gif](https://github.com/user-attachments/assets/b1ba80a0-d38c-4b75-9f35-117b3c18b9d9)
 
 For the bottom topography, the domain's boundaries look weird. The reason for that is a bug in `PlotData2D` of `Trixi.jl`. Once this has been addressed, the plotted bottom topography will look similar to the one in [the previous section](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).

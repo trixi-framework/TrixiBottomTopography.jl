@@ -87,8 +87,8 @@ if isdefined(Main, :Makie)
   Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 1])
   Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 3])
   Makie.ylims!(ax, 38, 65)
-  # Maybe need to use .gif or so to work in Documenter.jl
-  Makie.record(f, "animation.mp4", 1:length(pd_list)) do tt
+
+  Makie.record(f, "animation.gif", 1:length(pd_list)) do tt
     j[] = tt
     time[] = sol.t[tt]
   end

@@ -80,7 +80,7 @@ if isdefined(Main, :Makie)
   j = Makie.Observable(1)
   time = Makie.Observable(0.0)
 
-  pd_list = [PlotData2D(sol.u[i], semi) for i in 1:length(sol.t)]
+  pd_list = [PlotData2D(sol.u[i], semi) for i in 1:5:length(sol.t)]
   f = Makie.Figure()
 
   title_text = @lift "time t = $(round($(time), digits=3))"
@@ -95,9 +95,8 @@ if isdefined(Main, :Makie)
                  colormap = :greenbrownterrain)
   Makie.zlims!(ax, 35, 70)
 
-  # Maybe need to use .gif or so to work in Documenter.jl
-  Makie.record(f, "animation_2d.mp4", 1:length(pd_list)) do tt
+  Makie.record(f, "animation_2d.gif", 1:length(pd_list)) do tt
     j[] = tt
-    time[] = sol.t[tt]
+    time[] = sol.t[5*tt]
   end
 end
