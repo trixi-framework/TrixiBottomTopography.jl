@@ -39,9 +39,9 @@ end
 default_Makie_colormap() = :greenbrownterrain
 
 """
-    plot_topography_with_interpolation_knots(x, y;
-                                             xlabel = "", ylabel= "",
-                                             color, legend_position = :rt)
+    plot_topography(x, y;
+                    xlabel = "", ylabel= "",
+                    color, legend_position = :rt)
 
 Plot function for 1D bottom topography data.
 The interpolated values are provided in the vectors `x` and `y`.
