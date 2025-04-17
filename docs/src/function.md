@@ -121,7 +121,7 @@ y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 
 To fill a matrix `z_int_pts`, which contains the corresponding `z` values
 for `x_int_pts` and `y_int_pts`, we use the helper function
-[`evaluate_bicubicspline_interpolant`](@ref evaluate_bicubicspline_interpolant).
+[`evaluate_bicubicspline_interpolant`](@extref evaluate_bicubicspline_interpolant).
 
 ```julia
 # Get interpolated matrix
