@@ -40,19 +40,60 @@ This package contains the following three main functionalities:
 
 A detailed description of the functionalities can be found in the [documentation](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/) to this package.
 
-
 ## Installation
-If you have not yet installed Julia, please [follow the instructions for your operating system](https://julialang.org/downloads/platform/). TrixiBottomTopography works with Julia v1.7.
+If you have not yet installed Julia, please [follow the instructions for your
+operating system](https://julialang.org/downloads/platform/). TrixiBottomTopography.jl works
+with Julia v1.10 and newer. We recommend using the latest stable release of Julia.
 
-As TrixiBottomTopography is **not** a registered Julia package, you have to download it locally
+### For users
+TrixiBottomTopography.jl and its related tools are registered Julia packages. Hence, you
+can install it by executing the following commands in the Julia REPL:
+```julia
+julia> import Pkg; Pkg.add("TrixiBottomTopography")
 ```
-git clone https://github.com/trixi-framework/TrixiBottomTopography.jl.git
+
+The available visualization functionality uses [Makie.jl](https://github.com/JuliaPlots/Makie.jl/).
+A Makie backend, such as [GLMakie.jl](https://github.com/JuliaPlots/GLMakie.jl/), can
+be loaded in addition to TrixiBottomTopography
+```julia
+julia> using Pkg; Pkg.add("GLMakie")
 ```
-and run it from within the cloned directory
+
+To use TrixiBottomTopography.jl together with the numerical solver framework Trixi.jl
+also requires a relevant time integration sub-package of
+[OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl). These can be added
+by executing
+```julia
+julia> using Pkg
+
+julia> Pkg.add(["Trixi", "OrdinaryDiffEqLowStorageRK"])
 ```
-julia --project=@.
+TrixiBottomTopography.jl can also be used together with
+TrixiShallowWater.jl a solver suite specifically designed for shallow water flow applications.
+An example that combines TrixiBottomTopography.jl with wet/dry transitions and
+shock capturing to model a tsunami runup is available as a
+[tutorial](https://trixi-framework.github.io/TrixiShallowWater.jl/stable/tutorials/elixir_shallowwater_monai_tsunami/)
+in TrixiShallowWater.jl.
+
+### For developers
+If you plan on editing TrixiBottomTopography.jl itself, you can download TrixiBottomTopography.jl
+locally and use the code from the cloned directory:
+```bash
+git clone git@github.com:trixi-framework/TrixiBottomTopography.jl.git
+cd TrixiBottomTopography.jl
+mkdir run
+cd run
+julia --project=. -e 'using Pkg; Pkg.develop(PackageSpec(path=".."))' # Install local TrixiBottomTopography.jl clone
+julia --project=. -e 'using Pkg; Pkg.add(["GLMakie"])' # Install additional packages
 ```
-to make use of the implemented functionalities.
+Note that the visualization tool GLMakie.jl is optional and can be omitted.
+
+If you installed TrixiBottomTopography.jl this way, you always have to start Julia with the `--project`
+flag set to your `run` directory, e.g.,
+```bash
+julia --project=.
+```
+if already inside the `run` directory.
 
 ## Examples
 
