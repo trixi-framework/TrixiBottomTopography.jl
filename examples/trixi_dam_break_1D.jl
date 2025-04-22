@@ -7,10 +7,11 @@
 using TrixiBottomTopography
 using OrdinaryDiffEqLowStorageRK
 using Trixi
-using Downloads: download
 
 # Download one dimensional Rhine bottom data from gist
-Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
+root_dir = pkgdir(TrixiBottomTopography)
+Rhine_data = Trixi.download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt",
+                            joinpath(root_dir, "examples", "Rhine_data_1D_40_x_841.txt"))
 
 # B-spline interpolation of the underlying data
 spline_struct = CubicBSpline(Rhine_data)
