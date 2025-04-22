@@ -33,9 +33,6 @@ module TrixiBottomTopography
   # Export the functions which are used DGM data conversion
   export convert_dgm_1d, convert_dgm_2d
 
-  # Export default example
-  export TBT_default_example
-
   # Note, Empty routines for visualization are included and exported. They are extended
   # in `ext/TrixiBottomTopographyMakieExt.jl` where their implementations are found.
   function evaluate_bicubicspline_interpolant end

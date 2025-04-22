@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15122147.svg)](https://doi.org/10.5281/zenodo.15122147)
 
-`TrixiBottomTopography.jl` is a supplementary package to the numerical solvers [Trixi.jl](https://github.com/trixi-framework/Trixi.jl) and [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), which enables use of real world geographical data for the bottom topography function of the shallow water equations.
+**TrixiBottomTopography.jl** is a supplementary package to the numerical solvers [Trixi.jl](https://github.com/trixi-framework/Trixi.jl) and [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), which enables use of real world geographical data for the bottom topography function of the shallow water equations.
 
 The shallow water equations in one dimension
 ```math
@@ -29,12 +29,12 @@ require a (piecewise) differentiable function $b$, which describes the bottom to
 
 Geographical data is almost always given as scattered data points on a coordinate system with the corresponding elevation. So to incorporate geographical data into the shallow water equations, we need to define a function that remodels the topography from the data.
 
-`TrixiBottomTopography.jl` does this by B-spline interpolation of the underlying data.
+TrixiBottomTopography.jl does this by B-spline interpolation of the underlying data.
 
 ## Functionalities
 
 This package contains the following three main functionalities:
-- Converting geographical data given in form of `.xyz` files, e.g., from the [DGM data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/) provided by [Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw) to make it readable for `TrixiBottomTopography.jl`
+- Converting geographical data given in form of `.xyz` files, e.g., from the [DGM data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/) provided by [Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw) to make it readable for TrixiBottomTopography.jl
 - Setting up a B-spline interpolation structure in one and two dimensions which contains all the relevant information to define a B-spline interpolation function with additional specifications
 - Using the B-spline structure to set up a B-spline interpolation function
 
@@ -56,7 +56,7 @@ to make use of the implemented functionalities.
 
 ## Examples
 
-To see a first example of `TrixiBottomTopography.jl` a default example has been implemented.
+To see a first example of TrixiBottomTopography.jl a default example has been implemented.
 First, load the packages and either of the backends
 [GLMakie.jl](https://docs.makie.org/stable/explanations/backends/glmakie)
 or [CairoMakie.jl](https://docs.makie.org/v0.22/explanations/backends/cairomakie)
@@ -64,9 +64,9 @@ to activate the visualization.
 ```julia
 julia> using TrixiBottomTopography, GLMakie
 ```
-Then call the `T`rixi`B`ottom`T`opograpy `default example`
+Then call the [`default example`](@ref) for TrixiBottomTopography.jl as
 ```julia
-julia> TBT_default_example()
+julia> TrixiBottomTopography.default_example()
 ```
 If the implementation was successful, the following window appears:
 
@@ -75,9 +75,9 @@ If the implementation was successful, the following window appears:
 Further examples can be found in the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples) of this repository.
 
 ## Authors
-`TrixiBottomTopography.jl` was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
+TrixiBottomTopography.jl was developed by [Maximilian Dominique Bertrand](https://github.com/maxbertrand1996) (University of Cologne, Germany) with the help of [Andrew Winters](https://liu.se/en/employee/andwi94) (Linköping University, Sweden) and [Michael Schlottke-Lakemper](https://lakemper.eu/) (RWTH Aachen University, Germany).
 The full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 
 ## License and contributing
-`TrixiBottomTopography.jl` is published under the MIT license (see [LICENSE.md](LICENSE.md)).
+TrixiBottomTopography.jl is published under the MIT license (see [LICENSE.md](LICENSE.md)).
 We are pleased to accept contributions from everyone, preferably in the form of a PR.
