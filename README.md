@@ -58,8 +58,8 @@ to make use of the implemented functionalities.
 
 To see a first example of `TrixiBottomTopography.jl` a default example has been implemented.
 First, load the packages and either of the backends
-[`GLMakie.jl`](https://docs.makie.org/stable/explanations/backends/glmakie)
-or [`CairoMakie.jl`](https://docs.makie.org/v0.22/explanations/backends/cairomakie)
+[GLMakie.jl](https://docs.makie.org/stable/explanations/backends/glmakie)
+or [CairoMakie.jl](https://docs.makie.org/v0.22/explanations/backends/cairomakie)
 to activate the visualization.
 ```julia
 julia> using TrixiBottomTopography, GLMakie
