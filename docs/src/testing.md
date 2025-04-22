@@ -4,7 +4,7 @@ During the development of TrixiBottomTopography.jl, we rely on
 [continuous testing](https://en.wikipedia.org/wiki/Continuous_testing) to ensure
 that modifications or new features do not break existing
 functionality or add other errors. In the main
-[TrixiBottomTopography](https://github.com/trixi-framework/TrixiBottomTopography.jl) repository, this is facilitated by
+[TrixiBottomTopography.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl) repository, this is facilitated by
 [GitHub Actions](https://docs.github.com/en/free-pro-team@latest/actions),
 which allows to run tests automatically upon certain events. When, how, and what
 is tested by GitHub Actions is controlled by the workflow file

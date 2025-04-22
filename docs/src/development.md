@@ -1,7 +1,7 @@
 # Development
 
 This page contains some helpful information for the development of TrixiBottomTopography.jl.
-Further information about helpful tools for package development in Julia can be found on the
+Further information about useful tools for package development in Julia can be found on the
 [development page](https://trixi-framework.github.io/Trixi.jl/stable/development/) of the Trixi.jl docs.
 
 ## Releasing a new version of TrixiBottomTopography

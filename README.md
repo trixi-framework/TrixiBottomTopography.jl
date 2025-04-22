@@ -54,14 +54,15 @@ julia> import Pkg; Pkg.add("TrixiBottomTopography")
 
 The available visualization functionality uses [Makie.jl](https://github.com/JuliaPlots/Makie.jl/).
 A Makie backend, such as [GLMakie.jl](https://github.com/JuliaPlots/GLMakie.jl/), can
-be loaded in addition to TrixiBottomTopography
+be installed in addition to TrixiBottomTopography
 ```julia
 julia> using Pkg; Pkg.add("GLMakie")
 ```
 
-To use TrixiBottomTopography.jl together with the numerical solver framework Trixi.jl
-also requires a relevant time integration sub-package of
-[OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl). These can be added
+To use TrixiBottomTopography.jl together with the numerical solver framework [Trixi.jl](https://github.com/trixi-framework/Trixi.jl),
+you need both Trixi.jl and a relevant time integration sub-package of
+[OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl), e.g.,
+for high-order low-storage Runge-Kutta schemes. These can be added
 by executing
 ```julia
 julia> using Pkg
@@ -69,7 +70,7 @@ julia> using Pkg
 julia> Pkg.add(["Trixi", "OrdinaryDiffEqLowStorageRK"])
 ```
 TrixiBottomTopography.jl can also be used together with
-TrixiShallowWater.jl a solver suite specifically designed for shallow water flow applications.
+[TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), a solver suite specifically designed for shallow water flow applications.
 An example that combines TrixiBottomTopography.jl with wet/dry transitions and
 shock capturing to model a tsunami runup is available as a
 [tutorial](https://trixi-framework.github.io/TrixiShallowWater.jl/stable/tutorials/elixir_shallowwater_monai_tsunami/)
@@ -84,7 +85,7 @@ cd TrixiBottomTopography.jl
 mkdir run
 cd run
 julia --project=. -e 'using Pkg; Pkg.develop(PackageSpec(path=".."))' # Install local TrixiBottomTopography.jl clone
-julia --project=. -e 'using Pkg; Pkg.add(["GLMakie"])' # Install additional packages
+julia --project=. -e 'using Pkg; Pkg.add(["GLMakie", "Trixi", "OrdinaryDiffEqLowStorageRK"])' # Install additional packages
 ```
 Note that the visualization tool GLMakie.jl is optional and can be omitted.
 
