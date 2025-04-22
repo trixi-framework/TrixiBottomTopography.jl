@@ -1,20 +1,20 @@
 # Examples with Trixi.jl
 
 As mentioned in the [Home](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/)
-section of this documentation, `TrixiBottomTopography.jl` was initially developed as a
+section of this documentation, TrixiBottomTopography.jl was initially developed as a
 supplementary package for the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
 to enable the user to use real world geographical data for the bottom topography
 function of the shallow water equations.
-`TrixiBottomTopography.jl` can also be used together with
-[`TrixiShallowWater.jl`](https://github.com/trixi-framework/TrixiShallowWater.jl)
+TrixiBottomTopography.jl can also be used together with
+[TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl)
 a solver suite specifically designed for shallow water flow applications.
-An example that combines `TrixiBottomTopography.jl` with wet/dry transitions and
+An example that combines TrixiBottomTopography.jl with wet/dry transitions and
 shock capturing to model a tsunami runup is available as a
 [tutorial](https://trixi-framework.github.io/TrixiShallowWater.jl/stable/tutorials/elixir_shallowwater_monai_tsunami/)
-in `TrixiShallowWater.jl`.
+in TrixiShallowWater.jl.
 
 In this section, a one dimensional example is presented which uses the functionalities of
-`TrixiBottomTopography.jl` with [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
+TrixiBottomTopography.jl with [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
 to simulate a dam break problem.
 
 The underlying example file can be found [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_1D.jl).
@@ -27,8 +27,12 @@ using CairoMakie
 using OrdinaryDiffEqLowStorageRK
 using Trixi
 ```
-- `Plots` is responsible for visualizing the approximate solution of the dam break problem.
-- `OrdinaryDiffEqLowStorageRK` must be added to load low-storage explicit Runge-Kutta methods to be used by `Trixi.jl`.
+- [CairoMakie.jl]((https://github.com/JuliaPlots/CairoMakie.jl))
+  is the [Makie.jl](https://docs.makie.org/stable/) backend responsible
+  for visualizing the approximate solution of the dam break problem.
+- [OrdinaryDiffEqLowStorageRK.jl](https://docs.sciml.ai/OrdinaryDiffEq/stable/explicit/LowStorageRK/)
+  is a sub-package of [OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl)
+  that must be added to load low-storage explicit Runge-Kutta methods to be used by Trixi.jl.
 
 Next, the underlying bottom topography data is downloaded from a gist.
 ```julia
@@ -44,7 +48,7 @@ In this case, a cubic B-spline interpolation function with free end condition is
 spline_struct = CubicBSpline(Rhine_data)
 spline_func(x) = spline_interpolation(spline_struct, x)
 ```
-Now that the B-spline interpolation function is determined, the one dimensional shallow water equations implemented in `Trixi.jl` can be defined by calling:
+Now that the B-spline interpolation function is determined, the one dimensional shallow water equations implemented in Trixi.jl can be defined by calling:
 ```julia
 # Defining one dimensional shallow water equations
 equations = ShallowWaterEquations1D(gravity_constant=1.0, H0=55.0)
@@ -75,7 +79,7 @@ end
 ```
 After the initial condition, we can set the boundary conditions.
 In this case, a reflective wall condition is chosen, which is already implemented
-in `Trixi.jl` for the one dimensional shallow water equations.
+in Trixi.jl for the one dimensional shallow water equations.
 ```julia
 # Setting initaial condition
 initial_condition = initial_condition_dam_break
@@ -137,8 +141,9 @@ tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 ```
 The ordinary differential equations object `ode` is solved by the function `sol`
-which is part of the `OrdinaryDiffEq` package. Here the time stepping method can
-be specified (in this case, `RDPK3SpFSAL49()`) as well as some tolerances responsible for an error-based time step control.
+which is part of the OrdinaryDiffEq.jl package. Here the time stepping method can
+be specified (in this case, `RDPK3SpFSAL49()`) as well as some tolerances responsible
+for an error-based time step control.
 ```julia
 ###############################################################################
 # run the simulation
@@ -152,10 +157,10 @@ we want to create an animation of the solution to show its evolution over time.
 To do so, we have set the `save_everystep` attribute to `true`.
 This means that the solution for every time step will be callable afterwards.
 
-We use the plotting backend [`Makie.jl`](https://docs.makie.org/stable/) for this purpose.
+We use the plotting backend CairoMakie.jl for this purpose.
 To create an animation we use the `record` structure to save plots over every time step
 of the simulation and append them together into an animation.
-Inside the loop, the `PlotData1D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards, this plotting object is visualized using the `lines` command from Makie.
+Inside the loop, the `PlotData1D` functionality from Trixi.jl is called to create a plotting object. Afterwards, this plotting object is visualized using the `lines` command from Makie.
 
 Two `Observable` quantities are created, one to increment the number of plots and another
 for the time at which each solution occurs.
@@ -252,7 +257,7 @@ solver = DGSEM(polydeg=3, surface_flux=(flux_fjordholm_etal, flux_nonconservativ
 ```
 
 Now the mesh has to be specified. As above, we use a Cartesian box mesh created as a `TreeMesh`
-in `Trixi.jl`. Because we have defined boundary conditions defined, we set the `periodicity`
+in Trixi.jl. Because we have defined boundary conditions defined, we set the `periodicity`
 to be `false`.
 
 ```julia
@@ -315,10 +320,10 @@ Makie.record(f, "animation_2d.gif", 1:length(pd_list)) do tt
 end
 ```
 
-As in the 1D example, we use the plotting backend [`Makie.jl`](https://docs.makie.org/stable/).
+As in the 1D example, we use the plotting backend CairoMakie.jl.
 To create an animation we use the `record` structure to save plots over every time step
 of the simulation and append them together into an animation.
-Inside the loop, the `PlotData2D` functionality from `Trixi.jl` is called to create a plotting object. Afterwards, this plotting object is visualized using the `wireframe` command to visualize
+Inside the loop, the `PlotData2D` functionality from Trixi.jl is called to create a plotting object. Afterwards, this plotting object is visualized using the `wireframe` command to visualize
 the 2D water height evolution and `surface` to visualize bicubic B-spline approximation
 of the bottom topography.
 Two `Observable` quantities are created, one to increment the number of plots and another
@@ -328,4 +333,4 @@ The the resulting animation is given below
 
 ![gif](https://github.com/user-attachments/assets/b1ba80a0-d38c-4b75-9f35-117b3c18b9d9)
 
-For the bottom topography, the domain's boundaries look weird. The reason for that is a bug in `PlotData2D` of `Trixi.jl`. Once this has been addressed, the plotted bottom topography will look similar to the one in [the previous section](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).
+For the bottom topography, the domain's boundaries look weird. The reason for that is a bug in `PlotData2D` of Trixi.jl. Once this has been addressed, the plotted bottom topography will look similar to the one in [the previous section](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).

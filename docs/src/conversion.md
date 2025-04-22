@@ -38,13 +38,13 @@ As an example, the data can be given as `.xyz` files:
 ```
 where the first column provides the corresponding ETRS89 East coordinates, the second column the ETRS89 North coordinates and the third column the DHHN2016 height.
 
-## Data format of `TrixiBottomTopography.jl`
+## Data format of TrixiBottomTopography.jl
 
-The provided `.xyz` files of DGM are not directly accepted by `TrixiBottomTopography.jl` to
+The provided `.xyz` files of DGM are not directly accepted by TrixiBottomTopography.jl to
 define B-spline interpolation structures. To make the raw topography data work with the
 package, it must be converted into `.txt` files and organized in a specific format.
 
-For one dimensional interpolation, `TrixiBottomTopography.jl` requires the following form:
+For one dimensional interpolation, TrixiBottomTopography.jl requires the following form:
 ```
 # Number of x values
 n
@@ -84,7 +84,7 @@ The `x, y` and `z` values must be set to `Float64` format.
 
 ## Conversion functions
 
-To make matters easier, `TrixiBottomTopography.jl` provides the functions [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String})
+To make matters easier, TrixiBottomTopography.jl provides the functions [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String})
 for one dimensional interpolation and [`convert_dgm_2d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_2d-Tuple{String,%20String}) for two dimensional interpolation.
 
 To explain these functions, we consider the example file [`convert_data.jl`](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/convert_data.jl).
