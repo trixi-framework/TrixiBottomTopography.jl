@@ -78,26 +78,28 @@ sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
 
 # Create an animation of the solution
 if isdefined(Main, :Makie)
-  j = Makie.Observable(1)
-  time = Makie.Observable(0.0)
+  @eval begin
+    j = Makie.Observable(1)
+    time = Makie.Observable(0.0)
 
-  pd_list = [PlotData2D(sol.u[i], semi) for i in 1:5:length(sol.t)]
-  f = Makie.Figure()
+    pd_list = [PlotData2D(sol.u[i], semi) for i in 1:5:length(sol.t)]
+    f = Makie.Figure()
 
-  title_text = @lift "time t = $(round($(time), digits=3))"
-  az = 130 * pi / 180
-  el = 18 * pi / 180
-  ax = Makie.Axis3(f[1, 1], xlabel = "E", ylabel = "N", zlabel = "H",
-                   title = title_text, azimuth = az, elevation = el)
+    title_text = Makie.@lift "time t = $(round($(time), digits=3))"
+    az = 130 * pi / 180
+    el = 18 * pi / 180
+    ax = Makie.Axis3(f[1, 1], xlabel = "E", ylabel = "N", zlabel = "H",
+                    title = title_text, azimuth = az, elevation = el)
 
-  Makie.wireframe!(ax, pd_list[1].x, pd_list[1].y, @lift pd_list[ $(j) ].data[1];
-                   color = Makie.RGBA(0, 0.5, 1, 0.4))
-  Makie.surface!(ax, pd_list[1].x, pd_list[1].y, @lift pd_list[ $(j) ].data[4];
-                 colormap = :greenbrownterrain)
-  Makie.zlims!(ax, 35, 70)
+    Makie.wireframe!(ax, pd_list[1].x, pd_list[1].y, Makie.@lift pd_list[ $(j) ].data[1];
+                    color = Makie.RGBA(0, 0.5, 1, 0.4))
+    Makie.surface!(ax, pd_list[1].x, pd_list[1].y, Makie.@lift pd_list[ $(j) ].data[4];
+                  colormap = :greenbrownterrain)
+    Makie.zlims!(ax, 35, 70)
 
-  Makie.record(f, "animation_2d.gif", 1:length(pd_list)) do tt
-    j[] = tt
-    time[] = sol.t[5*tt]
+    Makie.record(f, "animation_2d.gif", 1:length(pd_list)) do tt
+      j[] = tt
+      time[] = sol.t[5*tt]
+    end
   end
 end

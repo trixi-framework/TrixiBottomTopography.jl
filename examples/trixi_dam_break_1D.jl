@@ -77,20 +77,22 @@ sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
 
 # Create an animation of the solution
 if isdefined(Main, :Makie)
-  j = Makie.Observable(1)
-  time = Makie.Observable(0.0)
+  @eval begin
+    j = Makie.Observable(1)
+    time = Makie.Observable(0.0)
 
-  pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
-  f = Makie.Figure()
-  ax = Makie.Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",
-                  title = @lift "time t = $(round($(time), digits=3))")
+    pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
+    f = Makie.Figure()
+    ax = Makie.Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",
+                    title = Makie.@lift "time t = $(round($(time), digits=3))")
 
-  Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 1])
-  Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 3])
-  Makie.ylims!(ax, 38, 65)
+    Makie.lines!(ax, pd_list[1].x, Makie.@lift pd_list[ $(j) ].data[:, 1])
+    Makie.lines!(ax, pd_list[1].x, Makie.@lift pd_list[ $(j) ].data[:, 3])
+    Makie.ylims!(ax, 38, 65)
 
-  Makie.record(f, "animation.gif", 1:length(pd_list)) do tt
-    j[] = tt
-    time[] = sol.t[tt]
+    Makie.record(f, "animation.gif", 1:length(pd_list)) do tt
+      j[] = tt
+      time[] = sol.t[tt]
+    end
   end
 end
