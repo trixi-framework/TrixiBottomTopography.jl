@@ -91,21 +91,28 @@ To explain these functions, we consider the example file [`convert_data.jl`](htt
 
 First, we import our package to be able to use the functions.
 
-```julia
+```@example convert
 # Include packages
 using TrixiBottomTopography
+using Downloads: download
 ```
 
 Next, we define the path of the `.xyz` file `path_src_file` that we want to convert,
 as well as the paths of the files where we want to save them files.
 
-```julia
+```@example convert
 # Define file paths
 root_dir = pkgdir(TrixiBottomTopography)
+
+# Download the raw bottom topography data
+path_src_file = download("https://gist.githubusercontent.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5/raw/f09b43f604adf9e2cfb45a7d998418f1e72f251d/dgm1_32_357_5646_1_nw.xyz",
+                         joinpath(root_dir, "examples", "data", "dgm1_32_357_5646_1_nw.xyz"))
+
 path_src_file = joinpath(root_dir, "examples", "data", "dgm1_32_357_5646_1_nw.xyz")
 path_out_file_1d_x = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
 path_out_file_1d_y = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_y.txt")
 path_out_file_2d = joinpath(root_dir, "examples", "data", "rhine_data_2d_20.txt")
+nothing #hide
 ```
 
 The source data from `path_src_file` looks as follows:
@@ -125,23 +132,23 @@ The source data from `path_src_file` looks as follows:
 
 Now the data can be converted.
 
-```julia
+```@example convert
 # Convert data
-convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 20, section = 100)
+convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 20, section = 100);
 ```
 
 Calling this expression tells [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String}) that the source file is `path_src_file` and the converted file will be saved in the file `path_out_file_1d_x`.
 The optional attribute `excerpt` tells the function that only every `20`th point in the `x` direction (in this case, in the ETRS89 East coordinate) will be considered. Setting `section` to `100` tells the function that the corresponding `z` values (DHHN2016 in this case) from the `100`th `y` coordinate (ETRS89 North) will be chosen. The entire converted file produced by
 this routine is available [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/data/rhine_data_1d_20_x.txt).
 
-```julia
-convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y", section = 100)
+```@example convert
+convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y", section = 100);
 ```
 
 Similar to the previous expression, this one has the additional attribute `direction = "y"` which tells [`convert_dgm_1d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_1d-Tuple{String,%20String}) that the data will be read from the `y` direction. (Click [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/data/rhine_data_1d_20_y.txt) to view the resulting file)
 
-```julia
-convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
+```@example convert
+convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20);
 ```
 The two dimensional version [`convert_dgm_2d`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.convert_dgm_2d-Tuple{String,%20String}) works similar to the one dimensional case except that the optional attributes
 `direction` and `section` do not exist, but only `excerpt`. Setting e.g. to `20` tells the

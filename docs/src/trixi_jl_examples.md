@@ -27,7 +27,7 @@ using CairoMakie
 using OrdinaryDiffEqLowStorageRK
 using Trixi
 ```
-- [CairoMakie.jl]((https://github.com/JuliaPlots/CairoMakie.jl))
+- [CairoMakie.jl](https://github.com/JuliaPlots/CairoMakie.jl)
   is the [Makie.jl](https://docs.makie.org/stable/) backend responsible
   for visualizing the approximate solution of the dam break problem.
 - [OrdinaryDiffEqLowStorageRK.jl](https://docs.sciml.ai/OrdinaryDiffEq/stable/explicit/LowStorageRK/)
