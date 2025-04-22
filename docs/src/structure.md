@@ -30,7 +30,7 @@ This particular example reads one dimensional bottom topography data from a `.tx
 and constructs a cubic B-spline interpolation with not-a-knot end condition
 and smoothing of the data.
 
-```julia
+```@example 1d
 # Include packages
 using TrixiBottomTopography
 
@@ -100,7 +100,7 @@ This example reads in two dimensional bottom topography data from a `.txt` file 
 creates a bicubic B-spline interpolation with not-a-knot end condition
 and smoothing of the data.
 
-```julia
+```@example 2d
 # Include packages
 using TrixiBottomTopography
 

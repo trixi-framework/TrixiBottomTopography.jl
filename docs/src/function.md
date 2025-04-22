@@ -12,7 +12,7 @@ section, we began with the example file
 from the [examples folder](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples)
 where we already defined the B-spline structure for the cubic B-spline interpolation with not-a-knot end condition and smoothing.
 
-```julia
+```@example 1d
 # Include packages
 using TrixiBottomTopography
 using CairoMakie
@@ -30,15 +30,16 @@ we use the `spline_interpolation` function. For the one dimensional case,
 this function is implemented as [`spline_interpolation(linear_struct, x)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{LinearBSpline,%20Any})
 and [`spline_interpolation(cubic_struct, x)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{CubicBSpline,%20Any}).
 
-```julia
+```@example 1d
 # Define B-spline interpolation function
 spline_func(x) = spline_interpolation(spline_struct, x)
+nothing #hide
 ```
 
 This defines the cubic B-spline interpolation function with not-a-knot end condition
 and smoothing with respect to variable `x` from the previously created `spline_struct`.
 If we want to visualize the interpolation function with 100 interpolation points, we define the following:
-```julia
+```@example 1d
 # Define interpolation points
 n = 200
 x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
@@ -46,25 +47,22 @@ x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
 
 and evaluate to obtain the corresponding `y` values by:
 
-```julia
+```@example 1d
 # Get interpolated values
 y_int_pts = spline_func.(x_int_pts)
 ```
 
-Plotting the interpolated points can be done via
+Plotting the interpolated points can be done via the command below and produces
+a one-dimensional plot
 
-```julia
+```@example 1d
 plot_topography(x_int_pts, y_int_pts; xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
 ```
-
-which gives the following representation:
-
-![image](https://github.com/user-attachments/assets/ceb242a8-53a6-424f-abc9-39789d6e31d4)
 
 Alternatively, one can plot the interpolated bottom topography together
 with the interpolation knots as follows
 
-```julia
+```@example 1d
 # Get the original interpolation knots
 x_knots = spline_struct.x
 y_knots = spline_func.(x_knots)
@@ -72,10 +70,6 @@ y_knots = spline_func.(x_knots)
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
                                          xlabel = "ETRS89 East", ylabel = "DHHN2016 Height" )
 ```
-
-which gives
-
-![image](https://github.com/user-attachments/assets/91c515f8-986b-42ff-bf5d-1927687a59c5)
 
 ## Two dimensional case
 
@@ -86,7 +80,7 @@ from the [examples folder](https://github.com/trixi-framework/TrixiBottomTopogra
 where we already created the B-spline structure for the bicubic B-spline interpolation
 with not-a-knot end condition and smoothing.
 
-```julia
+```@example 2d
 # Include packages
 using TrixiBottomTopography
 using CairoMakie
@@ -104,15 +98,16 @@ we use the `spline_interpolation` function for the two dimensional case.
 This functionality is implemented as [`spline_interpolation(bilinear_struct, x, y)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{BilinearBSpline,%20Any,%20Any})
 and [`spline_interpolation(bicubic_struct, x, y)`](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{BicubicBSpline,%20Any,%20Any}).
 
-```julia
+```@example 2d
 # Define B-spline interpolation function
 spline_func(x,y) = spline_interpolation(spline_struct, x, y)
+nothing #hide
 ```
 This defines the bicubic B-spline interpolation function with not-a-knot end condition
 and smoothing for variables `x` and `y` due to the previously constructed `spline_struct`. If we want to visualize the bicubic interpolation function with 100
 interpolation points in each spatial direction, we define:
 
-```julia
+```@example 2d
 # Define interpolation points
 n = 100
 x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
@@ -123,14 +118,15 @@ To fill a matrix `z_int_pts`, which contains the corresponding `z` values
 for `x_int_pts` and `y_int_pts`, we use the helper function
 `evaluate_bicubicspline_interpolant` implemented in `ext/TrixiBottomTopographyMakieExt.jl`.
 
-```julia
+```@example 2d
 # Get interpolated matrix
 z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
 ```
 
-Plotting the interpolated values
+Plotting the interpolated values gives the representation directly below the
+`plot_topography` command
 
-```julia
+```@example 2d
 plot_topography(x_int_pts, y_int_pts, z_int_pts;
                 xlabel="ETRS89\n East",
                 ylabel="ETRS89\n North",
@@ -139,14 +135,10 @@ plot_topography(x_int_pts, y_int_pts, z_int_pts;
                 elevation_angle = 27 * pi / 180)
 ```
 
-gives the following representation:
-
-![image](https://github.com/user-attachments/assets/1203483a-b414-45b1-a69a-c6e284eeb0c2)
-
-Alternatively, one can plot the interpolated bottom topography together
+Alternatively, one can plot the interpolated two-dimensional bottom topography together
 with the interpolation knots as follows
 
-```julia
+```@example 2d
 # Get the original interpolation knots
 x_knots = spline_struct.x
 y_knots = spline_struct.y
@@ -160,6 +152,3 @@ plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
                                          azimuth_angle = 54 * pi / 180,
                                          elevation_angle = 27 * pi / 180)
 ```
-
-which gives
-![image](https://github.com/user-attachments/assets/ed082318-47ec-4680-8cd0-04997c3a95b4)
