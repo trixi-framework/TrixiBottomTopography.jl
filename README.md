@@ -87,14 +87,18 @@ cd run
 julia --project=. -e 'using Pkg; Pkg.develop(PackageSpec(path=".."))' # Install local TrixiBottomTopography.jl clone
 julia --project=. -e 'using Pkg; Pkg.add(["GLMakie", "Trixi", "OrdinaryDiffEqLowStorageRK"])' # Install additional packages
 ```
-Note that the visualization tool GLMakie.jl is optional and can be omitted.
+Note that the additional packages are optional and can be omitted.
 
 If you installed TrixiBottomTopography.jl this way, you always have to start Julia with the `--project`
 flag set to your `run` directory, e.g.,
 ```bash
 julia --project=.
 ```
-if already inside the `run` directory.
+if already inside the `run` directory or
+```bash
+julia --project=run
+```
+if inside the repository root directory.
 
 ## Examples
 
