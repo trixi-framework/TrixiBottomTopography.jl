@@ -1,4 +1,4 @@
-## Changes in the v0.3 lifecycle
+## Changes in the v0.1 lifecycle
 
 #### Added
 
