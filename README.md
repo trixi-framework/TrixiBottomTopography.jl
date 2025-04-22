@@ -65,9 +65,7 @@ you need both Trixi.jl and a relevant time integration sub-package of
 for high-order low-storage Runge-Kutta schemes. These can be added
 by executing
 ```julia
-julia> using Pkg
-
-julia> Pkg.add(["Trixi", "OrdinaryDiffEqLowStorageRK"])
+julia> using Pkg; Pkg.add(["Trixi", "OrdinaryDiffEqLowStorageRK"])
 ```
 TrixiBottomTopography.jl can also be used together with
 [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), a solver suite specifically designed for shallow water flow applications.
