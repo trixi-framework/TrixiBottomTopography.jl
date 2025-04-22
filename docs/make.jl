@@ -87,6 +87,8 @@ makedocs(;
              "B-spline function" => "function.md",
          ],
          "Trixi.jl examples" => "trixi_jl_examples.md",
+         "Advanced topics & developers" => ["Development" => "development.md"
+                                            "Testing" => "testing.md"],
          "Authors" => "authors.md",
          "Contributing" => "contributing.md",
          "Code of Conduct" => "code_of_conduct.md",
