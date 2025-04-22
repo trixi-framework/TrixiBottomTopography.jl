@@ -64,7 +64,7 @@ to activate the visualization.
 ```julia
 julia> using TrixiBottomTopography, GLMakie
 ```
-Then call the [`default_example`](@ref) for TrixiBottomTopography.jl as
+Then call the [`default_example`](@ref TrixiBottomTopography.default_example) for TrixiBottomTopography.jl as
 ```julia
 julia> TrixiBottomTopography.default_example()
 ```
