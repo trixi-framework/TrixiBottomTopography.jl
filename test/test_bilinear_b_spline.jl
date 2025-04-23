@@ -1,3 +1,5 @@
+module TestBilinearBSpline
+
 using TrixiBottomTopography
 
 # Define data path
@@ -10,3 +12,5 @@ spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
 # Test function at arbitrary point
 @test 39.26 <= spline_func(357555, 5646555) <= 39.26000000000001
+
+end # module

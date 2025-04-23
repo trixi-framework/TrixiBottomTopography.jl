@@ -1,3 +1,5 @@
+module TestConvertRoutines
+
 using TrixiBottomTopography
 using Downloads: download
 
@@ -37,3 +39,5 @@ convert_dgm_2d(path_src_file, path_out_file_2d_10; excerpt = 10)
 @test isfile(path_out_file_1d_10_y_100)
 @test isfile(path_out_file_2d)
 @test isfile(path_out_file_2d_10)
+
+end # module

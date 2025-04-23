@@ -1,3 +1,5 @@
+module TestBicubicBSpline
+
 using TrixiBottomTopography
 
 # Free end condition
@@ -30,12 +32,12 @@ end
 
   # Test function at arbitrary point
   @test 39.23237242 < spline_func(357555, 5646555) < 39.23237243
-    
+
 end
 
 # Not-a-knot end condition
 @testset "Not-a-knot end" begin
-    
+
   # Define data path
   data = "data/rhine_2d_10.txt"
 
@@ -64,3 +66,5 @@ end
   @test 39.23237242 < spline_func(357555, 5646555) < 39.23237243
 
 end
+
+end # module
