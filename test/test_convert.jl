@@ -1,5 +1,6 @@
 module TestConvertRoutines
 
+using Test
 using TrixiBottomTopography
 using Downloads: download
 

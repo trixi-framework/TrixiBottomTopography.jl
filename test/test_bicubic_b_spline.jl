@@ -1,5 +1,6 @@
 module TestBicubicBSpline
 
+using Test
 using TrixiBottomTopography
 
 # Free end condition

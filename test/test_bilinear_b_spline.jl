@@ -1,5 +1,6 @@
 module TestBilinearBSpline
 
+using Test
 using TrixiBottomTopography
 
 # Define data path
