@@ -108,6 +108,7 @@ makedocs(;
          "Trixi.jl examples" => "trixi_jl_examples.md",
          "Advanced topics & developers" => ["Development" => "development.md"
                                             "Testing" => "testing.md"],
+         "Changelog" => "changelog.md",
          "Authors" => "authors.md",
          "Contributing" => "contributing.md",
          "Code of Conduct" => "code_of_conduct.md",
