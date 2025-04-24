@@ -56,7 +56,8 @@ end
 """
     plot_topography_with_interpolation_knots(x, y, x_knots, y_knots;
                                              xlabel = "", ylabel= "",
-                                             color, legend_position = :rt)
+                                             [color,]
+                                             legend_position = :rt)
 
 Plot function for 1D bottom topography data together with the interpolation knots.
 The interpolated values are provided in the vectors `x` and `y`.
@@ -93,7 +94,7 @@ end
 
 Plot function for 2D bottom topography data.
 The interpolated values are provided in the vectors `x`, `y` and an array `z`
-where the shape of array `z` must be size(y) by size(x).
+where the shape of array `z` must be `size(y)` by `size(x)`.
 Axis labels can be prescribed with `xlabel`, `ylabel`, and `zlabel`.
 The default `colormap` is `:greenbrownterrain`.
 Other possible colormaps for bottom topographies are `:darkterrain`, `:sandyterrain`,
@@ -101,10 +102,11 @@ or `:gist_earth`.
 The left / right camera angle is controlled by `azimuth_angle` whereas the up / down
 camera angle is controlled by `elevation_angle`. Both angle arguments must be given in radians.
 """
-# Generic plot function for 2D bottom topography data
 function plot_topography(x, y, z; xlabel = "", ylabel= "", zlabel = "",
                          colormap = default_Makie_colormap(),
                          azimuth_angle = 1.275*pi, elevation_angle = pi/8)
+  # Generic plot function for 2D bottom topography data
+
   Makie.surface(x, y, z, axis=(type = Makie.Axis3,
                 xlabel = xlabel, ylabel = ylabel, zlabel = zlabel,
                 azimuth = azimuth_angle, elevation = elevation_angle),
@@ -120,9 +122,9 @@ end
 
 Plot function for 2D bottom topography data together with the interpolation knots.
 The interpolated values are provided in the vectors `x`, `y` and an array `z`
-where the shape of array `z` must have size(y) by size(x).
+where the shape of array `z` must have `size(y)` by `size(x)`.
 The interpolation knots are provided in a similar fashion in vectors `x_knots`,
-`y_knots` and an array `z_knots` where the shape of `z_knots` must have size(y_knots) by size(x_knots).
+`y_knots` and an array `z_knots` where the shape of `z_knots` must have `size(y_knots)` by `size(x_knots)`.
 Axis labels can be prescribed with `xlabel`, `ylabel`, and `zlabel`.
 The default `colormap` is `:greenbrownterrain`.
 Other possible colormaps for bottom topographies are `:darkterrain`, `:sandyterrain`,

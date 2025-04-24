@@ -68,7 +68,7 @@ x_knots = spline_struct.x
 y_knots = spline_func.(x_knots)
 
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
-                                         xlabel = "ETRS89 East", ylabel = "DHHN2016 Height" )
+                                         xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
 ```
 
 ## Two dimensional case
@@ -116,7 +116,7 @@ y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 
 To fill a matrix `z_int_pts`, which contains the corresponding `z` values
 for `x_int_pts` and `y_int_pts`, we use the helper function
-`evaluate_bicubicspline_interpolant` implemented in `ext/TrixiBottomTopographyMakieExt.jl`.
+`evaluate_bicubicspline_interpolant`.
 
 ```@example 2d
 # Get interpolated matrix
