@@ -1,8 +1,10 @@
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+Changelog = "5217a498-cd5d-4ec6-b8c2-9b85a09b6e3e"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 TrixiBottomTopography = "86af9953-43df-404b-8eaa-d20d82623a82"
 
 [compat]
 CairoMakie = "0.13"
+Changelog = "1.1"
 Documenter = "1.3"
