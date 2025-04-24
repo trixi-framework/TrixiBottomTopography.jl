@@ -6,11 +6,13 @@ on:
       - 'main'
     tags: '*'
     paths-ignore:
+      - '.zenodo.json'
       - '.github/workflows/ci.yml'
       - '.github/workflows/CompatHelper.yml'
       - '.github/workflows/TagBot.yml'
   pull_request:
     paths-ignore:
+      - '.zenodo.json'
       - '.github/workflows/ci.yml'
       - '.github/workflows/CompatHelper.yml'
       - '.github/workflows/TagBot.yml'
