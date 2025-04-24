@@ -148,14 +148,17 @@ for an error-based time step control.
 ###############################################################################
 # run the simulation
 
+# define equidistant nodes in time for visualization of an animation
+visnodes = range(tspan[1], tspan[2], length = 90)
+
 # use a Runge-Kutta method with error-based time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
-            save_everystep=true);
+            saveat=visnodes);
 ```
 At this point, the calculation is finished. However, to visualize the dam break problem,
 we want to create an animation of the solution to show its evolution over time.
-To do so, we have set the `save_everystep` attribute to `true`.
-This means that the solution for every time step will be callable afterwards.
+Above we created a uniform set of points in time `visnodes` and used the `saveat`
+attribute so that the `solve` saves solution information at these check-in values.
 
 We use the plotting backend CairoMakie.jl for this purpose.
 To create an animation we use the `record` structure to save plots over every time step
@@ -166,19 +169,22 @@ Two `Observable` quantities are created, one to increment the number of plots an
 for the time at which each solution occurs.
 ```julia
 # Create animation of the solution
-j = Makie.Observable(1)
-time = Makie.Observable(0.0)
+j = Observable(1)
+time = Observable(0.0)
 
 pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
-f = Makie.Figure()
-ax = Makie.Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",
-                title = @lift "time t = $(round($(time), digits=3))")
+f = Figure()
+title_string = lift(t -> "time t = $(round(t, digits=3))", time)
+ax = Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",
+                title = title_string)
 
-Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 1])
-Makie.lines!(ax, pd_list[1].x, @lift pd_list[ $(j) ].data[:, 3])
-Makie.ylims!(ax, 38, 65)
+height = lift(i -> pd_list[i].data[:, 1], j)
+bottom = lift(i -> pd_list[i].data[:, 3], j)
+lines!(ax, pd_list[1].x, height)
+lines!(ax, pd_list[1].x, bottom)
+ylims!(ax, 38, 65)
 
-Makie.record(f, "animation.gif", 1:length(pd_list)) do tt
+record(f, "animation.gif", 1:length(pd_list)) do tt
   j[] = tt
   time[] = sol.t[tt]
 end
@@ -292,31 +298,37 @@ ode = semidiscretize(semi, tspan)
 ###############################################################################
 # run the simulation
 
+# define equidistant nodes in time for visualization of an animation
+visnodes = range(tspan[1], tspan[2], length = 175)
+
 # use a Runge-Kutta method with error based time step size control
-sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8, save_everystep=true);
+sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
+            saveat=visnodes);
 
 # Create an animation of the solution
-j = Makie.Observable(1)
-time = Makie.Observable(0.0)
+j = Observable(1)
+time = Observable(0.0)
 
-pd_list = [PlotData2D(sol.u[i], semi) for i in 1:5:length(sol.t)]
-f = Makie.Figure()
+pd_list = [PlotData2D(sol.u[i], semi) for i in 1:length(sol.t)]
+f = Figure()
 
-title_text = @lift "time t = $(round($(time), digits=3))"
+title_string = lift(t ->  "time t = $(round(t, digits=3))", time)
 az = 130 * pi / 180
 el = 18 * pi / 180
-ax = Makie.Axis3(f[1, 1], xlabel = "E", ylabel = "N", zlabel = "H",
-                  title = title_text, azimuth = az, elevation = el)
+ax = Axis3(f[1, 1], xlabel = "E", ylabel = "N", zlabel = "H",
+                  title = title_string, azimuth = az, elevation = el)
 
-Makie.wireframe!(ax, pd_list[1].x, pd_list[1].y, @lift pd_list[ $(j) ].data[1];
-                  color = Makie.RGBA(0, 0.5, 1, 0.4))
-Makie.surface!(ax, pd_list[1].x, pd_list[1].y, @lift pd_list[ $(j) ].data[4];
+height = lift(i -> pd_list[i].data[1], j)
+bottom = lift(i -> pd_list[i].data[4], j)
+wireframe!(ax, pd_list[1].x, pd_list[1].y, height;
+                  color = RGBA(0, 0.5, 1, 0.4))
+surface!(ax, pd_list[1].x, pd_list[1].y, bottom;
                 colormap = :greenbrownterrain)
-Makie.zlims!(ax, 35, 70)
+zlims!(ax, 35, 70)
 
-Makie.record(f, "animation_2d.gif", 1:length(pd_list)) do tt
+record(f, "animation_2d.gif", 1:length(pd_list)) do tt
   j[] = tt
-  time[] = sol.t[5*tt]
+  time[] = sol.t[tt]
 end
 ```
 
