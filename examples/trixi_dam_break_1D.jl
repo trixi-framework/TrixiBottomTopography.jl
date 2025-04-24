@@ -71,9 +71,12 @@ ode = semidiscretize(semi, tspan)
 ###############################################################################
 # run the simulation
 
+# define equidistant nodes in time for visualization of an animation
+visnodes = range(tspan[1], tspan[2], length = 90)
+
 # use a Runge-Kutta method with error based time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
-            save_everystep=true);
+            saveat=visnodes);
 
 # Create an animation of the solution
 if isdefined(Main, :Makie)
@@ -82,11 +85,14 @@ if isdefined(Main, :Makie)
 
   pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
   f = Makie.Figure()
+  title_string = lift(t -> "time t = $(round(t, digits=3))", time)
   ax = Makie.Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",
-                  title = Makie.@lift "time t = $(round($(time), digits=3))")
+                  title = title_string)
 
-  Makie.lines!(ax, pd_list[1].x, Makie.@lift pd_list[ $(j) ].data[:, 1])
-  Makie.lines!(ax, pd_list[1].x, Makie.@lift pd_list[ $(j) ].data[:, 3])
+  height = lift(i -> pd_list[i].data[:, 1], j)
+  bottom = lift(i -> pd_list[i].data[:, 3], j)
+  Makie.lines!(ax, pd_list[1].x, height)
+  Makie.lines!(ax, pd_list[1].x, bottom)
   Makie.ylims!(ax, 38, 65)
 
   Makie.record(f, "animation.gif", 1:length(pd_list)) do tt

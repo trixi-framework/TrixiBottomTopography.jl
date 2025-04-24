@@ -66,38 +66,43 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
 ###############################################################################
 # ODE solvers, callbacks etc.
 
-tspan = (0.0, 10.0)
+tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 
 ###############################################################################
 # run the simulation
 
+# define equidistant nodes in time for visualization of an animation
+visnodes = range(tspan[1], tspan[2], length = 175)
+
 # use a Runge-Kutta method with error based time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
-            save_everystep=true);
+            saveat=visnodes);
 
 # Create an animation of the solution
 if isdefined(Main, :Makie)
   j = Makie.Observable(1)
   time = Makie.Observable(0.0)
 
-  pd_list = [PlotData2D(sol.u[i], semi) for i in 1:5:length(sol.t)]
+  pd_list = [PlotData2D(sol.u[i], semi) for i in 1:length(sol.t)]
   f = Makie.Figure()
 
-  title_text = Makie.@lift "time t = $(round($(time), digits=3))"
+  title_string = lift(t ->  "time t = $(round(t, digits=3))", time)
   az = 130 * pi / 180
   el = 18 * pi / 180
   ax = Makie.Axis3(f[1, 1], xlabel = "E", ylabel = "N", zlabel = "H",
-                  title = title_text, azimuth = az, elevation = el)
+                  title = title_string, azimuth = az, elevation = el)
 
-  Makie.wireframe!(ax, pd_list[1].x, pd_list[1].y, Makie.@lift pd_list[ $(j) ].data[1];
+  height = lift(i -> pd_list[i].data[1], j)
+  bottom = lift(i -> pd_list[i].data[4], j)
+  Makie.wireframe!(ax, pd_list[1].x, pd_list[1].y, height;
                   color = Makie.RGBA(0, 0.5, 1, 0.4))
-  Makie.surface!(ax, pd_list[1].x, pd_list[1].y, Makie.@lift pd_list[ $(j) ].data[4];
+  Makie.surface!(ax, pd_list[1].x, pd_list[1].y, bottom;
                 colormap = :greenbrownterrain)
   Makie.zlims!(ax, 35, 70)
 
   Makie.record(f, "animation_2d.gif", 1:length(pd_list)) do tt
     j[] = tt
-    time[] = sol.t[5*tt]
+    time[] = sol.t[tt]
   end
 end
