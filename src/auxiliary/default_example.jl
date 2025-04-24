@@ -1,5 +1,5 @@
 """
-    default_example()
+    TrixiBottomTopography.default_example()
 
 Function which calls the example file "rhine_data_bicubic-nak.jl" to
 check if including the package has worked. The example script creates
