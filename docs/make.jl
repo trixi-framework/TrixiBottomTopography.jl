@@ -1,6 +1,7 @@
 using Documenter
 import Pkg
 using TrixiBottomTopography
+using Changelog: Changelog
 
 # Copy list of authors to not need to synchronize it manually.
 # Since the authors header exists twice we create a unique identifier for the docs section.
@@ -65,6 +66,24 @@ readme_text = replace(readme_text,
 readme_text = replace(readme_text,
                       r"\[comment\].*\n" => "")    # remove comments
 write(joinpath(@__DIR__, "src", "index.md"), readme_text)
+
+# Create changelog
+Changelog.generate(Changelog.Documenter(),                            # output type
+                   joinpath(@__DIR__, "..", "NEWS.md"),               # input file
+                   joinpath(@__DIR__, "src", "changelog_tmp.md");     # output file
+                   repo = "trixi-framework/TrixiBottomTopography.jl", # default repository for links
+                   branch = "main",)
+# Fix edit URL of changelog
+open(joinpath(@__DIR__, "src", "changelog.md"), "w") do io
+    for line in eachline(joinpath(@__DIR__, "src", "changelog_tmp.md"))
+        if startswith(line, "EditURL")
+            line = "EditURL = \"https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/NEWS.md\""
+        end
+        println(io, line)
+    end
+end
+# Remove temporary file
+rm(joinpath(@__DIR__, "src", "changelog_tmp.md"))
 
 # Make documentation
 makedocs(;
