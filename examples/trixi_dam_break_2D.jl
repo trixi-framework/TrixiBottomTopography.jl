@@ -95,10 +95,10 @@ if isdefined(Main, :Makie)
 
   height = lift(i -> pd_list[i].data[1], j)
   bottom = lift(i -> pd_list[i].data[4], j)
-  Makie.wireframe!(ax, pd_list[1].x, pd_list[1].y, height;
-                  color = Makie.RGBA(0, 0.5, 1, 0.4))
   Makie.surface!(ax, pd_list[1].x, pd_list[1].y, bottom;
                 colormap = :greenbrownterrain)
+  Makie.wireframe!(ax, pd_list[1].x, pd_list[1].y, height;
+                  color = Makie.RGBA(0, 0.5, 1, 0.4))
   Makie.zlims!(ax, 35, 70)
 
   Makie.record(f, "animation_2d.gif", 1:length(pd_list)) do tt
