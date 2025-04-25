@@ -18,12 +18,14 @@ spline_func(x) = spline_interpolation(spline_struct, x)
 
 # Evaluate the cubic B-spline on a new set of nodes and plot
 if isdefined(Main, :Makie)
-  # Define interpolation points
-  n = 200
-  x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
+    # Define interpolation points
+    n = 200
+    x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
 
-  # Get interpolated values
-  y_int_pts = spline_func.(x_int_pts)
+    # Get interpolated values
+    y_int_pts = spline_func.(x_int_pts)
 
-  plot_topography(x_int_pts, y_int_pts; xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
+    plot_topography(x_int_pts, y_int_pts;
+                    xlabel = "ETRS89 East",
+                    ylabel = "DHHN2016 Height")
 end
