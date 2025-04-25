@@ -8,7 +8,8 @@ using Makie: Makie
 using TrixiBottomTopography
 
 # Import functions such that they can be extended with new methods
-import TrixiBottomTopography: evaluate_bicubicspline_interpolant, plot_topography, plot_topography_with_interpolation_knots
+import TrixiBottomTopography: evaluate_bicubicspline_interpolant, plot_topography,
+                              plot_topography_with_interpolation_knots
 
 """
     evaluate_bicubicspline_interpolant(spline, x, y)
@@ -19,20 +20,20 @@ and return the values in an array `z` of size `m` by `n`.
 """
 function evaluate_bicubicspline_interpolant(spline, x, y)
 
-  # Get dimensions for solution matrix
-  n = length(x)
-  m = length(y)
+    # Get dimensions for solution matrix
+    n = length(x)
+    m = length(y)
 
-  # Create empty solution matrix
-  z = zeros(n, m)
+    # Create empty solution matrix
+    z = zeros(n, m)
 
-  # Evaluate spline function at given x, y values
-  for i in 1:n, j in 1:m
-    z[j,i] = spline(x[i], y[j])
-  end
+    # Evaluate spline function at given x, y values
+    for i in 1:n, j in 1:m
+        z[j, i] = spline(x[i], y[j])
+    end
 
-  # Return the interpolated values
-  return z
+    # Return the interpolated values
+    return z
 end
 
 # Set the Makie default colormap to `:greenbrownterrain`.
@@ -49,8 +50,8 @@ Axis labels can be prescribed with `xlabel`, `ylabel`, and `zlabel`.
 The default `color` for the interpolated bottom topography is light blue.
 The `legend_position` controls the placement of the legend.
 """
-function plot_topography(x, y; xlabel = "", ylabel= "", color = Makie.wong_colors(2)[5])
-  Makie.lines(x, y, axis=(xlabel = xlabel, ylabel = ylabel), color = color)
+function plot_topography(x, y; xlabel = "", ylabel = "", color = Makie.wong_colors(2)[5])
+    Makie.lines(x, y, axis = (xlabel = xlabel, ylabel = ylabel), color = color)
 end
 
 """
@@ -68,21 +69,21 @@ The default `color` for the interpolated bottom topography is light blue.
 The `legend_position` controls the placement of the legend.
 """
 function plot_topography_with_interpolation_knots(x, y, x_knots, y_knots;
-                                                  xlabel = "", ylabel= "",
+                                                  xlabel = "", ylabel = "",
                                                   color = Makie.wong_colors(2)[5],
                                                   legend_position = :rt)
-  fig = Makie.Figure()
-  ax = Makie.Axis(fig[1, 1], xlabel = xlabel, ylabel = ylabel)
+    fig = Makie.Figure()
+    ax = Makie.Axis(fig[1, 1], xlabel = xlabel, ylabel = ylabel)
 
-  # Approximate topography with a line
-  Makie.lines!(ax, x, y, color = color, label = "Bottom topography")
-  # Interpolation knots as orange dots
-  Makie.scatter!(ax, x_knots, y_knots, color = :orange, strokewidth = 1,
-                 strokecolor = (:black, 0.5), markersize = 5, label = "Knots")
-  # Create the legend
-  Makie.axislegend(ax, position = legend_position)
-  # Show the figure
-  fig
+    # Approximate topography with a line
+    Makie.lines!(ax, x, y, color = color, label = "Bottom topography")
+    # Interpolation knots as orange dots
+    Makie.scatter!(ax, x_knots, y_knots, color = :orange, strokewidth = 1,
+                   strokecolor = (:black, 0.5), markersize = 5, label = "Knots")
+    # Create the legend
+    Makie.axislegend(ax, position = legend_position)
+    # Show the figure
+    fig
 end
 
 """
@@ -102,15 +103,16 @@ or `:gist_earth`.
 The left / right camera angle is controlled by `azimuth_angle` whereas the up / down
 camera angle is controlled by `elevation_angle`. Both angle arguments must be given in radians.
 """
-function plot_topography(x, y, z; xlabel = "", ylabel= "", zlabel = "",
+function plot_topography(x, y, z; xlabel = "", ylabel = "", zlabel = "",
                          colormap = default_Makie_colormap(),
-                         azimuth_angle = 1.275*pi, elevation_angle = pi/8)
-  # Generic plot function for 2D bottom topography data
+                         azimuth_angle = 1.275 * pi, elevation_angle = pi / 8)
+    # Generic plot function for 2D bottom topography data
 
-  Makie.surface(x, y, z, axis=(type = Makie.Axis3,
-                xlabel = xlabel, ylabel = ylabel, zlabel = zlabel,
-                azimuth = azimuth_angle, elevation = elevation_angle),
-                colormap = colormap)
+    Makie.surface(x, y, z,
+                  axis = (type = Makie.Axis3,
+                          xlabel = xlabel, ylabel = ylabel, zlabel = zlabel,
+                          azimuth = azimuth_angle, elevation = elevation_angle),
+                  colormap = colormap)
 end
 
 """
@@ -134,24 +136,24 @@ The left / right camera angle is controlled by `azimuth_angle` whereas the up / 
 camera angle is controlled by `elevation_angle`. Both angle arguments must be given in radians.
 """
 function plot_topography_with_interpolation_knots(x, y, z, x_knots, y_knots, z_knots;
-                                                  xlabel = "", ylabel= "", zlabel = "",
+                                                  xlabel = "", ylabel = "", zlabel = "",
                                                   colormap = default_Makie_colormap(),
                                                   legend_position = :rt,
-                                                  azimuth_angle = 1.275*pi,
-                                                  elevation_angle = pi/8)
-  fig = Makie.Figure()
-  ax = Makie.Axis3(fig[1, 1], xlabel = xlabel, ylabel = ylabel, zlabel = zlabel,
-                   azimuth = azimuth_angle, elevation = elevation_angle)
+                                                  azimuth_angle = 1.275 * pi,
+                                                  elevation_angle = pi / 8)
+    fig = Makie.Figure()
+    ax = Makie.Axis3(fig[1, 1], xlabel = xlabel, ylabel = ylabel, zlabel = zlabel,
+                     azimuth = azimuth_angle, elevation = elevation_angle)
 
-  # Approximate topography with a line
-  Makie.surface!(ax, x, y, z, colormap = colormap, label = "Bottom topography")
-  # Interpolation knots as orange dots
-  Makie.scatter!(ax, x_knots, y_knots, z_knots, color = :orange, strokewidth = 1,
-                 strokecolor = (:black, 0.5), markersize = 5, label = "Knots")
-  # Create the legend
-  Makie.axislegend(ax, position = legend_position)
-  # Show the figure
-  fig
+    # Approximate topography with a line
+    Makie.surface!(ax, x, y, z, colormap = colormap, label = "Bottom topography")
+    # Interpolation knots as orange dots
+    Makie.scatter!(ax, x_knots, y_knots, z_knots, color = :orange, strokewidth = 1,
+                   strokecolor = (:black, 0.5), markersize = 5, label = "Knots")
+    # Create the legend
+    Makie.axislegend(ax, position = legend_position)
+    # Show the figure
+    fig
 end
 
 end
