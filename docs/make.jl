@@ -100,23 +100,22 @@ makedocs(;
                                   edit_link = "main",
                                   size_threshold_ignore = ["index.md"],),
          # Explicitly specify documentation structure
-         pages = [
-         "Home" => "index.md",
-         "Overview" => [
-             "Data conversion" => "conversion.md",
-             "B-spline structure" => "structure.md",
-             "B-spline function" => "function.md",
-         ],
-         "Trixi.jl examples" => "trixi_jl_examples.md",
-         "Advanced topics & developers" => ["Development" => "development.md"
-                                            "Style guide" => "styleguide.md",
-                                            "Testing" => "testing.md"],
-         "Changelog" => "changelog.md",
-         "Authors" => "authors.md",
-         "Contributing" => "contributing.md",
-         "Code of Conduct" => "code_of_conduct.md",
-         "License" => "license.md",
-         "Reference" => "reference.md"])
+         pages = ["Home" => "index.md",
+             "Overview" => [
+                 "Data conversion" => "conversion.md",
+                 "B-spline structure" => "structure.md",
+                 "B-spline function" => "function.md"
+             ],
+             "Trixi.jl examples" => "trixi_jl_examples.md",
+             "Advanced topics & developers" => ["Development" => "development.md",
+                 "Style guide" => "styleguide.md",
+                 "Testing" => "testing.md"],
+             "Changelog" => "changelog.md",
+             "Authors" => "authors.md",
+             "Contributing" => "contributing.md",
+             "Code of Conduct" => "code_of_conduct.md",
+             "License" => "license.md",
+             "Reference" => "reference.md"])
 
 # Documenter can also automatically deploy documentation to gh-pages.
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
