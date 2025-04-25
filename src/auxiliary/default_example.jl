@@ -9,12 +9,10 @@ such as [GLMakie.jl](https://github.com/JuliaPlots/GLMakie.jl/)
 is included a plot will be generated as well.
 """
 function default_example()
+    # Location of example file
+    root_dir = pkgdir(TrixiBottomTopography)
+    example_file = joinpath(root_dir, "examples", "rhine_data_bicubic-nak.jl")
 
-  # Location of example file
-  root_dir = pkgdir(TrixiBottomTopography)
-  example_file = joinpath(root_dir, "examples", "rhine_data_bicubic-nak.jl")
-
-  # Include example
-  include(example_file)
-
+    # Include example
+    include(example_file)
 end
