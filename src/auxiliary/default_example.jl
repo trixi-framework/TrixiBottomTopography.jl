@@ -1,16 +1,18 @@
 """
-    TBT_default_example()
+    TrixiBottomTopography.default_example()
 
-Function which calls the example file "rhine_data_bicubic-nak.jl" as a default example to
-check if including the package has worked and to see a quick example.
+Function which calls the example file "rhine_data_bicubic-nak.jl" to
+check if including the package has worked. The example script creates
+a bicubic B-spline with the "not-a-knot" boundary condition.
+If a [Makie.jl](https://github.com/JuliaPlots/Makie.jl/) backend
+such as [GLMakie.jl](https://github.com/JuliaPlots/GLMakie.jl/)
+is included a plot will be generated as well.
 """
-function TBT_default_example()
-
-  # Get root directory
-  dir_path = pkgdir(TrixiBottomTopography)
+function default_example()
 
   # Location of example file
-  example_file = string(dir_path, "/examples/rhine_data_bicubic-nak.jl")
+  root_dir = pkgdir(TrixiBottomTopography)
+  example_file = joinpath(root_dir, "examples", "rhine_data_bicubic-nak.jl")
 
   # Include example
   include(example_file)
