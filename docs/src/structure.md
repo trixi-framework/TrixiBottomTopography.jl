@@ -30,16 +30,13 @@ This particular example reads one dimensional bottom topography data from a `.tx
 and constructs a cubic B-spline interpolation with not-a-knot end condition
 and smoothing of the data.
 
-```julia
+```@example 1d
 # Include packages
 using TrixiBottomTopography
-using Plots
-
-# Get root directory
-dir_path = pkgdir(TrixiBottomTopography)
 
 # Define data path
-data = string(dir_path, "/examples/data/rhine_data_1d_20_x.txt")
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
 
 # Define B-spline structure
 spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
@@ -103,16 +100,13 @@ This example reads in two dimensional bottom topography data from a `.txt` file 
 creates a bicubic B-spline interpolation with not-a-knot end condition
 and smoothing of the data.
 
-```julia
+```@example 2d
 # Include packages
 using TrixiBottomTopography
-using Plots
-
-# Get root directory
-dir_path = pkgdir(TrixiBottomTopography)
 
 # Define data path
-data = string(dir_path, "/examples/data/rhine_data_2d_20.txt")
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, "examples", "data", "rhine_data_2d_20.txt")
 
 # Define B-spline structure
 spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
