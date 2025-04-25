@@ -61,7 +61,7 @@ Now that the B-spline interpolation function is determined, the one dimensional 
 
 ```@example trixi1d
 # Defining one dimensional shallow water equations
-equations = ShallowWaterEquations1D(gravity_constant=1.0, H0=55.0)
+equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 55.0)
 ```
 
 Here the gravity constant has been chosen to be $1.0$, and the background
@@ -82,7 +82,7 @@ function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
   r = abs(x_norm)
 
   # Calculate primitive variables
-  H =  r < 50 ? 60.0 : 55.0
+  H = r < 50 ? 60.0 : 55.0
   v = 0.0
   b = spline_func(x[1])
 
@@ -95,7 +95,7 @@ In this case, a reflective wall condition is chosen, which is already implemente
 in Trixi.jl for the one dimensional shallow water equations.
 
 ```@example trixi1d
-# Setting initaial condition
+# Setting initial condition
 initial_condition = initial_condition_dam_break
 
 # Setting the boundary to be a reflective wall
@@ -142,8 +142,8 @@ by calling `SemiDiscretizationHyperbolic`. This collects all the building blocks
 coordinates_min = spline_struct.x[1]
 coordinates_max = spline_struct.x[end]
 mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level=3,
-                n_cells_max=10_000,
+                initial_refinement_level = 3,
+                n_cells_max = 10_000,
                 periodicity = false)
 
 # create the semi discretization object
@@ -175,8 +175,8 @@ for an error-based time step control.
 visnodes = range(tspan[1], tspan[2], length = 90)
 
 # use a Runge-Kutta method with error-based time step size control
-sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
-            saveat=visnodes)
+sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
+            saveat = visnodes)
 nothing #hide
 ```
 
@@ -249,7 +249,7 @@ spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 Then the two dimensional shallow water equations are defined, where the gravitational constant has been chosen to be `3.0` and the initial water height `55.0`. Afterwards, the initial condition is defined. Similar to the one dimensional case, in the center of the domain, a circular part with a diameter of `100.0` is chosen where the initial water height is chosen to be `10.0` units higher.
 
 ```@example trixi2d
-equations = ShallowWaterEquations2D(gravity_constant=3.0, H0=55.0)
+equations = ShallowWaterEquations2D(gravity_constant = 9.81, H0 = 55.0)
 
 function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
 
@@ -301,9 +301,9 @@ to be `false`.
 coordinates_min = (spline_struct.x[1], spline_struct.y[1])
 coordinates_max = (spline_struct.x[end], spline_struct.y[end])
 mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level=3,
-                n_cells_max=10_000,
-                periodicity=false)
+                initial_refinement_level = 3,
+                n_cells_max = 10_000,
+                periodicity = false)
 ```
 
 When calling the semidiscretization object again, `boundary_conditions` does not have to be specified.
@@ -339,8 +339,8 @@ ode = semidiscretize(semi, tspan)
 visnodes = range(tspan[1], tspan[2], length = 175)
 
 # use a Runge-Kutta method with error based time step size control
-sol = solve(ode, RDPK3SpFSAL49(), abstol=1.0e-8, reltol=1.0e-8,
-            saveat=visnodes);
+sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
+            saveat = visnodes);
 
 # Create an animation of the solution
 j = Observable(1)
