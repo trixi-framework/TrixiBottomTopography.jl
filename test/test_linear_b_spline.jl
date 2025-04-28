@@ -13,6 +13,6 @@ spline_struct = LinearBSpline(data)
 spline_func(x) = spline_interpolation(spline_struct, x)
 
 # Test function at arbitrary point
-@test spline_func(357555) == 46.19
+@test spline_func(357555) ≈ 46.19
 
 end # module
