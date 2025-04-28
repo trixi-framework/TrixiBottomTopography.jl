@@ -7,11 +7,17 @@ on:
     paths-ignore:
       - 'LICENSE.md'
       - 'README.md'
+      - '.zenodo.json'
+      - '.github/workflows/CompatHelper.yml'
+      - '.github/workflows/TagBot.yml'
       - 'docs/**'
   pull_request:
     paths-ignore:
       - 'LICENSE.md'
       - 'README.md'
+      - '.zenodo.json'
+      - '.github/workflows/CompatHelper.yml'
+      - '.github/workflows/TagBot.yml'
       - 'docs/**'
   workflow_dispatch:
 
@@ -33,14 +39,20 @@ jobs:
       matrix:
         version:
           - '1.10'
-          # - 'nightly'
         os:
           - ubuntu-latest
         arch:
           - x64
+        include:
+          - version: '1.10'
+            os: macos-latest
+            arch: aarch64
+          - version: '1.10'
+            os: windows-latest
+            arch: x64
     steps:
       - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
@@ -52,13 +64,50 @@ jobs:
       - name: Run tests
         uses: julia-actions/julia-runtest@v1
         with:
+          coverage: false
+        env:
+          PYTHON: ""
+
+  test_coverage:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    name: coverage - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - '1.10'
+        os:
+          - ubuntu-latest
+        arch:
+          - x64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+          arch: ${{ matrix.arch }}
+      - run: julia -e 'using InteractiveUtils; versioninfo(verbose=true)'
+      - uses: julia-actions/cache@v2
+      - uses: julia-actions/julia-buildpkg@v1
+      - name: Run tests with coverage
+        uses: julia-actions/julia-runtest@v1
+        with:
           coverage: true
         env:
           PYTHON: ""
-      - uses: julia-actions/julia-processcoverage@v1
+      - name: Process coverage results
+        uses: julia-actions/julia-processcoverage@v1
         with:
           directories: src
-      - uses: coverallsapp/github-action@v2
+      - name: Upload coverage report to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: lcov.info
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }} # now required for public repos
+      - name: Upload coverage report to Coveralls
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./lcov.info
