@@ -371,5 +371,3 @@ nothing #hide
 ```
 
 ![simTrixi2D](animation_2d.gif)
-
-For the bottom topography, the domain's boundaries look weird. The reason for that is a bug in `PlotData2D` of Trixi.jl. Once this has been addressed, the plotted bottom topography will look similar to the one in [the previous section](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/#Two-dimensional-case).

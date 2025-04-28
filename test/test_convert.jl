@@ -1,3 +1,6 @@
+module TestConvertRoutines
+
+using Test
 using TrixiBottomTopography
 using Downloads: download
 
@@ -41,3 +44,5 @@ using Downloads: download
     @test isfile(path_out_file_2d)
     @test isfile(path_out_file_2d_10)
 end
+
+end # module

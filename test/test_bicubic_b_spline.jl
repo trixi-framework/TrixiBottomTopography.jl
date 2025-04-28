@@ -1,3 +1,6 @@
+module TestBicubicBSpline
+
+using Test
 using TrixiBottomTopography
 
 # Free end condition
@@ -64,3 +67,5 @@ end
     # Test function at arbitrary point
     @test 39.23237242 < spline_func(357555, 5646555) < 39.23237243
 end
+
+end # module

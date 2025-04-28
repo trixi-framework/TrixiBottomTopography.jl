@@ -1,3 +1,6 @@
+module TestBilinearBSpline
+
+using Test
 using TrixiBottomTopography
 
 @testset "Bilinear B-spline" begin
@@ -13,3 +16,5 @@ using TrixiBottomTopography
     # Test function at arbitrary point
     @test 39.26 <= spline_func(357555, 5646555) <= 39.26000000000001
 end
+
+end # module
