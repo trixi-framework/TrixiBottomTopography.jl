@@ -17,22 +17,21 @@ afterwards the `y` values are sorted with the matrix `z` accordingly.
 The sorted `x`, `y` and `z` values are returned.
 """
 function sort_data(x::Vector, y::Vector, z::Matrix)
+    zx = transpose(z)
+    original_data_x = hcat(x, zx)
+    sorted_data_x = original_data_x[sortperm(original_data_x[:, 1]), :]
 
-  zx              = transpose(z)
-  original_data_x = hcat(x, zx)
-  sorted_data_x   = original_data_x[sortperm(original_data_x[:,1]), :]
+    x_sorted = sorted_data_x[:, 1]
+    z_interim = sorted_data_x[:, 2:end]
 
-  x_sorted  = sorted_data_x[:,1]
-  z_interim = sorted_data_x[:,2:end]
+    zy = transpose(z_interim)
+    original_data_y = hcat(y, zy)
+    sorted_data_y = original_data_y[sortperm(original_data_y[:, 1]), :]
 
-  zy              = transpose(z_interim)
-  original_data_y = hcat(y, zy)
-  sorted_data_y   = original_data_y[sortperm(original_data_y[:,1]), :]
+    y_sorted = sorted_data_y[:, 1]
+    z_sorted = sorted_data_y[:, 2:end]
 
-  y_sorted = sorted_data_y[:,1]
-  z_sorted = sorted_data_y[:,2:end]
-
-  return x_sorted, y_sorted, Matrix(z_sorted)
+    return x_sorted, y_sorted, Matrix(z_sorted)
 end
 
 ###################################
@@ -50,13 +49,11 @@ Thin plate spline basis function.
   [DOI: 10.1007/3-540-47977-5_2](https://link.springer.com/content/pdf/10.1007/3-540-47977-5_2.pdf)
 """
 function tps_base_func(r::Number)
-
-  if r == 0
-    return 0
-  else
-    return r*r*log(r)
-  end
-
+    if r == 0
+        return 0
+    else
+        return r * r * log(r)
+    end
 end
 
 # restructure input data to be able to use the thin plate spline functionality
@@ -72,31 +69,29 @@ This function restructures the input values
 The output is of the following form:
 ```math
 \begin{aligned}
-  \begin{bmatrix}
-    x_1 & y_1 & z_{1,1}\\
-    x_2 & y_1 & z_{1,2}\\
-    & \vdots & \\
-    x_n & y_1 & z_{1,n}\\
-    x_1 & y_2 & z_{2,1}\\
-    & \vdots & \\
-    x_n & y_m & z_{m,n}
-  \end{bmatrix}
+    \begin{bmatrix}
+        x_1 & y_1 & z_{1,1}\\
+        x_2 & y_1 & z_{1,2}\\
+        & \vdots & \\
+        x_n & y_1 & z_{1,n}\\
+        x_1 & y_2 & z_{2,1}\\
+        & \vdots & \\
+        x_n & y_m & z_{m,n}
+    \end{bmatrix}
 \end{aligned}
 ```
-
 """
 function restructure_data(x::Vector, y::Vector, z::Matrix)
+    x_mat = repeat(x, 1, length(y))
+    y_mat = repeat(y, 1, length(x))
 
-  x_mat = repeat(x, 1, length(y))
-  y_mat = repeat(y, 1, length(x))
+    p = length(z)
 
-  p = length(z)
+    x_vec = vec(reshape(x_mat, (p, 1)))
+    y_vec = vec(reshape(y_mat', (p, 1)))
+    z_vec = vec(reshape(z', (p, 1)))
 
-  x_vec = vec(reshape(x_mat , (p, 1)))
-  y_vec = vec(reshape(y_mat', (p, 1)))
-  z_vec = vec(reshape(z'    , (p, 1)))
-
-  return [x_vec y_vec z_vec]
+    return [x_vec y_vec z_vec]
 end
 
 # Thin plate spline approximation
@@ -114,19 +109,23 @@ This function uses the thin plate spline approach to perform the smoothing.
 To do so, the following linear equations system has to be solved for `coeff`:
 ```math
 \begin{aligned}
-		\underbrace{
-		\begin{bmatrix}
-			K & P \\
-			P^T & O
-		\end{bmatrix}
-		}_{:= L}
-		\underbrace{\begin{bmatrix}
-			w \\ a
-		\end{bmatrix}}_{\text{:= coeff}}
-		=
-		\underbrace{\begin{bmatrix}
-			z\\o
-		\end{bmatrix}}_{\text{:= rhs}}
+    \underbrace{
+        \begin{bmatrix}
+            K & P \\
+            P^T & O
+        \end{bmatrix}
+    }_{:= L}
+    \underbrace{
+        \begin{bmatrix}
+            w \\ a
+        \end{bmatrix}}_{\text{:= coeff}
+    }
+        =
+    \underbrace{
+        \begin{bmatrix}
+            z\\o
+        \end{bmatrix}}_{\text{:= rhs}
+    }
 \end{aligned}
 ```
 First, the inputs are restructured using the function [`restructure_data`](@ref) and
@@ -155,57 +154,56 @@ A reference to the calculations can be found in the lecture notes of
   [DOI: 10.1007/3-540-47977-5_2](https://link.springer.com/content/pdf/10.1007/3-540-47977-5_2.pdf)
 """
 function calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
+    restructured_data = restructure_data(x, y, z)
+    x_hat = restructured_data[:, 1]
+    y_hat = restructured_data[:, 2]
+    z_hat = restructured_data[:, 3]
 
-  restructured_data = restructure_data(x,y,z)
-  x_hat = restructured_data[:,1]
-  y_hat = restructured_data[:,2]
-  z_hat = restructured_data[:,3]
+    n = length(x)
+    m = length(y)
+    p = length(z)
 
-  n = length(x)
-  m = length(y)
-  p = length(z)
+    L = zeros(p + 3, p + 3)
+    rhs = zeros(p + 3, 1)
+    z_smth = zeros(p, 1)
 
-  L      = zeros(p+3, p+3)
-  rhs    = zeros(p+3, 1  )
-  z_smth = zeros(p  , 1  )
-
-  # Fill K part of matrix L
-  for i in 1:p
-    for j in (i+1):p
-      p_i    = [x_hat[i], y_hat[i]]
-      p_j    = [x_hat[j], y_hat[j]]
-      U      = tps_base_func(norm(p_i .- p_j))
-      L[i,j] = U
-      L[j,i] = U
+    # Fill K part of matrix L
+    for i in 1:p
+        for j in (i + 1):p
+            p_i = [x_hat[i], y_hat[i]]
+            p_j = [x_hat[j], y_hat[j]]
+            U = tps_base_func(norm(p_i .- p_j))
+            L[i, j] = U
+            L[j, i] = U
+        end
     end
-  end
 
-  # Fill rest of matrix L
-  L[1:p,1:p] = L[1:p,1:p] + lambda * diagm(ones(p))
+    # Fill rest of matrix L
+    L[1:p, 1:p] = L[1:p, 1:p] + lambda * diagm(ones(p))
 
-  L[1:p,p+1] = ones(p)
-  L[1:p,p+2] = x_hat
-  L[1:p,p+3] = y_hat
+    L[1:p, p + 1] = ones(p)
+    L[1:p, p + 2] = x_hat
+    L[1:p, p + 3] = y_hat
 
-  L[p+1,1:p] = ones(p)
-  L[p+2,1:p] = x_hat
-  L[p+3,1:p] = y_hat
+    L[p + 1, 1:p] = ones(p)
+    L[p + 2, 1:p] = x_hat
+    L[p + 3, 1:p] = y_hat
 
-  # Fill part z of rhs
-  rhs[1:p,1] = z_hat
+    # Fill part z of rhs
+    rhs[1:p, 1] = z_hat
 
-  # Calculate solution vector
-  coeff = L\rhs
+    # Calculate solution vector
+    coeff = L \ rhs
 
-  # Fill matrix grid with smoothed z values
-  for i in 1:p
-    z_smth[i] = coeff[p+1] + coeff[p+2]*x_hat[i] + coeff[p+3]*y_hat[i]
-    p_i    = [x_hat[i], y_hat[i]]
-    for k in 1:p
-      p_k    = [x_hat[k], y_hat[k]]
-      z_smth[i] = z_smth[i] + coeff[k] * tps_base_func(norm(p_i .- p_k))
+    # Fill matrix grid with smoothed z values
+    for i in 1:p
+        z_smth[i] = coeff[p + 1] + coeff[p + 2] * x_hat[i] + coeff[p + 3] * y_hat[i]
+        p_i = [x_hat[i], y_hat[i]]
+        for k in 1:p
+            p_k = [x_hat[k], y_hat[k]]
+            z_smth[i] = z_smth[i] + coeff[k] * tps_base_func(norm(p_i .- p_k))
+        end
     end
-  end
 
-  return transpose(reshape(z_smth, (n,m)))
+    return transpose(reshape(z_smth, (n, m)))
 end

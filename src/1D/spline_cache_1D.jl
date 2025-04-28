@@ -19,10 +19,10 @@ These attributes are:
 - `IP`: Coefficients matrix
 """
 mutable struct LinearBSpline{x_type, Delta_type, Q_type, IP_type}
-  x::x_type
-  Delta::Delta_type
-  Q::Q_type
-  IP::IP_type
+    x::x_type
+    Delta::Delta_type
+    Q::Q_type
+    IP::IP_type
 end
 
 # Fill structure
@@ -61,25 +61,25 @@ A reference for the calculations in this script can be found in Chapter 1 of
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function LinearBSpline(x::Vector, y::Vector)
-  if length(x) != length(y)
-    throw(DimensionMismatch("Vectors x and y have to contain the same number of values"))
-  end
+    if length(x) != length(y)
+        throw(DimensionMismatch("Vectors x and y have to contain the same number of values"))
+    end
 
-  if length(x) == 1
-    throw(ArgumentError("To perform linear B-spline interpolation, we need an x vector
-                         that contains at least 2 values."))
-  end
+    if length(x) == 1
+        throw(ArgumentError("To perform linear B-spline interpolation, we need an x vector
+                             that contains at least 2 values."))
+    end
 
-  x,y = sort_data(x, y)
+    x, y = sort_data(x, y)
 
-  Delta = x[2] - x[1]
+    Delta = x[2] - x[1]
 
-  IP = [-1 1;
-         1 0]
+    IP = [-1 1;
+          1 0]
 
-  Q = y
+    Q = y
 
-  LinearBSpline(x, Delta, Q, IP)
+    LinearBSpline(x, Delta, Q, IP)
 end
 
 # Read from file
@@ -103,16 +103,15 @@ Note that the number of `x` and `y` values have to be the same.
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/b05a90e66025ee1ebddf444a32c3fa01/raw/90d375c1ac11b26589aab1fe92bd0e6f6daf37b7/Rhine_data_1D_10.txt)
 """
 function LinearBSpline(path::String)
+    file = open(path)
+    lines = readlines(file)
+    close(file)
 
-  file = open(path)
-  lines = readlines(file)
-  close(file)
+    num_elements = parse(Int64, lines[2])
+    x = [parse(Float64, val) for val in lines[4:(3 + num_elements)]]
+    y = [parse(Float64, val) for val in lines[(5 + num_elements):end]]
 
-  num_elements = parse(Int64,lines[2])
-  x = [parse(Float64, val) for val in lines[4:3+num_elements]]
-  y = [parse(Float64, val) for val in lines[5+num_elements:end]]
-
-  LinearBSpline(x, y)
+    LinearBSpline(x, y)
 end
 
 ######################
@@ -135,10 +134,10 @@ These attributes are:
 - `IP`: Coefficients matrix
 """
 mutable struct CubicBSpline{x_type, Delta_type, Q_type, IP_type}
-  x::x_type
-  Delta::Delta_type
-  Q::Q_type
-  IP::IP_type
+    x::x_type
+    Delta::Delta_type
+    Q::Q_type
+    IP::IP_type
 end
 
 # Fill structure
@@ -183,25 +182,25 @@ between the third to last and the last control point. This procedure is only pos
 values in `x` data. The system of linear equations to determine the control points have the following form:
 ```math
 \begin{aligned}
-		\underbrace{\begin{bmatrix}
-				0 \\ P_1 \\ P_2 \\ \vdots \\ P_{n-1} \\ P_n\\ 0
-		\end{bmatrix}}_{:= P^*_{\text{free}}}
-		= \frac{1}{6}
-		\underbrace{
-			\begin{bmatrix}
-				1 & -2 & 1 & 0 & ... & ... & 0 \\
-				1      & 4 & 1 & 0 & ... & ... & 0\\
-				0      & 1 & 4 & 1 & 0   &     &     \vdots\\
-				\vdots &  0      & \ddots & \ddots & \ddots & 0 & \vdots\\
-				\vdots &       & 0 & 1 & 4 & 1 & 0\\
-				0 & ... & ... & 0 & 1 & 4 & 1\\
-				0 & ... & ... & 0 & 1 & -2 & 1
-			\end{bmatrix}
-		}_{:= \Phi^*_{\text{free}}}
-		\underbrace{\begin{bmatrix}
-				Q_1 \\ Q_2 \\ Q_3 \\ \vdots \\ Q_n \\ Q_{n+1} \\ Q_{n+2}
-		\end{bmatrix}}_{:= Q_{\text{free}}},
-	\end{aligned}
+    \underbrace{\begin{bmatrix}
+            0 \\ P_1 \\ P_2 \\ \vdots \\ P_{n-1} \\ P_n\\ 0
+        \end{bmatrix}}_{:= P^*_{\text{free}}}
+        = \frac{1}{6}
+    \underbrace{
+        \begin{bmatrix}
+            1 & -2 & 1 & 0 & ... & ... & 0 \\
+            1      & 4 & 1 & 0 & ... & ... & 0\\
+            0      & 1 & 4 & 1 & 0   &     &     \vdots\\
+            \vdots &  0      & \ddots & \ddots & \ddots & 0 & \vdots\\
+            \vdots &       & 0 & 1 & 4 & 1 & 0\\
+            0 & ... & ... & 0 & 1 & 4 & 1\\
+            0 & ... & ... & 0 & 1 & -2 & 1
+        \end{bmatrix}
+    }_{:= \Phi^*_{\text{free}}}
+    \underbrace{\begin{bmatrix}
+        Q_1 \\ Q_2 \\ Q_3 \\ \vdots \\ Q_n \\ Q_{n+1} \\ Q_{n+2}
+    \end{bmatrix}}_{:= Q_{\text{free}}},
+\end{aligned}
 ```
 which is solved for ``Q_{\text{free}}``.
 
@@ -210,26 +209,26 @@ and second to last fit knot. This end condition is only possible with at least f
 The system of linear equations to determine the control points has the following form:
 ```math
 \begin{aligned}
-		\underbrace{\begin{bmatrix}
-				0 \\ P_1 \\ P_2 \\ \vdots \\ P_{n-1} \\ P_n\\ 0
-		\end{bmatrix}}_{:= P^*_{\text{not-a-knot}}}
-		= \frac{1}{6}
-		\underbrace{
-			\begin{bmatrix}
-				-1 & 4 & -6 & 4 & -1 & 0 &... &  0 \\
-				1      & 4 & 1 & 0 & ... & ... & ... & 0\\
-				0      & 1 & 4 & 1 & 0   &     &     &\vdots\\
-				\vdots &  0      & \ddots & \ddots & \ddots & 0 & &\vdots\\
-				\vdots &  & 0      & \ddots & \ddots & \ddots & 0 &\vdots\\
-				\vdots &    &   & 0 & 1 & 4 & 1 & 0\\
-				0 & ... & ...  & ... & 0 & 1 & 4 & 1\\
-				0 & ... & 0 & -1 & 4 & -6 & 4 & -1
-			\end{bmatrix}
-		}_{:= \Phi^*_{\text{not-a-knot}}}
-		\underbrace{\begin{bmatrix}
-				Q_1 \\ Q_2 \\ Q_3 \\ \vdots \\ \vdots \\ Q_n \\ Q_{n+1} \\ Q_{n+2}
-		\end{bmatrix}}_{:= Q_{\text{not-a-knot}}}.
-	\end{aligned}
+    \underbrace{\begin{bmatrix}
+        0 \\ P_1 \\ P_2 \\ \vdots \\ P_{n-1} \\ P_n\\ 0
+    \end{bmatrix}}_{:= P^*_{\text{not-a-knot}}}
+    = \frac{1}{6}
+    \underbrace{
+        \begin{bmatrix}
+            -1 & 4 & -6 & 4 & -1 & 0 &... &  0 \\
+            1      & 4 & 1 & 0 & ... & ... & ... & 0\\
+            0      & 1 & 4 & 1 & 0   &     &     &\vdots\\
+            \vdots &  0      & \ddots & \ddots & \ddots & 0 & &\vdots\\
+            \vdots &  & 0      & \ddots & \ddots & \ddots & 0 &\vdots\\
+            \vdots &    &   & 0 & 1 & 4 & 1 & 0\\
+            0 & ... & ...  & ... & 0 & 1 & 4 & 1\\
+            0 & ... & 0 & -1 & 4 & -6 & 4 & -1
+        \end{bmatrix}
+    }_{:= \Phi^*_{\text{not-a-knot}}}
+    \underbrace{\begin{bmatrix}
+        Q_1 \\ Q_2 \\ Q_3 \\ \vdots \\ \vdots \\ Q_n \\ Q_{n+1} \\ Q_{n+2}
+    \end{bmatrix}}_{:= Q_{\text{not-a-knot}}}.
+\end{aligned}
 ```
 which is solved for ``Q_{\text{not-a-knot}}``.
 
@@ -241,67 +240,66 @@ A reference for the calculations in this script can be found in Chapter 1 of
    [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
 function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_factor = 0.0)
-
-  if length(x) < 2
-    throw(ArgumentError("To perform cubic B-spline interpolation, we need an x vector
-                         which contains at least 2 values."))
-  end
-
-  x,y = sort_data(x,y)
-
-  Delta  = x[2] - x[1]
-
-  # Consider spline smoothing if required
-  if smoothing_factor > 0
-    y = spline_smoothing(smoothing_factor, Delta, y)
-  end
-
-  n  = length(x)
-  P  = vcat(0, y, 0)
-  IP = [-1  3 -3 1;
-         3 -6  3 0;
-        -3  0  3 0;
-         1  4  1 0]
-
-  # Free end condition
-  if end_condition == "free"
-    du = vcat(-2, ones(n))
-    dm = vcat(1, 4*ones(n), 1)
-    dl = vcat(ones(n), -2)
-
-    Phi             = Matrix(Tridiagonal(dl, dm, du))
-    Phi[1  , 3    ] = 1
-    Phi[end, end-2] = 1
-    Phi_free        = sparse(Phi)
-    Q_free = 6 * (Phi_free\P)
-
-    CubicBSpline(x, Delta, Q_free, IP)
-
-  # Not-a-knot end condition
-  elseif end_condition == "not-a-knot"
-    if length(x) < 4
-      throw(ArgumentError("To perform cubic B-spline interpolation with not-a-knot
-                           end condition, we need an x vector which contains
-                           at least 4 values."))
+    if length(x) < 2
+        throw(ArgumentError("To perform cubic B-spline interpolation, we need an x vector
+                             which contains at least 2 values."))
     end
 
-    du = vcat(4, ones(n))
-    dm = vcat(-1, 4*ones(n), -1)
-    dl = vcat(ones(n), 4)
+    x, y = sort_data(x, y)
 
-    Phi                       = Matrix(Tridiagonal(dl, dm, du))
-    Phi[1  , 3:5            ] = [-6 4 -1]
-    Phi[end, (end-4):(end-2)] = [-1 4 -6]
-    Phi_knot                  = sparse(Phi)
+    Delta = x[2] - x[1]
 
-    Q_knot = 6 * (Phi_knot\P)
+    # Consider spline smoothing if required
+    if smoothing_factor > 0
+        y = spline_smoothing(smoothing_factor, Delta, y)
+    end
 
-    CubicBSpline(x, Delta, Q_knot, IP)
+    n = length(x)
+    P = vcat(0, y, 0)
+    IP = [-1 3 -3 1;
+          3 -6 3 0;
+          -3 0 3 0;
+          1 4 1 0]
 
-  else
-    throw(ArgumentError("Only \"free\" and \"not-a-knot\" boundary conditions
-                         are available!"))
-  end
+    # Free end condition
+    if end_condition == "free"
+        du = vcat(-2, ones(n))
+        dm = vcat(1, 4 * ones(n), 1)
+        dl = vcat(ones(n), -2)
+
+        Phi = Matrix(Tridiagonal(dl, dm, du))
+        Phi[1, 3] = 1
+        Phi[end, end - 2] = 1
+        Phi_free = sparse(Phi)
+        Q_free = 6 * (Phi_free \ P)
+
+        CubicBSpline(x, Delta, Q_free, IP)
+
+        # Not-a-knot end condition
+    elseif end_condition == "not-a-knot"
+        if length(x) < 4
+            throw(ArgumentError("To perform cubic B-spline interpolation with not-a-knot
+                                 end condition, we need an x vector which contains
+                                 at least 4 values."))
+        end
+
+        du = vcat(4, ones(n))
+        dm = vcat(-1, 4 * ones(n), -1)
+        dl = vcat(ones(n), 4)
+
+        Phi = Matrix(Tridiagonal(dl, dm, du))
+        Phi[1, 3:5] = [-6 4 -1]
+        Phi[end, (end - 4):(end - 2)] = [-1 4 -6]
+        Phi_knot = sparse(Phi)
+
+        Q_knot = 6 * (Phi_knot \ P)
+
+        CubicBSpline(x, Delta, Q_knot, IP)
+
+    else
+        throw(ArgumentError("Only \"free\" and \"not-a-knot\" boundary conditions
+                             are available!"))
+    end
 end
 
 # Read from file
@@ -329,14 +327,13 @@ Note that the number of `x` and `y` values have to be the same.
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/b05a90e66025ee1ebddf444a32c3fa01/raw/90d375c1ac11b26589aab1fe92bd0e6f6daf37b7/Rhine_data_1D_10.txt)
 """
 function CubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
+    file = open(path)
+    lines = readlines(file)
+    close(file)
 
-  file = open(path)
-  lines = readlines(file)
-  close(file)
+    num_elements = parse(Int64, lines[2])
+    x = [parse(Float64, val) for val in lines[4:(3 + num_elements)]]
+    y = [parse(Float64, val) for val in lines[(5 + num_elements):end]]
 
-  num_elements = parse(Int64,lines[2])
-  x = [parse(Float64, val) for val in lines[4:3+num_elements]]
-  y = [parse(Float64, val) for val in lines[5+num_elements:end]]
-
-  CubicBSpline(x, y; end_condition = end_condition, smoothing_factor = smoothing_factor)
+    CubicBSpline(x, y; end_condition = end_condition, smoothing_factor = smoothing_factor)
 end
