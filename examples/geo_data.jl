@@ -10,19 +10,56 @@ using Plots
 using GeophysicalModelGenerator
 
 
-lon_min, lon_max = -10.0, 10.0  # Longitude range from -10° to 10°
-lat_min, lat_max = 45.0, 55.0   # Latitude range from 45° to 55°
+##########################
+#some topography data from the Rhine close to the Theodor-Heuss-Brücke in Mainz
+#50.008306, 8.276694
+#50.008200, 8.277027
+#50.007888, 8.276223
+#50.008217, 8.275613
+###########################
+# Specify the limits of the topography data based on the coordinates
+lon_min = 8.276223
+lon_max = 8.277027
+lat_min = 50.007888
+lat_max = 50.008306
+limits=[lon_min, lon_max, lat_min, lat_max]
+############################
+#Loading the topography data
+#important: if you have a small area you might use hiher resolution: 
+# Note: 
+# ====
+# - latitude values in the southern hemisphere should have a minus sign (e.g., -2.8)
+# - longitude values that are "west" should *either* come with a minus sign *or* are defined by values >180
 
-# Load topography data using GMT.grdtrack
-region = [lon_min, lon_max, lat_min, lat_max]
-spacing = "0.1/0.1"  # Grid spacing in degrees
-topo_data = GMT.grdtrack(region=region, spacing=spacing)
+# | Dataset                 |   Resolution |   Description                                               |
+# |:----------------        | ------------ | ----------------------------------------------------------- |
+# | "@earth\\_relief\\_01s" |	1 arc sec 	 | SRTM tiles (14297 tiles, land only, 60S-60N) [NASA/USGS]    |
+# | "@earth\\_relief\\_03s"	|   3 arc sec	 | SRTM tiles (14297 tiles, land only, 60S-60N) [NASA/USGS]    |
+# | "@earth\\_relief\\_15s"	|  15 arc sec	 | SRTM15+ [David Sandwell, SIO/UCSD]                          |
+# | "@earth\\_relief\\_30s"	|  30 arc sec	 | SRTM30+ [Becker et al., 2009, SIO/UCSD]                     |
+# | "@earth\\_relief\\_01m"	|   1 arc min	 | ETOPO1 Ice surface [NEIC/NOAA]                              |
+# | "@earth\\_relief\\_02m"	|   2 arc min	 | ETOPO2v2 Ice surface [NEIC/NOAA]                            |
+# | "@earth\\_relief\\_03m"	|   3 arc min	 | ETOPO1 after Gaussian spherical filtering (5.6 km fullwidth)|
+# | "@earth\\_relief\\_04m"	|   4 arc min	 | ETOPO1 after Gaussian spherical filtering (7.5 km fullwidth)|
+# | "@earth\\_relief\\_05m"	|   5 arc min	 | ETOPO1 after Gaussian spherical filtering (9 km fullwidth)  |
+# | "@earth\\_relief\\_06m"	|   6 arc min	 | ETOPO1 after Gaussia30n spherical filtering (10 km fullwidth) |
+# | "@earth\\_relief\\_10m"	|  10 arc min	 | ETOPO1 after Gaussian spherical filtering (18 km fullwidth) |
+# | "@earth\\_relief\\_15m"	|  20 arc min	 | ETOPO1 after Gaussian spherical filtering (28 km fullwidth) |
+# | "@earth\\_relief\\_20m"	|  20 arc min	 | ETOPO1 after Gaussian spherical filtering (37 km fullwidth) |
+# | "@earth\\_relief\\_30m"	|  30 arc min	 | ETOPO1 after Gaussian spherical filtering (55 km fullwidth) |
+# | "@earth\\_relief\\_60m"	|  60 arc min	 | ETOPO1 after Gaussian spherical filtering (111 km fullwidth)|
 
-# Reshape the data for plotting
-z = reshape(topo_data[:, 3], length(lon_min:0.1:lon_max), length(lat_min:0.1:lat_max))
+# *Note*: this routine is only available once the GMT.jl package is loaded in the REPL
 
-# Visualize the data
-heatmap(lon_min:0.1:lon_max, lat_min:0.1:lat_max, z', 
-        xlabel="Longitude", 
-        ylabel="Latitude",
-        title="Topography")
+Topo = import_topo(limits; file="@earth_relief_01s", maxattempts=5) 
+
+############################
+#building a .vts file to first get an impression of the topography data in Paraview
+
+write_paraview(Topo, "topography_rhein") 
+    
+#Uses `GMT` to download the topography of a certain region, specified with limits=[lon_min, lon_max, lat_min, lat_max].
+#Sometimes download fails because of the internet connection. We do `maxattempts` to download it.
+
+# using GeophysicalModelGenerator, GMT
+# Topo = import_topo([4,20,37,49], file="@earth_relief_01m")
