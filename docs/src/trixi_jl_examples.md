@@ -1,6 +1,6 @@
 # Examples with Trixi.jl
 
-As mentioned in the [Home](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/)
+As mentioned in the [Home](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/)
 section of this documentation, TrixiBottomTopography.jl was initially developed as a
 supplementary package for the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
 to enable the user to use real world geographical data for the bottom topography
@@ -104,7 +104,7 @@ boundary_condition = boundary_condition_slip_wall
 
 The upcoming code parts will **not** be covered in full detail.
 To get a more profound understanding of the routines, please see the
-[Trixi.jl documentation](https://trixi-framework.github.io/Trixi.jl/stable/).
+[Trixi.jl documentation](https://trixi-framework.github.io/TrixiDocumentation/stable/).
 
 The following code snippet sets up the discontinuous Galerkin spectral element method (DGSEM).
 In this solver type, we can specify which flux functions for the surface and volume fluxes
@@ -121,7 +121,8 @@ solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm
 ```
 
 After the solver comes the specification of the mesh in the approximation.
-In this case, a [`TreeMesh`](https://trixi-framework.github.io/Trixi.jl/stable/meshes/tree_mesh/) is chosen, which is a Cartesian mesh.
+In this case, a [`TreeMesh`](https://trixi-framework.github.io/TrixiDocumentation/stable/meshes/tree_mesh/)
+is chosen, which is a Cartesian mesh.
 Here the domain borders must be defined, as well as the number of initial elements
 ($2$ to the power of `initial_refinement_level`).
 Also, we have to indicate if the domain is periodic.
