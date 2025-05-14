@@ -14,7 +14,7 @@ write(joinpath(@__DIR__, "src", "authors.md"), authors_text)
 
 # Define module-wide setups such that the respective modules are available in doctests
 DocMeta.setdocmeta!(TrixiBottomTopography, :DocTestSetup, :(using TrixiBottomTopography);
-                    recursive=true)
+                    recursive = true)
 
 # Copy some files from the repository root directory to the docs and modify them
 # as necessary
@@ -31,7 +31,8 @@ open(joinpath(@__DIR__, "src", "code_of_conduct.md"), "w") do io
     println(io, "# [Code of Conduct](@id code-of-conduct)")
     println(io, "")
     for line in eachline(joinpath(dirname(@__DIR__), "CODE_OF_CONDUCT.md"))
-        line = replace(line, "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
+        line = replace(line,
+                       "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
         println(io, "> ", line)
     end
 end
@@ -48,7 +49,8 @@ open(joinpath(@__DIR__, "src", "contributing.md"), "w") do io
     # Write the modified contents
     for line in eachline(joinpath(dirname(@__DIR__), "CONTRIBUTING.md"))
         line = replace(line, "[LICENSE.md](LICENSE.md)" => "[License](@ref)")
-        line = replace(line, "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
+        line = replace(line,
+                       "[AUTHORS.md](AUTHORS.md)" => "[Authors](@ref trixi_bt_authors)")
         println(io, line)
     end
 end
@@ -98,28 +100,26 @@ makedocs(;
                                   edit_link = "main",
                                   size_threshold_ignore = ["index.md"],),
          # Explicitly specify documentation structure
-         pages = [
-         "Home" => "index.md",
-         "Overview" => [
-             "Data conversion" => "conversion.md",
-             "B-spline structure" => "structure.md",
-             "B-spline function" => "function.md",
-         ],
-         "Trixi.jl examples" => "trixi_jl_examples.md",
-         "Advanced topics & developers" => ["Development" => "development.md"
-                                            "Testing" => "testing.md"],
-         "Changelog" => "changelog.md",
-         "Authors" => "authors.md",
-         "Contributing" => "contributing.md",
-         "Code of Conduct" => "code_of_conduct.md",
-         "License" => "license.md",
-         "Reference" => "reference.md"])
+         pages = ["Home" => "index.md",
+             "Overview" => [
+                 "Data conversion" => "conversion.md",
+                 "B-spline structure" => "structure.md",
+                 "B-spline function" => "function.md"
+             ],
+             "Trixi.jl examples" => "trixi_jl_examples.md",
+             "Advanced topics & developers" => ["Development" => "development.md",
+                 "Style guide" => "styleguide.md",
+                 "Testing" => "testing.md"],
+             "Changelog" => "changelog.md",
+             "Authors" => "authors.md",
+             "Contributing" => "contributing.md",
+             "Code of Conduct" => "code_of_conduct.md",
+             "License" => "license.md",
+             "Reference" => "reference.md"])
 
 # Documenter can also automatically deploy documentation to gh-pages.
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
 # for more information.
-deploydocs(
-    repo = "github.com/trixi-framework/TrixiBottomTopography.jl.git",
-    devbranch = "main",
-    push_preview = true
-)
+deploydocs(repo = "github.com/trixi-framework/TrixiBottomTopography.jl.git",
+           devbranch = "main",
+           push_preview = true)
