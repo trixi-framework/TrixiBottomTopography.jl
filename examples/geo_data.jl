@@ -46,7 +46,35 @@ Topo_Cart = convert2CartData(Topo,p)
 
 #es muss eine datei erstellt werden, sodass die wurzel der länge der datei ein integer ist
 
+low_x = -0.5
+high_x = 0.5
+gridsize_x = 0.1
 
+low_y = -0.5
+high_y = 0.5
+gridzize_y = 0.2
+
+values_x = collect(low_x:gridsize_x:high_x)
+values_y = collect(low_y:gridzize_y:high_y)
+
+function safe_computation(values_x, values_y)
+    try
+        Int(sqrt(length(values_x)*length(values_y)))
+        return Int(sqrt(length(values_x)*length(values_y))), false
+    catch e                                                    
+        if e isa InexactError                                                                   
+            println("There is an InexactError. the gridsizez have to be adjusted")
+            return nothing, nothing, true
+        else
+            rethrow(e)
+        end
+    end
+end
+
+safe_computation(values_x, values_y)
+
+
+Topo_Cart_orth  = CartData(xyz_grid(low_x:gridsize_x:high_x,low_y:gridzize_y:high_y,0))
 
 Topo_Cart_orth  = CartData(xyz_grid(-0.5:0.1:0.5,-0.5:0.1:0.5,0))
 
@@ -99,32 +127,34 @@ convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 1)
 
 Int(sqrt(122))
 round(Int, sqrt(14.45))
-####################
-
-#####################
-# Define file paths
-root_dir = pkgdir(TrixiBottomTopography)
-
-# Download the raw bottom topography data
-path_src_file = download("https://gist.githubusercontent.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5/raw/f09b43f604adf9e2cfb45a7d998418f1e72f251d/dgm1_32_357_5646_1_nw.xyz",
-                         joinpath(root_dir, "examples", "data",
-                                  "dgm1_32_357_5646_1_nw.xyz"))
-
-file_path = joinpath(root_dir, "examples", "data", "dgm1_32_357_5646_1_nw.xyz")
-line_count = countlines(file_path)
-
-path_out_file_1d_x = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
-path_out_file_1d_y = joinpath(root_dir, "examples", "rhine_data_1d_20_y.txt")
-path_out_file_2d = joinpath(root_dir, "examples", "rhine_data_2d_20.txt")
-
-# Convert data
-convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1)
-convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y",
-               section = 100)
-convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
-
 
 print("lol")
+####################
+
+# #####################
+# # Define file paths
+# root_dir = pkgdir(TrixiBottomTopography)
+
+# # Download the raw bottom topography data
+# path_src_file = download("https://gist.githubusercontent.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5/raw/f09b43f604adf9e2cfb45a7d998418f1e72f251d/dgm1_32_357_5646_1_nw.xyz",
+#                          joinpath(root_dir, "examples", "data",
+#                                   "dgm1_32_357_5646_1_nw.xyz"))
+
+# file_path = joinpath(root_dir, "examples", "data", "dgm1_32_357_5646_1_nw.xyz")
+# line_count = countlines(file_path)
+
+# path_out_file_1d_x = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
+# path_out_file_1d_y = joinpath(root_dir, "examples", "rhine_data_1d_20_y.txt")
+# path_out_file_2d = joinpath(root_dir, "examples", "rhine_data_2d_20.txt")
+
+# # Convert data
+# convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1)
+# convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y",
+#                section = 100)
+# convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
+
+
+
 
 
 ############################
@@ -153,14 +183,6 @@ print("lol")
 # | "@earth\\_relief\\_30m"	|  30 arc min	 | ETOPO1 after Gaussian spherical filtering (55 km fullwidth) |
 # | "@earth\\_relief\\_60m"	|  60 arc min	 | ETOPO1 after Gaussian spherical filtering (111 km fullwidth)|
 
-
-# Topo = import_topo(lon = [-10, 45], lat=[25, 50], file="@earth_relief_20m")
-# p=ProjectionPoint(Lon=17.3, Lat=37.5)
-# convert2UTMzone(Topo,p)
-# Topo_Cart = convert2CartData(Topo,p)
-# Topo_Cart_orth  = CartData(xyz_grid(-2000:20:2000,-1000:20:1000,0))
-# Topo_Cart_orth  = project_CartData(Topo_Cart_orth, Topo, p)
-# write_paraview(Topo_Cart,"Topo_Cart_orth");
 
 
 # #Topo = import_topo(lon = [-10, 45], lat=[25, 50], file="@earth_relief_20m")
@@ -204,25 +226,3 @@ print("lol")
 # ## Convert the CSV from the topo data to XYZ format:
 # csv_to_xyz("/Users/Vincent_1/Library/CloudStorage/OneDrive-JGU(2)/HiWi/TrixiBottomTopography_geforkt/TrixiBottomTopography.jl/examples/modelgenerator3.csv", "/Users/Vincent_1/Library/CloudStorage/OneDrive-JGU(2)/HiWi/TrixiBottomTopography_geforkt/TrixiBottomTopography.jl/examples/modelgenerator3.xyz")
 
-# # ############################################################################
-# #convert this data to a format which can be used by TrixiBottomTopography, namely a special .txt file format
-
-# # Define file paths
-# data_dir = joinpath(@__DIR__, "data")
-# data_dir
-# # Download the raw bottom topography data
-# path_src_file = joinpath(@__DIR__, "modelgenerator3.xyz")
-
-# path_out_file_1d_x = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
-# path_out_file_1d_y = joinpath(data_dir, "rhine_data_1d_20_y_theodor.txt")
-# path_out_file_2d = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
-
-# # Convert data
-# convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 20, section = 10)
-# convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y", section = 10)
-# convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
-
-# # Download one dimensional Rhine bottom data from gist
-# #Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
-
-# #
