@@ -6,6 +6,7 @@
 # 
 # this data is not available in the GeophysicalModelGenerator.jl package, so here we chose
 # 
+
 # 
 import Pkg
 Pkg.add(["GeophysicalModelGenerator", "GMT", "Plots","CSV","DataFrames","TrixiBottomTopography", "Downloads"])
