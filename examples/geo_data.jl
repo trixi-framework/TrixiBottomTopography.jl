@@ -1,7 +1,11 @@
-#the goal is to use the GeophysicalModelGenerator.jl to load real topography data 
-
-# wie lade ich beliebeige topographische daten in GeophysicalModelGenerator.jl:
-# es gibt import topo, gmg laden und gmt, dann gibt es eine funktion import_topo, denn gebe ich die longitude und lattitude ein und dann läd man das runter
+#the goal is to use the GeophysicalModelGenerator.jl to load real topography data and use it for TrixiBottomTopography.jl
+# 
+# the data from originaly used in TrixiBottomTopography.jl  were collected by the Geobasis NRW.
+# in this data the first column provides the corresponding ETRS89 East coordinates, the second 
+# column the ETRS89 North coordinates and the third column the DHHN2016 height.
+# 
+# this data is not available in the GeophysicalModelGenerator.jl package, so here we chose
+# 
 # 
 import Pkg
 Pkg.add(["GeophysicalModelGenerator", "GMT", "Plots","CSV","DataFrames","TrixiBottomTopography", "Downloads"])
@@ -19,9 +23,6 @@ using Downloads: download
 #50.009480 8.270871
 #50.006184 8.274388
 #50.007914 8.278718
-
-
-
 ###########################
 # Specify the limits of the topography data based on the coordinates
 lon_min = 8.270871
@@ -33,131 +34,8 @@ limits=[lon_min, lon_max, lat_min, lat_max]
 lon_mean = (lon_max+lon_min)/2
 lat_mean=(lat_min+lat_max)/2
 
-#rausfinden wie man die richtigen topographischen daten bekommt, anscheinend ist die gewählte form: 
-#the first column provides the corresponding ETRS89 East coordinates, the second column the 
-#ETRS89 North coordinates and the third column the DHHN2016 height.
 
-###
-#Lon=17.3, Lat=37.5
-#Topo = import_topo(limits, file="@earth_relief_20m")
-Topo = import_topo(lon = [8.270871, 8.278718], lat=[50.006184, 50.010910], file="@earth_relief_01m")
-p=ProjectionPoint(Lon=lon_mean, Lat=lat_mean)
-Topo_Cart = convert2CartData(Topo,p)
-
-#es muss eine datei erstellt werden, sodass die wurzel der länge der datei ein integer ist
-
-low_x = -0.5
-high_x = 0.5
-gridsize_x = 0.1
-
-low_y = -0.5
-high_y = 0.5
-gridzize_y = 0.2
-
-values_x = collect(low_x:gridsize_x:high_x)
-values_y = collect(low_y:gridzize_y:high_y)
-
-function safe_computation(values_x, values_y)
-    try
-        Int(sqrt(length(values_x)*length(values_y)))
-        return Int(sqrt(length(values_x)*length(values_y))), false
-    catch e                                                    
-        if e isa InexactError                                                                   
-            println("There is an InexactError. the gridsizez have to be adjusted")
-            return nothing, nothing, true
-        else
-            rethrow(e)
-        end
-    end
-end
-
-safe_computation(values_x, values_y)
-
-
-Topo_Cart_orth  = CartData(xyz_grid(low_x:gridsize_x:high_x,low_y:gridzize_y:high_y,0))
-
-Topo_Cart_orth  = CartData(xyz_grid(-0.5:0.1:0.5,-0.5:0.1:0.5,0))
-
-Topo_Cart_orth  = project_CartData(Topo_Cart_orth, Topo, p)
-
-df_x = DataFrame(Topo_Cart_orth.x.val[:,:,1], :auto)
-
-df_y = DataFrame(Topo_Cart_orth.y.val[:,:,1], :auto);
-
-df_z = DataFrame(Topo_Cart_orth.z.val[:,:,1], :auto);
-
-# Kombiniere die DataFrames für x, y und z in einen DataFrame
-df_xyz = DataFrame(
-                   x = convert.(Float64,vec(Topo_Cart_orth.x.val[:,:,1])), 
-                   y = convert.(Float64,vec(Topo_Cart_orth.y.val[:,:,1])), 
-                   z = convert.(Float64,vec(Topo_Cart_orth.z.val[:,:,1])),
-                   )
-
-
- #alohomora, spieglein spieglein an der wand bitte löse meine probleme wie von zauberhand
-
-# Schreibe die Datei ohne Header und mit Leerzeichen als Delimiter
-# Make sure the data directory exists
-data_dir = joinpath(@__DIR__, "data")
-mkpath(data_dir)  # Create the directory if it doesn't exist
-
-# Write directly to the data directory
-output_file = joinpath(data_dir, "test.xyz")
-open(output_file, "w") do file
-    for row in eachrow(df_xyz)
-        # Round each value in the row to 2 decimal places
-        rounded_row = [round(value, digits=2) for value in row]
-        println(file, join(rounded_row, " "))
-    end
-end
-
-data_dir = joinpath(@__DIR__, "data")
-data_dir
-# Download the raw bottom topography data
-path_src_file = joinpath(@__DIR__, "test.xyz")
-
-path_out_file_1d_x = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
-path_out_file_1d_y = joinpath(data_dir, "rhine_data_1d_20_y_theodor.txt")
-path_out_file_2d = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
-
-# Convert data
-convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1)
-convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 1, direction = "y", section = 1)
-convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 1)
-
-Int(sqrt(122))
-round(Int, sqrt(14.45))
-
-print("lol")
-####################
-
-# #####################
-# # Define file paths
-# root_dir = pkgdir(TrixiBottomTopography)
-
-# # Download the raw bottom topography data
-# path_src_file = download("https://gist.githubusercontent.com/maxbertrand1996/c6917dcf80aef1704c633ec643a531d5/raw/f09b43f604adf9e2cfb45a7d998418f1e72f251d/dgm1_32_357_5646_1_nw.xyz",
-#                          joinpath(root_dir, "examples", "data",
-#                                   "dgm1_32_357_5646_1_nw.xyz"))
-
-# file_path = joinpath(root_dir, "examples", "data", "dgm1_32_357_5646_1_nw.xyz")
-# line_count = countlines(file_path)
-
-# path_out_file_1d_x = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
-# path_out_file_1d_y = joinpath(root_dir, "examples", "rhine_data_1d_20_y.txt")
-# path_out_file_2d = joinpath(root_dir, "examples", "rhine_data_2d_20.txt")
-
-# # Convert data
-# convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1)
-# convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y",
-#                section = 100)
-# convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
-
-
-
-
-
-############################
+###################################
 #Loading the topography data
 #important: if you have a small area you might use hiher resolution: 
 # Note: 
@@ -183,46 +61,115 @@ print("lol")
 # | "@earth\\_relief\\_30m"	|  30 arc min	 | ETOPO1 after Gaussian spherical filtering (55 km fullwidth) |
 # | "@earth\\_relief\\_60m"	|  60 arc min	 | ETOPO1 after Gaussian spherical filtering (111 km fullwidth)|
 
+###################################
 
 
-# #Topo = import_topo(lon = [-10, 45], lat=[25, 50], file="@earth_relief_20m")
-# p=ProjectionPoint(Lon=lon_mean, Lat=lat_mean)
-# Topo_Cart = convert2CartData(Topo,p)#Topo_Cart = convert2UTMzone(Topo,p) #convert2UTMzone(Topo,p),convert2CartData(Topo,p)
-# write_paraview(Topo_Cart,"Rhein_highest");
+###
+#Lon=17.3, Lat=37.5
+#Topo = import_topo(limits, file="@earth_relief_20m")
+Topo = import_topo(lon = [8.270871, 8.278718], lat=[50.006184, 50.010910], file="@earth_relief_01m")
+p=ProjectionPoint(Lon=lon_mean, Lat=lat_mean)
+Topo_Cart = convert2CartData(Topo,p) # here we get a first impression on what intervall to chose
 
-# #load the csv file for the topography data from the paraview file
-# # now we load the csv file for the topography data from the paraview file
-# #in vs code you might get asked if you like to install Rainbow CSV
-# # ...existing code...
-# #df = CSV.read("/Users/Vincent_1/Library/CloudStorage/OneDrive-JGU(2)/HiWi/TrixiBottomTopography_geforkt/TrixiBottomTopography.jl/examples/rh.csv", DataFrame)
-# df = CSV.read("/Users/Vincent_1/Library/CloudStorage/OneDrive-JGU(2)/HiWi/TrixiBottomTopography_geforkt/TrixiBottomTopography.jl/examples/modelgenerator3.csv", DataFrame)
-# #try to load the data as an orthogonal cartesian grid, vlt geht das aber nicht 
+# the gridpoints have to fullfill the condition: Int(sqrt(length))
 
-# ############################
-# #convert the csv file to a xyz file to be able to use it in TrixiBottomTopography
+low_x = -0.5
+high_x = 0.5
+gridsize_x = 0.1
 
-# function csv_to_xyz(csv_path, xyz_path)
-#     # CSV-Datei einlesen
-#     data = CSV.read(csv_path, DataFrame)
-    
-#     # Spaltenüberschriften bereinigen
-#     column_names = names(data)
-#     clean_names = [replace(String(name), "Points:" => "") for name in column_names]
-#     rename!(data, Dict(zip(column_names, clean_names)))
-    
-#     # XYZ-Datei erstellen
-#     open(xyz_path, "w") do file
-#         for i in 1:size(data, 1)
-#             x = data[i, "0"]
-#             y = data[i, "1"]
-#             z = data[i, "2"]
-#             println(file, "$x $y $z")
-#         end
-#     end
-    
-#     println("Konvertierung abgeschlossen. XYZ-Datei wurde erstellt: $xyz_path")
-# end
+low_y = -0.5
+high_y = 0.5
+gridzize_y = 0.1
 
-# ## Convert the CSV from the topo data to XYZ format:
-# csv_to_xyz("/Users/Vincent_1/Library/CloudStorage/OneDrive-JGU(2)/HiWi/TrixiBottomTopography_geforkt/TrixiBottomTopography.jl/examples/modelgenerator3.csv", "/Users/Vincent_1/Library/CloudStorage/OneDrive-JGU(2)/HiWi/TrixiBottomTopography_geforkt/TrixiBottomTopography.jl/examples/modelgenerator3.xyz")
+values_x = collect(low_x:gridsize_x:high_x)
+values_y = collect(low_y:gridzize_y:high_y)
 
+
+##############
+#check if we have a right choice for our gridpoints
+function safe_computation(values_x, values_y)
+    try
+        Int(sqrt(length(values_x)*length(values_y)))
+        return Int(sqrt(length(values_x)*length(values_y))), false
+    catch e                                                    
+        if e isa InexactError                                                                   
+            println("There is an InexactError. the gridsizez has to be adjusted")
+            return nothing, nothing, true
+        else
+            rethrow(e)
+        end
+    end
+end
+##################
+
+safe_computation(values_x, values_y) # here we check if the gridpoints are ok
+
+
+Topo_Cart_orth  = CartData(xyz_grid(low_x:gridsize_x:high_x,low_y:gridzize_y:high_y,0))
+
+Topo_Cart_orth  = CartData(xyz_grid(-0.5:0.1:0.5,-0.5:0.1:0.5,0))
+
+Topo_Cart_orth  = project_CartData(Topo_Cart_orth, Topo, p)
+
+df_x = DataFrame(Topo_Cart_orth.x.val[:,:,1], :auto)
+
+df_y = DataFrame(Topo_Cart_orth.y.val[:,:,1], :auto);
+
+df_z = DataFrame(Topo_Cart_orth.z.val[:,:,1], :auto);
+
+# Kombiniere die DataFrames für x, y und z in einen DataFrame
+df_xyz = DataFrame(
+                   x = convert.(Float64,vec(Topo_Cart_orth.x.val[:,:,1])),  # here we have to convert the values to Float64
+                   y = convert.(Float64,vec(Topo_Cart_orth.y.val[:,:,1])), 
+                   z = convert.(Float64,vec(Topo_Cart_orth.z.val[:,:,1])),
+                   )
+
+
+# write the data without header and space as delimiter 
+# Make sure the data directory exists
+data_dir = joinpath(@__DIR__, "data")
+mkpath(data_dir)  # Create the directory if it doesn't exist
+
+# Write directly to the data directory
+output_file = joinpath(data_dir, "test.xyz")
+open(output_file, "w") do file
+    for row in eachrow(df_xyz)
+        # Round each value in the row to 2 decimal places
+        rounded_row = [value for value in row]
+        println(file, join(rounded_row, " "))
+    end
+end
+
+data_dir = joinpath(@__DIR__, "data")
+data_dir
+# Download the raw bottom topography data
+path_src_file = joinpath(@__DIR__, "test.xyz")
+
+path_out_file_1d_x = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
+path_out_file_1d_y = joinpath(data_dir, "rhine_data_1d_20_y_theodor.txt")
+path_out_file_2d = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
+
+# Convert data
+convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1)
+convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 1, direction = "y", section = 1)
+convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 1)
+
+
+#now redoo the steps as in the other turoial steps. try if we can do b-spline interpolation and simulations with this data
+
+
+
+
+print("lol")
+####################
+
+
+
+
+# Plot with random numbers
+using Random
+
+random_x = randn(100)
+random_y = randn(100)
+
+scatter(random_x, random_y, title="Scatter Plot of Random Numbers", xlabel="Random X", ylabel="Random Y")
