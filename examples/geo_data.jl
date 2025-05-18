@@ -10,7 +10,6 @@
 #
 import Pkg
 
-
 Pkg.add([
             "GeophysicalModelGenerator",
             "GMT",
@@ -18,7 +17,8 @@ Pkg.add([
             "CSV",
             "DataFrames",
             "Downloads",
-            "CairoMakie"
+            "CairoMakie",
+            "JuliaFormatter"
         ])
 using GMT
 using Plots
@@ -28,6 +28,7 @@ using DataFrames
 using TrixiBottomTopography
 using Downloads: download
 using CairoMakie
+using JuliaFormatter
 
 ##########################
 # some topography data from the Rhine close to the Theodor-Heuss-Brücke in Mainz
@@ -77,11 +78,12 @@ lat_mean = (lat_min + lat_max) / 2
 ###
 #Lon=17.3, Lat=37.5
 #Topo = import_topo(limits, file="@earth_relief_20m")
-Topo = import_topo(lon = [8.270871, 8.278718], lat=[50.006184, 50.010910], file="@earth_relief_01m")
+Topo = import_topo(lon = [8.270871, 8.278718], lat = [50.006184, 50.010910],
+                   file = "@earth_relief_01m")
 
-p=ProjectionPoint(Lon=lon_mean, Lat=lat_mean)
-T
-opo_Cart = convert2CartData(Topo,p) # here we get a first impression on what intervall to chose
+p=ProjectionPoint(Lon = lon_mean, Lat = lat_mean)
+
+Topo_Cart = convert2CartData(Topo, p) # here we get a first impression on what intervall to chose
 
 # the gridpoints have to fullfill the condition: Int(sqrt(length))
 
@@ -220,4 +222,4 @@ plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
                                          ylabel = "ETRS89\n North",
                                          zlabel = "DHHN2016\n Height",
                                          azimuth_angle = 54 * pi / 180,
-                                         elevation_angle = 27 * pi / 180)       
+                                         elevation_angle = 27 * pi / 180)
