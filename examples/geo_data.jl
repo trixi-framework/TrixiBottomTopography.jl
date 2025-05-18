@@ -4,12 +4,21 @@
 # in this data the first column provides the corresponding ETRS89 East coordinates, the second 
 # column the ETRS89 North coordinates and the third column the DHHN2016 height.
 # 
-# this data is not available in the GeophysicalModelGenerator.jl package, so here we chose
-# 
-
-# 
+# this data is not available in the GeophysicalModelGenerator.jl package, so here we chose first longitudianal
+#and transversal data and then choose a projection point in the middle of the choosen area and then convert the data into cartesion 
+#data
+#
 import Pkg
-Pkg.add(["GeophysicalModelGenerator", "GMT", "Plots","CSV","DataFrames","TrixiBottomTopography", "Downloads"])
+Pkg.add([
+            "GeophysicalModelGenerator",
+            "GMT",
+            "Plots",
+            "CSV",
+            "DataFrames",
+            "TrixiBottomTopography",
+            "Downloads",
+            "CairoMakie"
+        ])
 using GMT
 using Plots
 using GeophysicalModelGenerator
@@ -17,6 +26,7 @@ using CSV
 using DataFrames
 using TrixiBottomTopography
 using Downloads: download
+using CairoMakie
 
 ##########################
 # some topography data from the Rhine close to the Theodor-Heuss-Brücke in Mainz
@@ -28,13 +38,12 @@ using Downloads: download
 # Specify the limits of the topography data based on the coordinates
 lon_min = 8.270871
 lon_max = 8.278718
-lat_min = 50.006184 
+lat_min = 50.006184
 lat_max = 50.010910
-limits=[lon_min, lon_max, lat_min, lat_max]
+limits = [lon_min, lon_max, lat_min, lat_max]
 
-lon_mean = (lon_max+lon_min)/2
-lat_mean=(lat_min+lat_max)/2
-
+lon_mean = (lon_max + lon_min) / 2
+lat_mean = (lat_min + lat_max) / 2
 
 ###################################
 #Loading the topography data
@@ -64,13 +73,13 @@ lat_mean=(lat_min+lat_max)/2
 
 ###################################
 
-
 ###
 #Lon=17.3, Lat=37.5
 #Topo = import_topo(limits, file="@earth_relief_20m")
-Topo = import_topo(lon = [8.270871, 8.278718], lat=[50.006184, 50.010910], file="@earth_relief_01m")
-p=ProjectionPoint(Lon=lon_mean, Lat=lat_mean)
-Topo_Cart = convert2CartData(Topo,p) # here we get a first impression on what intervall to chose
+Topo = import_topo(lon = [8.270871, 8.278718], lat = [50.006184, 50.010910],
+                   file = "@earth_relief_01m")
+p = ProjectionPoint(Lon = lon_mean, Lat = lat_mean)
+Topo_Cart = convert2CartData(Topo, p) # here we get a first impression on what intervall to chose
 
 # the gridpoints have to fullfill the condition: Int(sqrt(length))
 
@@ -85,15 +94,14 @@ gridzize_y = 0.1
 values_x = collect(low_x:gridsize_x:high_x)
 values_y = collect(low_y:gridzize_y:high_y)
 
-
 ##############
 #check if we have a right choice for our gridpoints
 function safe_computation(values_x, values_y)
     try
-        Int(sqrt(length(values_x)*length(values_y)))
-        return Int(sqrt(length(values_x)*length(values_y))), false
-    catch e                                                    
-        if e isa InexactError                                                                   
+        Int(sqrt(length(values_x) * length(values_y)))
+        return Int(sqrt(length(values_x) * length(values_y))), false
+    catch e
+        if e isa InexactError
             println("There is an InexactError. the gridsizez has to be adjusted")
             return nothing, nothing, true
         else
@@ -105,26 +113,22 @@ end
 
 safe_computation(values_x, values_y) # here we check if the gridpoints are ok
 
+Topo_Cart_orth = CartData(xyz_grid(low_x:gridsize_x:high_x, low_y:gridzize_y:high_y, 0))
 
-Topo_Cart_orth  = CartData(xyz_grid(low_x:gridsize_x:high_x,low_y:gridzize_y:high_y,0))
+Topo_Cart_orth = CartData(xyz_grid(-0.5:0.1:0.5, -0.5:0.1:0.5, 0))
 
-Topo_Cart_orth  = CartData(xyz_grid(-0.5:0.1:0.5,-0.5:0.1:0.5,0))
+Topo_Cart_orth = project_CartData(Topo_Cart_orth, Topo, p)
 
-Topo_Cart_orth  = project_CartData(Topo_Cart_orth, Topo, p)
+df_x = DataFrame(Topo_Cart_orth.x.val[:, :, 1], :auto)
 
-df_x = DataFrame(Topo_Cart_orth.x.val[:,:,1], :auto)
+df_y = DataFrame(Topo_Cart_orth.y.val[:, :, 1], :auto);
 
-df_y = DataFrame(Topo_Cart_orth.y.val[:,:,1], :auto);
-
-df_z = DataFrame(Topo_Cart_orth.z.val[:,:,1], :auto);
+df_z = DataFrame(Topo_Cart_orth.z.val[:, :, 1], :auto);
 
 # Kombiniere die DataFrames für x, y und z in einen DataFrame
-df_xyz = DataFrame(
-                   x = convert.(Float64,vec(Topo_Cart_orth.x.val[:,:,1])),  # here we have to convert the values to Float64
-                   y = convert.(Float64,vec(Topo_Cart_orth.y.val[:,:,1])), 
-                   z = convert.(Float64,vec(Topo_Cart_orth.z.val[:,:,1])),
-                   )
-
+df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])),  # here we have to convert the values to Float64
+                   y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])),
+                   z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])))
 
 # write the data without header and space as delimiter 
 # Make sure the data directory exists
@@ -136,13 +140,11 @@ output_file = joinpath(data_dir, "test.xyz")
 open(output_file, "w") do file
     for row in eachrow(df_xyz)
         # Round each value in the row to 2 decimal places
-        rounded_row = [value for value in row]
+        rounded_row = [round(value, digits = 4) for value in row]
         println(file, join(rounded_row, " "))
     end
 end
 
-data_dir = joinpath(@__DIR__, "data")
-data_dir
 # Download the raw bottom topography data
 path_src_file = joinpath(@__DIR__, "test.xyz")
 
@@ -155,22 +157,65 @@ convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1)
 convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 1, direction = "y", section = 1)
 convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 1)
 
-
+#################
 #now redoo the steps as in the other turoial steps. try if we can do b-spline interpolation and simulations with this data
 
+# Define data path
 
+data = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
 
+# Define B-spline structure
+spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 
-print("lol")
-####################
+spline_func(x) = spline_interpolation(spline_struct, x)
 
+# Define interpolation points
+n = 200
+x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
 
+# Get interpolated values
+y_int_pts = spline_func.(x_int_pts)
 
+plot_topography(x_int_pts, y_int_pts; xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
 
-# Plot with random numbers
-using Random
+# Get the original interpolation knots
+x_knots = spline_struct.x
+y_knots = spline_func.(x_knots)
 
-random_x = randn(100)
-random_y = randn(100)
+plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
+                                         xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
 
-scatter(random_x, random_y, title="Scatter Plot of Random Numbers", xlabel="Random X", ylabel="Random Y")
+data = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
+
+spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
+
+# Define B-spline interpolation function
+spline_func(x, y) = spline_interpolation(spline_struct, x, y)
+
+# Define interpolation points
+n = 100
+x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
+y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
+
+# Get interpolated matrix
+z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
+
+plot_topography(x_int_pts, y_int_pts, z_int_pts;
+                xlabel = "ETRS89\n East",
+                ylabel = "ETRS89\n North",
+                zlabel = "DHHN2016\n Height",
+                azimuth_angle = 54 * pi / 180,
+                elevation_angle = 27 * pi / 180)
+
+# Get the original interpolation knots
+x_knots = spline_struct.x
+y_knots = spline_struct.y
+z_knots = evaluate_bicubicspline_interpolant(spline_func, x_knots, y_knots)
+
+plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
+                                         x_knots, y_knots, z_knots;
+                                         xlabel = "ETRS89\n East",
+                                         ylabel = "ETRS89\n North",
+                                         zlabel = "DHHN2016\n Height",
+                                         azimuth_angle = 54 * pi / 180,
+                                         elevation_angle = 27 * pi / 180)
