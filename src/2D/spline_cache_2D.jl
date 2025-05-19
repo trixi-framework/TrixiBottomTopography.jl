@@ -98,7 +98,7 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
 
     P = vcat(reshape(z', (m * n, 1)))
     IP = @SMatrix [-1 1;
-                    1 0]
+                   1 0]
 
     Q = reshape(P, (n, m))
 
@@ -301,9 +301,9 @@ function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
     P = vcat(reshape(z', (inner_elmts, 1)), zeros(boundary_elmts))
 
     IP = @SMatrix [-1 3 -3 1;
-                    3 -6 3 0;
+                   3 -6 3 0;
                    -3 0 3 0;
-                    1 4 1 0]
+                   1 4 1 0]
 
     # Mapping matrix Phi
     Phi = spzeros((m + 2) * (n + 2), (m + 2) * (n + 2))
