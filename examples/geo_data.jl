@@ -8,21 +8,29 @@
 #and transversal data and then choose a projection point in the middle of the choosen area and then convert the data into cartesion 
 #data
 #
-import Pkg
 
-Pkg.add([
-            "GeophysicalModelGenerator",
-            "GMT",
-            "Plots",
-            "CSV",
-            "DataFrames",
-            "Downloads",
-            "JuliaFormatter",
-            "DelimitedFiles",
-            "PyPlot"
-        ])
+using Pkg
+Pkg.activate(@__DIR__)
+Pkg.instantiate() # if everything works as expected, only run this and not "Pkg.add(...)"
+
+# add more packages if needed here 
+#  Pkg.add("GeophysicalModelGenerator")
+#  Pkg.add("GMT")
+#  Pkg.add("Plots") # if you want to use Plots.jl
+#  Pkg.add("CSV")
+#  Pkg.add("DataFrames")
+#  Pkg.add("Downloads")
+#  Pkg.add("JuliaFormatter")
+#  Pkg.add("DelimitedFiles")
+#  Pkg.add("PyPlot")
+#  Pkg.add("CairoMakie")
+#  Pkg.add("Trixi")
+#  Pkg.add("OrdinaryDiffEqCore")
+#  Pkg.add("OrdinaryDiffEq")
+#Pkg.add("OrdinaryDiffEqLowStorageRK")
+
 using GMT
-using Plots
+#using Plots
 using GeophysicalModelGenerator
 using CSV
 using DataFrames
@@ -30,7 +38,12 @@ using TrixiBottomTopography
 using Downloads: download
 using JuliaFormatter
 using DelimitedFiles
-using PyPlot: figure, plot, title, xlabel, ylabel, grid, legend, display
+#using PyPlot: figure, plot, title, xlabel, ylabel, grid, legend, display
+using CairoMakie
+using OrdinaryDiffEq
+#using OrdinaryDiffEqLowStorageRK
+using Trixi
+
 
 ##########################
 # some topography data from the Rhine close to the Theodor-Heuss-Brücke in Mainz
@@ -121,11 +134,10 @@ function safe_computation(values_x, values_y)
 end
 ##################
 
+
 safe_computation(values_x, values_y) # here we check if the gridpoints are ok
 
 Topo_Cart_orth = CartData(xyz_grid(low_x:gridsize_x:high_x, low_y:gridzize_y:high_y, 0))
-
-#Topo_Cart_orth = CartData(xyz_grid(-0.2:0.01:0.2, -0.2:0.01:0.2, 0))
 
 Topo_Cart_orth = project_CartData(Topo_Cart_orth, Topo, p)
 
@@ -158,29 +170,27 @@ end
 #------------------------------------------------------------
 #plotting the topography data
 
-data = readdlm(joinpath(@__DIR__, "data", "test.xyz"))
+# data = readdlm(joinpath(@__DIR__, "data", "test.xyz"))
 
-# Extract x, y, z coordinates
-x = data[:, 1]
-y = data[:, 2]
-z = data[:, 3]
+# # Extract x, y, z coordinates
+# x = data[:, 1]
+# y = data[:, 2]
+# z = data[:, 3]
 
-# Create 3D scatter plot
-fig = figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection="3d")
-scatter = ax.scatter(x, y, z, c=z, cmap="viridis")
-PyPlot.colorbar(scatter)
+# # Create 3D scatter plot
+# fig = figure(figsize=(10, 8))
+# ax = fig.add_subplot(111, projection="3d")
+# scatter = ax.scatter(x, y, z, c=z, cmap="viridis")
+# PyPlot.colorbar(scatter)
 
-ax.set_xlabel("ETRS89 East")
-ax.set_ylabel("ETRS89 North")
-ax.set_zlabel("DHHN2016 Height")
-ax.set_title("3D Scatter Plot der Topographie")
+# ax.set_xlabel("ETRS89 East")
+# ax.set_ylabel("ETRS89 North")
+# ax.set_zlabel("DHHN2016 Height")
+# ax.set_title("3D Scatter Plot der Topographie")
 
-display(fig)
+# display(fig)
 
 #------------------------------------------------------------
-#hier passieren noch komische fehler, die ich nicht verstehe
-
 # Download the raw bottom topography data
 path_src_file = joinpath(data_dir, "test.xyz") # path_src_file = joinpath(@__DIR__,"data", "test.xyz")
 
@@ -189,7 +199,7 @@ path_out_file_1d_y = joinpath(data_dir, "rhine_data_1d_20_y_theodor.txt")
 path_out_file_2d = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
 
 # Convert data
-convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1);
+convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 20, section = 100);
 convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y", section = 100)
 convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
 
@@ -221,6 +231,101 @@ y_knots = spline_func.(x_knots)
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
                                          xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
 
+####################
+#------------------------------------------------------------
+# Download one dimensional Rhine bottom data from gist
+#Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
+
+# B-spline interpolation of the underlying data
+#spline_struct = CubicBSpline(Rhine_data)
+#spline_func(x) = spline_interpolation(spline_struct, x)
+
+# look if we can do a simulation with this data in 1D
+equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 60.0)
+
+# Defining initial condition for the dam break problem
+function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
+
+  inicenter = SVector(0.0)
+  x_norm = x[1] - inicenter[1]
+  r = abs(x_norm)
+
+  # Calculate primitive variables
+  H = r < 0.05 ? 70.0 : 60.0
+  v = 0.0
+  b = spline_func(x[1])
+
+  return prim2cons(SVector(H, v, b), equations)
+end
+
+# Setting initial condition
+initial_condition = initial_condition_dam_break
+
+# Setting the boundary to be a reflective wall
+boundary_condition = boundary_condition_slip_wall
+
+###############################################################################
+# Get the DG approximation space
+
+volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
+solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm_etal),
+               volume_integral=VolumeIntegralFluxDifferencing(volume_flux))
+
+###############################################################################
+# Get the TreeMesh and setup a periodic mesh
+
+coordinates_min = spline_struct.x[1]
+coordinates_max = spline_struct.x[end]
+mesh = TreeMesh(coordinates_min, coordinates_max,
+                initial_refinement_level = 3,
+                n_cells_max = 10_000,
+                periodicity = false)
+
+# create the semi discretization object
+semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
+                                    boundary_conditions = boundary_condition)
+
+###############################################################################
+# ODE solvers
+
+tspan = (0.0, 20.0)
+ode = semidiscretize(semi, tspan)
+
+
+###############################################################################
+# run the simulation
+
+# define equidistant nodes in time for visualization of an animation
+visnodes = range(tspan[1], tspan[2], length = 900)
+
+# use a Runge-Kutta method with error-based time step size control
+sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
+            saveat = visnodes)
+
+# Create animation of the solution
+j = Observable(1)
+time = Observable(0.0)
+
+pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
+f = Figure()
+title_string = lift(t -> "time t = $(round(t, digits=3))", time)
+ax = Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",title = title_string)
+
+height = lift(i -> pd_list[i].data[:, 1], j)
+bottom = lift(i -> pd_list[i].data[:, 3], j)
+CairoMakie.lines!(ax, pd_list[1].x, height)
+CairoMakie.lines!(ax, pd_list[1].x, bottom)
+ylims!(ax, 30, 90)
+
+record(f, "animation.gif", 1:length(pd_list)) do tt
+  j[] = tt
+  time[] = sol.t[tt]
+end
+
+
+
+####################
+#now we have a look on the 2D interpolated data
 
 data = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
 
@@ -259,4 +364,106 @@ plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
                                          elevation_angle = 27 * pi / 180)
 
 
-            
+
+#------------------------------------------------------------
+# look if we can do a simulation with this data in 2D
+
+Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
+
+# B-spline interpolation of the underlying data
+spline_struct = BicubicBSpline(Rhine_data)
+spline_func(x,y) = spline_interpolation(spline_struct, x, y)
+
+equations = ShallowWaterEquations2D(gravity_constant = 9.81, H0 = 65.0)
+
+function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
+
+  inicenter = SVector(0.0, 0.0)
+  x_norm = x - inicenter
+  r = sqrt(x_norm[1]^2 + x_norm[2]^2)
+
+  # Calculate primitive variables
+  H =  r < 0.1 ? 75.0 : 65.0
+  v1 = 0.0
+  v2 = 0.0
+
+  x1, x2 = x
+  b = spline_func(x1, x2)
+
+  return prim2cons(SVector(H, v1, v2, b), equations)
+end
+
+# Setting initial condition
+initial_condition = initial_condition_wave
+
+# Setting the boundary to be a free-slip wall
+boundary_condition = boundary_condition_slip_wall
+
+###############################################################################
+# Get the DG approximation space
+
+volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
+solver = DGSEM(polydeg=3, surface_flux=(flux_fjordholm_etal, flux_nonconservative_fjordholm_etal),
+               volume_integral=VolumeIntegralFluxDifferencing(volume_flux))
+
+
+###############################################################################
+# Get the TreeMesh and setup a periodic mesh
+
+coordinates_min = (spline_struct.x[1], spline_struct.y[1])
+coordinates_max = (spline_struct.x[end], spline_struct.y[end])
+mesh = TreeMesh(coordinates_min, coordinates_max,
+                initial_refinement_level = 3,
+                n_cells_max = 10_000,
+                periodicity = false)
+
+
+
+# create the semi discretization object
+semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
+                                    boundary_conditions = boundary_condition)
+
+
+
+###############################################################################
+# ODE solvers, callbacks etc.
+
+tspan = (0.0, 20.0)
+ode = semidiscretize(semi, tspan)
+
+###############################################################################
+# run the simulation
+
+# define equidistant nodes in time for visualization of an animation
+visnodes = range(tspan[1], tspan[2], length = 17500)
+
+# use a Runge-Kutta method with error based time step size control
+sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
+            saveat = visnodes);
+
+# Create an animation of the solution
+j = Observable(1)
+time = Observable(0.0)
+
+pd_list = [PlotData2D(sol.u[i], semi) for i in 1:length(sol.t)]
+f = Figure()
+
+title_string = lift(t ->  "time t = $(round(t, digits=3))", time)
+az = 130 * pi / 180
+el = 18 * pi / 180
+ax = Axis3(f[1, 1], xlabel = "E", ylabel = "N", zlabel = "H",
+                  title = title_string, azimuth = az, elevation = el)
+
+height = lift(i -> pd_list[i].data[1], j)
+bottom = lift(i -> pd_list[i].data[4], j)
+surface!(ax, pd_list[1].x, pd_list[1].y, bottom;
+                colormap = :greenbrownterrain)
+wireframe!(ax, pd_list[1].x, pd_list[1].y, height;
+                  color = Makie.RGBA(0, 0.5, 1, 0.4))
+zlims!(ax, 35, 70)
+
+record(f, "animation_2d.gif", 1:length(pd_list)) do tt
+  j[] = tt
+  time[] = sol.t[tt]
+end
+#------------------------------------------------------------
