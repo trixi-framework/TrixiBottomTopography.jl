@@ -48,7 +48,15 @@ function spline_interpolation(b_spline::LinearBSpline, x::Number)
 
     kappa_i = (x - x_vec[i]) / Delta
 
-    c_i1 = [kappa_i, 1]' * IP * Q[i:(i + 1)]
+    # Allocation free version of the naive implementation
+    # c_i1 = [kappa_i, 1]' * IP * Q[i:(i + 1)]
+
+    # Note, IP has already been constructed as an `SMatrix`
+    # in the `LinearBSpline` constructor
+    kappa_vec = @SVector [kappa_i, 1]
+    Q_slice = @SVector [Q[i], Q[i+1]]
+
+    c_i1 = kappa_vec' * (IP * Q_slice)
 
     return c_i1
 end
@@ -101,7 +109,15 @@ function spline_interpolation(b_spline::CubicBSpline, x::Number)
 
     kappa_i = (x - x_vec[i]) / Delta
 
-    c_i3 = 1 / 6 * [kappa_i^3, kappa_i^2, kappa_i, 1]' * IP * Q[i:(i + 3)]
+    # Allocation free version of the naive implementation
+    # c_i3 = 1 / 6 * [kappa_i^3, kappa_i^2, kappa_i, 1]' * IP * Q[i:(i + 3)]
+
+    # Note, IP has already been constructed as an `SMatrix`
+    # in the `CubicBSpline` constructor
+    kappa_vec = @SVector [kappa_i^3, kappa_i^2, kappa_i, 1]
+    Q_slice = @SVector [Q[i], Q[i+1], Q[i+2], Q[i+3]]
+
+    c_i3 = (1 / 6) * (kappa_vec' * (IP * Q_slice))
 
     return c_i3
 end

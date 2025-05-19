@@ -10,6 +10,7 @@ module TrixiBottomTopography
 # Include necessary packages
 using LinearAlgebra: norm, diagm, qr, Tridiagonal, SymTridiagonal
 using SparseArrays: sparse, spzeros
+using StaticArrays: SVector, @SVector, SMatrix, @SMatrix
 
 # Include one dimensional B-spline interpolation
 include("1D/spline_cache_1D.jl")
