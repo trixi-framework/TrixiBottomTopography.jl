@@ -17,7 +17,6 @@ Pkg.add([
             "CSV",
             "DataFrames",
             "Downloads",
-            "CairoMakie",
             "JuliaFormatter",
             "DelimitedFiles",
             "PyPlot"
@@ -29,7 +28,6 @@ using CSV
 using DataFrames
 using TrixiBottomTopography
 using Downloads: download
-using CairoMakie
 using JuliaFormatter
 using DelimitedFiles
 using PyPlot: figure, plot, title, xlabel, ylabel, grid, legend, display
@@ -202,7 +200,7 @@ convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
 
 data = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
 
-# Define B-spline structure
+# Define B-spline structure: smoothing factor has to be 0, otherwise the data is not correct 
 spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 0)
 
 spline_func(x) = spline_interpolation(spline_struct, x)
