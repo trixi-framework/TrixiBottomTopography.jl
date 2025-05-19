@@ -48,6 +48,7 @@ function spline_interpolation(b_spline::BilinearBSpline, x::Number, y::Number)
     ny = (y - y_vec[j]) / Delta
 
     # Allocation free version of the naive implementation
+    # Q_temp = [Q[i, j:(j + 1)] Q[(i + 1), j:(j + 1)]]
     # c = [ny, 1]' * IP * Q_temp * IP' * [my, 1]
 
     # Note, IP has already been constructed as an `SMatrix`
@@ -55,7 +56,7 @@ function spline_interpolation(b_spline::BilinearBSpline, x::Number, y::Number)
     ny_vec = @SVector [ny, 1]
     my_vec = @SVector [my, 1]
     Q_temp = @SMatrix [Q[i, j] Q[i + 1, j];
-                       Q[i + 1, j] Q[i + 1, j + 1]]
+                       Q[i, j + 1] Q[i + 1, j + 1]]
 
     c = ny_vec' * IP * Q_temp * IP' * my_vec
 
@@ -122,6 +123,7 @@ function spline_interpolation(b_spline::BicubicBSpline, x::Number, y::Number)
     ny = (y - y_vec[j]) / Delta
 
     # Allocation free version of the naive implementation
+    # Q_temp = [Q[i, j:(j + 3)] Q[(i + 1), j:(j + 3)] Q[(i + 2), j:(j + 3)] Q[(i + 3), j:(j + 3)]]
     # c = 1 / 36 * [ny^3, ny^2, ny, 1]' * IP * Q_temp * IP' * [my^3, my^2, my, 1]
 
     # Note, IP has already been constructed as an `SMatrix`
