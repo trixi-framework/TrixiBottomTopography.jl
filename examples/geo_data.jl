@@ -18,7 +18,9 @@ Pkg.add([
             "DataFrames",
             "Downloads",
             "CairoMakie",
-            "JuliaFormatter"
+            "JuliaFormatter",
+            "DelimitedFiles",
+            "PyPlot"
         ])
 using GMT
 using Plots
@@ -29,6 +31,8 @@ using TrixiBottomTopography
 using Downloads: download
 using CairoMakie
 using JuliaFormatter
+using DelimitedFiles
+using PyPlot: figure, plot, title, xlabel, ylabel, grid, legend, display
 
 ##########################
 # some topography data from the Rhine close to the Theodor-Heuss-Brücke in Mainz
@@ -36,12 +40,19 @@ using JuliaFormatter
 #50.009480 8.270871
 #50.006184 8.274388
 #50.007914 8.278718
+
+############################
+
+#50.957095 6.978109
+#50.956847 6.963880
+#50.947861 6.964273
+#50.948108 6.978499 
 ###########################
 # Specify the limits of the topography data based on the coordinates
-lon_min = 8.270871
-lon_max = 8.278718
-lat_min = 50.006184
-lat_max = 50.010910
+lon_min = 6.963880
+lon_max = 6.978499
+lat_min = 50.947861
+lat_max = 50.957095 
 limits = [lon_min, lon_max, lat_min, lat_max]
 
 lon_mean = (lon_max + lon_min) / 2
@@ -75,11 +86,9 @@ lat_mean = (lat_min + lat_max) / 2
 
 ###################################
 
-###
-#Lon=17.3, Lat=37.5
-#Topo = import_topo(limits, file="@earth_relief_20m")
-Topo = import_topo(lon = [8.270871, 8.278718], lat = [50.006184, 50.010910],
-                   file = "@earth_relief_01m")
+
+Topo = import_topo(lon = [lon_min, lon_max], lat = [lat_min, lat_max], 
+                    file = "@earth_relief_01s")
 
 p=ProjectionPoint(Lon = lon_mean, Lat = lat_mean)
 
@@ -88,12 +97,11 @@ Topo_Cart = convert2CartData(Topo, p) # here we get a first impression on what i
 # the gridpoints have to fullfill the condition: Int(sqrt(length))
 
 low_x = -0.5
-high_x = 0.5
-gridsize_x = 0.1
-
+high_x = 0.499
+gridsize_x = 0.001
 low_y = -0.5
-high_y = 0.5
-gridzize_y = 0.1
+high_y = 0.499
+gridzize_y = 0.001
 
 values_x = collect(low_x:gridsize_x:high_x)
 values_y = collect(low_y:gridzize_y:high_y)
@@ -119,11 +127,11 @@ safe_computation(values_x, values_y) # here we check if the gridpoints are ok
 
 Topo_Cart_orth = CartData(xyz_grid(low_x:gridsize_x:high_x, low_y:gridzize_y:high_y, 0))
 
-Topo_Cart_orth = CartData(xyz_grid(-0.5:0.1:0.5, -0.5:0.1:0.5, 0))
+#Topo_Cart_orth = CartData(xyz_grid(-0.2:0.01:0.2, -0.2:0.01:0.2, 0))
 
 Topo_Cart_orth = project_CartData(Topo_Cart_orth, Topo, p)
 
-df_x = DataFrame(Topo_Cart_orth.x.val[:, :, 1], :auto)
+df_x = DataFrame(Topo_Cart_orth.x.val[:, :, 1], :auto);
 
 df_y = DataFrame(Topo_Cart_orth.y.val[:, :, 1], :auto);
 
@@ -132,7 +140,7 @@ df_z = DataFrame(Topo_Cart_orth.z.val[:, :, 1], :auto);
 # Kombiniere die DataFrames für x, y und z in einen DataFrame
 df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])),  # here we have to convert the values to Float64
                    y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])),
-                   z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])))
+                   z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .*1000)
 
 # write the data without header and space as delimiter 
 # Make sure the data directory exists
@@ -144,22 +152,48 @@ output_file = joinpath(data_dir, "test.xyz")
 open(output_file, "w") do file
     for row in eachrow(df_xyz)
         # Round each value in the row to 2 decimal places
-        rounded_row = [round(value, digits = 4) for value in row]
+        rounded_row = [round(value, digits = 5) for value in row]
         println(file, join(rounded_row, " "))
     end
 end
 
+#------------------------------------------------------------
+#plotting the topography data
+
+data = readdlm(joinpath(@__DIR__, "data", "test.xyz"))
+
+# Extract x, y, z coordinates
+x = data[:, 1]
+y = data[:, 2]
+z = data[:, 3]
+
+# Create 3D scatter plot
+fig = figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection="3d")
+scatter = ax.scatter(x, y, z, c=z, cmap="viridis")
+PyPlot.colorbar(scatter)
+
+ax.set_xlabel("ETRS89 East")
+ax.set_ylabel("ETRS89 North")
+ax.set_zlabel("DHHN2016 Height")
+ax.set_title("3D Scatter Plot der Topographie")
+
+display(fig)
+
+#------------------------------------------------------------
+#hier passieren noch komische fehler, die ich nicht verstehe
+
 # Download the raw bottom topography data
-path_src_file = joinpath(@__DIR__, "test.xyz")
+path_src_file = joinpath(data_dir, "test.xyz") # path_src_file = joinpath(@__DIR__,"data", "test.xyz")
 
 path_out_file_1d_x = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
 path_out_file_1d_y = joinpath(data_dir, "rhine_data_1d_20_y_theodor.txt")
 path_out_file_2d = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
 
 # Convert data
-convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1)
-convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 1, direction = "y", section = 1)
-convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 1)
+convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 1, section = 1);
+convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y", section = 100)
+convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
 
 #################
 #now redoo the steps as in the other turoial steps. try if we can do b-spline interpolation and simulations with this data
@@ -169,12 +203,12 @@ convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 1)
 data = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
 
 # Define B-spline structure
-spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
+spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 0)
 
 spline_func(x) = spline_interpolation(spline_struct, x)
 
 # Define interpolation points
-n = 200
+n = 100
 x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
 
 # Get interpolated values
@@ -189,9 +223,10 @@ y_knots = spline_func.(x_knots)
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
                                          xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
 
+
 data = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
 
-spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
+spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 0)
 
 # Define B-spline interpolation function
 spline_func(x, y) = spline_interpolation(spline_struct, x, y)
@@ -205,9 +240,9 @@ y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
 
 plot_topography(x_int_pts, y_int_pts, z_int_pts;
-                xlabel = "ETRS89\n East",
-                ylabel = "ETRS89\n North",
-                zlabel = "DHHN2016\n Height",
+                xlabel = "East\n [km]",
+                ylabel = "North\n [km]",
+                zlabel = "Height\n [m]",
                 azimuth_angle = 54 * pi / 180,
                 elevation_angle = 27 * pi / 180)
 
@@ -218,8 +253,11 @@ z_knots = evaluate_bicubicspline_interpolant(spline_func, x_knots, y_knots)
 
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
                                          x_knots, y_knots, z_knots;
-                                         xlabel = "ETRS89\n East",
-                                         ylabel = "ETRS89\n North",
-                                         zlabel = "DHHN2016\n Height",
+                                         xlabel = "East\n [km]",
+                                         ylabel = "North\n [km]",
+                                         zlabel = "Height\n [m]",
                                          azimuth_angle = 54 * pi / 180,
                                          elevation_angle = 27 * pi / 180)
+
+
+            
