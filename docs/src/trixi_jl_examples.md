@@ -52,9 +52,10 @@ and [B-spline function](https://trixi-framework.github.io/TrixiBottomTopography.
 In this case, a cubic B-spline interpolation function with free end condition is chosen.
 
 ```@example trixi1d
-# B-spline interpolation of the underlying data
-spline_struct = CubicBSpline(Rhine_data)
-spline_func(x) = spline_interpolation(spline_struct, x)
+# B-spline interpolation of the underlying data.
+# The type of this struct is fixed as `CubicBSpline`.
+const spline_struct = CubicBSpline(Rhine_data)
+spline_func(x::Float64) = spline_interpolation(spline_struct, x)
 ```
 
 Now that the B-spline interpolation function is determined, the one dimensional shallow water equations implemented in Trixi.jl can be defined by calling:
@@ -242,9 +243,10 @@ nothing #hide
 Using the data, a bicubic B-spline interpolation is performed on the data to define a bottom topography function.
 
 ```@example trixi2d
-# B-spline interpolation of the underlying data
-spline_struct = BicubicBSpline(Rhine_data)
-spline_func(x,y) = spline_interpolation(spline_struct, x, y)
+# B-spline interpolation of the underlying data.
+# The type of this struct is fixed as `BicubicBSpline`.
+const spline_struct = BicubicBSpline(Rhine_data)
+spline_func(x::Float64, y::Float64) = spline_interpolation(spline_struct, x, y)
 ```
 
 Then the two dimensional shallow water equations are defined, where the gravitational constant has been chosen to be `3.0` and the initial water height `55.0`. Afterwards, the initial condition is defined. Similar to the one dimensional case, in the center of the domain, a circular part with a diameter of `100.0` is chosen where the initial water height is chosen to be `10.0` units higher.

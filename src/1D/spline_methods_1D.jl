@@ -56,7 +56,7 @@ function spline_interpolation(b_spline::LinearBSpline, x::Number)
     kappa_vec = @SVector [kappa_i, 1]
     Q_slice = @SVector [Q[i], Q[i+1]]
 
-    c_i1 = kappa_vec' * (IP * Q_slice)
+    c_i1 = kappa_vec' * IP * Q_slice
 
     return c_i1
 end
@@ -117,7 +117,7 @@ function spline_interpolation(b_spline::CubicBSpline, x::Number)
     kappa_vec = @SVector [kappa_i^3, kappa_i^2, kappa_i, 1]
     Q_slice = @SVector [Q[i], Q[i+1], Q[i+2], Q[i+3]]
 
-    c_i3 = (1 / 6) * (kappa_vec' * (IP * Q_slice))
+    c_i3 = (1 / 6) * (kappa_vec' * IP * Q_slice)
 
     return c_i3
 end
