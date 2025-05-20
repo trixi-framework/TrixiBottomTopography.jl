@@ -74,8 +74,8 @@ function LinearBSpline(x::Vector, y::Vector)
 
     Delta = x[2] - x[1]
 
-    IP = [-1 1;
-          1 0]
+    IP = @SMatrix [-1 1;
+                   1 0]
 
     Q = y
 
@@ -256,10 +256,10 @@ function CubicBSpline(x::Vector, y::Vector; end_condition = "free", smoothing_fa
 
     n = length(x)
     P = vcat(0, y, 0)
-    IP = [-1 3 -3 1;
-          3 -6 3 0;
-          -3 0 3 0;
-          1 4 1 0]
+    IP = @SMatrix [-1 3 -3 1;
+                   3 -6 3 0;
+                   -3 0 3 0;
+                   1 4 1 0]
 
     # Free end condition
     if end_condition == "free"
