@@ -8,8 +8,9 @@
 #and transversal data and then choose a projection point in the middle of the choosen area and then convert the data into cartesion 
 #data
 #
+#anpassen der skalierung noch machen
 
-using Pkg
+import Pkg
 Pkg.activate(@__DIR__)
 Pkg.instantiate() # if everything works as expected, only run this and not "Pkg.add(...)"
 
@@ -26,7 +27,7 @@ Pkg.instantiate() # if everything works as expected, only run this and not "Pkg.
 #  Pkg.add("CairoMakie")
 #  Pkg.add("Trixi")
 #  Pkg.add("OrdinaryDiffEqCore")
-#  Pkg.add("OrdinaryDiffEq")
+  #Pkg.add("OrdinaryDiffEq")
 #Pkg.add("OrdinaryDiffEqLowStorageRK")
 
 using GMT
@@ -148,8 +149,8 @@ df_y = DataFrame(Topo_Cart_orth.y.val[:, :, 1], :auto);
 df_z = DataFrame(Topo_Cart_orth.z.val[:, :, 1], :auto);
 
 # Kombiniere die DataFrames für x, y und z in einen DataFrame
-df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])),  # here we have to convert the values to Float64
-                   y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])),
+df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])) .*1000,  # here we have to convert the values to Float64
+                   y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])) .*1000,
                    z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .*1000)
 
 # write the data without header and space as delimiter 
@@ -211,7 +212,7 @@ convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
 data = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
 
 # Define B-spline structure: smoothing factor has to be 0, otherwise the data is not correct 
-spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 0)
+spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 
 spline_func(x) = spline_interpolation(spline_struct, x)
 
@@ -241,7 +242,7 @@ plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
 #spline_func(x) = spline_interpolation(spline_struct, x)
 
 # look if we can do a simulation with this data in 1D
-equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 60.0)
+equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 57.0)
 
 # Defining initial condition for the dam break problem
 function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
@@ -251,7 +252,7 @@ function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
   r = abs(x_norm)
 
   # Calculate primitive variables
-  H = r < 0.05 ? 70.0 : 60.0
+  H = r < 50 ? 70.0 : 57.0
   v = 0.0
   b = spline_func(x[1])
 
@@ -288,7 +289,7 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
 ###############################################################################
 # ODE solvers
 
-tspan = (0.0, 20.0)
+tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 
 
@@ -296,7 +297,7 @@ ode = semidiscretize(semi, tspan)
 # run the simulation
 
 # define equidistant nodes in time for visualization of an animation
-visnodes = range(tspan[1], tspan[2], length = 900)
+visnodes = range(tspan[1], tspan[2], length = 90)
 
 # use a Runge-Kutta method with error-based time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
@@ -329,7 +330,7 @@ end
 
 data = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
 
-spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 0)
+spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 
 # Define B-spline interpolation function
 spline_func(x, y) = spline_interpolation(spline_struct, x, y)
@@ -368,11 +369,11 @@ plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
 #------------------------------------------------------------
 # look if we can do a simulation with this data in 2D
 
-Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
+#Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
 
 # B-spline interpolation of the underlying data
-spline_struct = BicubicBSpline(Rhine_data)
-spline_func(x,y) = spline_interpolation(spline_struct, x, y)
+#spline_struct = BicubicBSpline(Rhine_data)
+#spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 
 equations = ShallowWaterEquations2D(gravity_constant = 9.81, H0 = 65.0)
 
@@ -383,7 +384,7 @@ function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
   r = sqrt(x_norm[1]^2 + x_norm[2]^2)
 
   # Calculate primitive variables
-  H =  r < 0.1 ? 75.0 : 65.0
+  H =  r < 50 ? 75.0 : 65.0
   v1 = 0.0
   v2 = 0.0
 
@@ -428,14 +429,14 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
 ###############################################################################
 # ODE solvers, callbacks etc.
 
-tspan = (0.0, 20.0)
+tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 
 ###############################################################################
 # run the simulation
 
 # define equidistant nodes in time for visualization of an animation
-visnodes = range(tspan[1], tspan[2], length = 17500)
+visnodes = range(tspan[1], tspan[2], length = 175)
 
 # use a Runge-Kutta method with error based time step size control
 sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
@@ -466,4 +467,5 @@ record(f, "animation_2d.gif", 1:length(pd_list)) do tt
   j[] = tt
   time[] = sol.t[tt]
 end
+
 #------------------------------------------------------------
