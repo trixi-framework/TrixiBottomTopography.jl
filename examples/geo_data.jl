@@ -6,7 +6,6 @@
 #import Pkg
 #Pkg.activate(@__DIR__)
 #Pkg.instantiate()
-
 #  Pkg.add("GeophysicalModelGenerator")
 #  Pkg.add("GMT")
 #  Pkg.add("CSV")
@@ -27,7 +26,7 @@ using TrixiBottomTopography
 using Downloads: download
 using JuliaFormatter
 using DelimitedFiles
-#using CairoMakie
+using CairoMakie
 using OrdinaryDiffEq
 using Trixi
 
