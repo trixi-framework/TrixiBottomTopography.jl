@@ -67,6 +67,7 @@ jobs:
           coverage: false
         env:
           PYTHON: ""
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for authenticated downloads without strict rate limits
 
   test_coverage:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
