@@ -3,20 +3,18 @@
 # into TrixiBottomTopography.                                              #
 ############################################################################
 
-#import Pkg
-#Pkg.activate(@__DIR__)
+import Pkg
+Pkg.activate(@__DIR__)
 #Pkg.instantiate()
-#  Pkg.add("GeophysicalModelGenerator")
-#  Pkg.add("GMT")
-#  Pkg.add("CSV")
-#  Pkg.add("DataFrames")
-#  Pkg.add("Downloads")
-#  Pkg.add("JuliaFormatter")
-#  Pkg.add("DelimitedFiles")
-#  Pkg.add("PyPlot")
-#  Pkg.add("CairoMakie")
-#  Pkg.add("Trixi")
-#  Pkg.add("OrdinaryDiffEq")
+Pkg.add("GeophysicalModelGenerator")
+Pkg.add("GMT")
+Pkg.add("CSV")
+Pkg.add("DataFrames")
+Pkg.add("Downloads")
+Pkg.add("DelimitedFiles")
+Pkg.add("CairoMakie")
+Pkg.add("Trixi")
+Pkg.add("OrdinaryDiffEq")
 
 using GMT
 using GeophysicalModelGenerator
@@ -24,7 +22,6 @@ using CSV
 using DataFrames
 using TrixiBottomTopography
 using Downloads: download
-using JuliaFormatter
 using DelimitedFiles
 using CairoMakie
 using OrdinaryDiffEq
@@ -174,7 +171,7 @@ y_knots = spline_func.(x_knots)
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
                                          xlabel = "x[m]", ylabel = "z[m]")
 
-equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 57.0)
+equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 60.0)
 
 # Defining initial condition for the dam break problem
 function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
@@ -183,7 +180,7 @@ function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
     r = abs(x_norm)
 
     # Calculate primitive variables
-    H = r < 50 ? 70.0 : 57.0
+    H = r < 50 ? 70.0 : 60.0
     v = 0.0
     b = spline_func(x[1])
 
