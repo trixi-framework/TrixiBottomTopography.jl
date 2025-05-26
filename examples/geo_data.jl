@@ -72,7 +72,7 @@ lat_mean = (lat_min + lat_max) / 2
 Topo = import_topo(lon = [lon_min, lon_max], lat = [lat_min, lat_max], 
                     file = "@earth_relief_01s") # here we load the topography data
 
-p=ProjectionPoint(Lon = lon_mean, Lat = lat_mean) # to use cartasian coordiantes we choose a projection point 
+p=ProjectionPoint(Lon = lon_mean, Lat = lat_mean) # to use cartasian coordiantes we choose a projection point here 
 
 Topo_Cart = convert2CartData(Topo, p) # here we use the projection point to convert the topography data to cartesian coordinates
 ###################################
