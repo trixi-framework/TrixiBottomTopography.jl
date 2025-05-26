@@ -3,9 +3,9 @@
 # into TrixiBottomTopography.                                              #
 ############################################################################
 
-import Pkg
-Pkg.activate(@__DIR__)
-Pkg.instantiate()
+#import Pkg
+#Pkg.activate(@__DIR__)
+#Pkg.instantiate()
 
 #  Pkg.add("GeophysicalModelGenerator")
 #  Pkg.add("GMT")
