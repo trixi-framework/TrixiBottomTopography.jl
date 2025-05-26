@@ -5,7 +5,7 @@
 
 import Pkg
 Pkg.activate(@__DIR__)
-Pkg.instantiate() 
+Pkg.instantiate()
 
 #  Pkg.add("GeophysicalModelGenerator")
 #  Pkg.add("GMT")
@@ -18,7 +18,6 @@ Pkg.instantiate()
 #  Pkg.add("CairoMakie")
 #  Pkg.add("Trixi")
 #  Pkg.add("OrdinaryDiffEq")
-
 
 using GMT
 using GeophysicalModelGenerator
@@ -39,7 +38,7 @@ using Trixi
 lon_min = 6.963880
 lon_max = 6.978499
 lat_min = 50.947861
-lat_max = 50.957095 
+lat_max = 50.957095
 limits = [lon_min, lon_max, lat_min, lat_max]
 
 lon_mean = (lon_max + lon_min) / 2
@@ -68,9 +67,8 @@ lat_mean = (lat_min + lat_max) / 2
 # | "@earth\\_relief\\_30m"	|  30 arc min	 | ETOPO1 after Gaussian spherical filtering (55 km fullwidth) |
 # | "@earth\\_relief\\_60m"	|  60 arc min	 | ETOPO1 after Gaussian spherical filtering (111 km fullwidth)|
 
-
-Topo = import_topo(lon = [lon_min, lon_max], lat = [lat_min, lat_max], 
-                    file = "@earth_relief_01s") # here we load the topography data
+Topo = import_topo(lon = [lon_min, lon_max], lat = [lat_min, lat_max],
+                   file = "@earth_relief_01s") # here we load the topography data
 
 p=ProjectionPoint(Lon = lon_mean, Lat = lat_mean) # to use cartasian coordiantes we choose a projection point here 
 
@@ -105,7 +103,7 @@ function safe_computation(values_x, values_y)
     end
 end
 
-safe_computation(values_x, values_y) 
+safe_computation(values_x, values_y)
 
 ###################################
 
@@ -122,10 +120,9 @@ df_y = DataFrame(Topo_Cart_orth.y.val[:, :, 1], :auto);
 df_z = DataFrame(Topo_Cart_orth.z.val[:, :, 1], :auto);
 
 # combine x, y, z into a DataFrame, warning: you have to scale the values to meters
-df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])) .*1000, 
-                   y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])) .*1000,
-                   z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .*1000)
-
+df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])) .* 1000,
+                   y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])) .* 1000,
+                   z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .* 1000)
 
 data_dir = joinpath(@__DIR__, "data")
 
@@ -138,7 +135,6 @@ open(output_file, "w") do file
     end
 end
 
-
 path_src_file = joinpath(data_dir, "geo.xyz")
 
 path_out_file_1d_x = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")
@@ -147,7 +143,8 @@ path_out_file_2d = joinpath(data_dir, "rhine_data_2d_20_geo.txt")
 
 # Convert data
 convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 20, section = 100);
-convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y", section = 100)
+convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y",
+               section = 100)
 convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
 
 #################
@@ -177,22 +174,20 @@ y_knots = spline_func.(x_knots)
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
                                          xlabel = "x[m]", ylabel = "z[m]")
 
-
 equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 57.0)
 
 # Defining initial condition for the dam break problem
 function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
+    inicenter = SVector(0.0)
+    x_norm = x[1] - inicenter[1]
+    r = abs(x_norm)
 
-  inicenter = SVector(0.0)
-  x_norm = x[1] - inicenter[1]
-  r = abs(x_norm)
+    # Calculate primitive variables
+    H = r < 50 ? 70.0 : 57.0
+    v = 0.0
+    b = spline_func(x[1])
 
-  # Calculate primitive variables
-  H = r < 50 ? 70.0 : 57.0
-  v = 0.0
-  b = spline_func(x[1])
-
-  return prim2cons(SVector(H, v, b), equations)
+    return prim2cons(SVector(H, v, b), equations)
 end
 
 # Setting initial condition
@@ -205,8 +200,8 @@ boundary_condition = boundary_condition_slip_wall
 # Get the DG approximation space
 
 volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
-solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm_etal),
-               volume_integral=VolumeIntegralFluxDifferencing(volume_flux))
+solver = DGSEM(polydeg = 3, surface_flux = (flux_hll, flux_nonconservative_fjordholm_etal),
+               volume_integral = VolumeIntegralFluxDifferencing(volume_flux))
 
 ###############################################################################
 # Get the TreeMesh and setup a periodic mesh
@@ -228,7 +223,6 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
 tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 
-
 ###############################################################################
 # run the simulation
 
@@ -246,7 +240,7 @@ time = Observable(0.0)
 pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
 f = Figure()
 title_string = lift(t -> "time t = $(round(t, digits=3))", time)
-ax = Axis(f[1, 1], xlabel = "x[m]", ylabel = "z[m]",title = title_string)
+ax = Axis(f[1, 1], xlabel = "x[m]", ylabel = "z[m]", title = title_string)
 
 height = lift(i -> pd_list[i].data[:, 1], j)
 bottom = lift(i -> pd_list[i].data[:, 3], j)
@@ -255,11 +249,9 @@ CairoMakie.lines!(ax, pd_list[1].x, bottom)
 ylims!(ax, 30, 90)
 
 record(f, "animation.gif", 1:length(pd_list)) do tt
-  j[] = tt
-  time[] = sol.t[tt]
+    j[] = tt
+    time[] = sol.t[tt]
 end
-
-
 
 ####################
 #now redoo the steps of the turoial and try if we can do b-spline interpolation and simulations with this data
@@ -301,25 +293,22 @@ plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
                                          azimuth_angle = 54 * pi / 180,
                                          elevation_angle = 27 * pi / 180)
 
-
-
 equations = ShallowWaterEquations2D(gravity_constant = 9.81, H0 = 65.0)
 
 function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
+    inicenter = SVector(0.0, 0.0)
+    x_norm = x - inicenter
+    r = sqrt(x_norm[1]^2 + x_norm[2]^2)
 
-  inicenter = SVector(0.0, 0.0)
-  x_norm = x - inicenter
-  r = sqrt(x_norm[1]^2 + x_norm[2]^2)
+    # Calculate primitive variables
+    H = r < 50 ? 75.0 : 65.0
+    v1 = 0.0
+    v2 = 0.0
 
-  # Calculate primitive variables
-  H =  r < 50 ? 75.0 : 65.0
-  v1 = 0.0
-  v2 = 0.0
+    x1, x2 = x
+    b = spline_func(x1, x2)
 
-  x1, x2 = x
-  b = spline_func(x1, x2)
-
-  return prim2cons(SVector(H, v1, v2, b), equations)
+    return prim2cons(SVector(H, v1, v2, b), equations)
 end
 
 # Setting initial condition
@@ -332,9 +321,9 @@ boundary_condition = boundary_condition_slip_wall
 # Get the DG approximation space
 
 volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
-solver = DGSEM(polydeg=3, surface_flux=(flux_fjordholm_etal, flux_nonconservative_fjordholm_etal),
-               volume_integral=VolumeIntegralFluxDifferencing(volume_flux))
-
+solver = DGSEM(polydeg = 3,
+               surface_flux = (flux_fjordholm_etal, flux_nonconservative_fjordholm_etal),
+               volume_integral = VolumeIntegralFluxDifferencing(volume_flux))
 
 ###############################################################################
 # Get the TreeMesh and setup a periodic mesh
@@ -346,13 +335,9 @@ mesh = TreeMesh(coordinates_min, coordinates_max,
                 n_cells_max = 10_000,
                 periodicity = false)
 
-
-
 # create the semi discretization object
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
                                     boundary_conditions = boundary_condition)
-
-
 
 ###############################################################################
 # ODE solvers, callbacks etc.
@@ -377,21 +362,21 @@ time = Observable(0.0)
 pd_list = [PlotData2D(sol.u[i], semi) for i in 1:length(sol.t)]
 f = Figure()
 
-title_string = lift(t ->  "time t = $(round(t, digits=3))", time)
+title_string = lift(t -> "time t = $(round(t, digits=3))", time)
 az = 130 * pi / 180
 el = 18 * pi / 180
 ax = Axis3(f[1, 1], xlabel = "x[m]", ylabel = "y[m]", zlabel = "z[m]",
-                  title = title_string, azimuth = az, elevation = el)
+           title = title_string, azimuth = az, elevation = el)
 
 height = lift(i -> pd_list[i].data[1], j)
 bottom = lift(i -> pd_list[i].data[4], j)
 surface!(ax, pd_list[1].x, pd_list[1].y, bottom;
-                colormap = :greenbrownterrain)
+         colormap = :greenbrownterrain)
 wireframe!(ax, pd_list[1].x, pd_list[1].y, height;
-                  color = Makie.RGBA(0, 0.5, 1, 0.4))
+           color = Makie.RGBA(0, 0.5, 1, 0.4))
 zlims!(ax, 35, 70)
 
 record(f, "animation_2d.gif", 1:length(pd_list)) do tt
-  j[] = tt
-  time[] = sol.t[tt]
+    j[] = tt
+    time[] = sol.t[tt]
 end
