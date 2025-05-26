@@ -109,6 +109,7 @@ safe_computation(values_x, values_y)
 Topo_Cart_orth = CartData(xyz_grid(low_x:gridsize_x:high_x, low_y:gridzize_y:high_y, 0)) # create a grid
 
 Topo_Cart_orth = project_CartData(Topo_Cart_orth, Topo, p) # project the topography data on the cartasian grid
+
 ###################################
 # write the topography data to a file compatible with TrixiBottomTopography
 
