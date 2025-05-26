@@ -95,7 +95,7 @@ function safe_computation(values_x, values_y)
     catch e
         if e isa InexactError
             println("There is an InexactError. the gridsize has to be adjusted")
-            return nothing, nothing, true
+            return nothing, true
         else
             rethrow(e)
         end
