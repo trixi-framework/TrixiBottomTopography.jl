@@ -27,7 +27,7 @@ using TrixiBottomTopography
 using Downloads: download
 using JuliaFormatter
 using DelimitedFiles
-using CairoMakie
+#using CairoMakie
 using OrdinaryDiffEq
 using Trixi
 
