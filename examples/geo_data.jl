@@ -1,23 +1,14 @@
-#the goal is to use the GeophysicalModelGenerator.jl to load real topography data and use it for TrixiBottomTopography.jl
-# 
-# the data from originaly used in TrixiBottomTopography.jl  were collected by the Geobasis NRW.
-# in this data the first column provides the corresponding ETRS89 East coordinates, the second 
-# column the ETRS89 North coordinates and the third column the DHHN2016 height.
-# 
-# this data is not available in the GeophysicalModelGenerator.jl package, so here we chose first longitudianal
-#and transversal data and then choose a projection point in the middle of the choosen area and then convert the data into cartesion 
-#data
-#
-#anpassen der skalierung noch machen
+############################################################################
+# Script which uses GeophysicalModelGenerator to load real topography data #
+# into TrixiBottomTopography.                                              #
+############################################################################
 
 import Pkg
 Pkg.activate(@__DIR__)
-Pkg.instantiate() # if everything works as expected, only run this and not "Pkg.add(...)"
+Pkg.instantiate() 
 
-# add more packages if needed here 
 #  Pkg.add("GeophysicalModelGenerator")
 #  Pkg.add("GMT")
-#  Pkg.add("Plots") # if you want to use Plots.jl
 #  Pkg.add("CSV")
 #  Pkg.add("DataFrames")
 #  Pkg.add("Downloads")
@@ -26,12 +17,10 @@ Pkg.instantiate() # if everything works as expected, only run this and not "Pkg.
 #  Pkg.add("PyPlot")
 #  Pkg.add("CairoMakie")
 #  Pkg.add("Trixi")
-#  Pkg.add("OrdinaryDiffEqCore")
-  #Pkg.add("OrdinaryDiffEq")
-#Pkg.add("OrdinaryDiffEqLowStorageRK")
+#  Pkg.add("OrdinaryDiffEq")
+
 
 using GMT
-#using Plots
 using GeophysicalModelGenerator
 using CSV
 using DataFrames
@@ -39,28 +28,14 @@ using TrixiBottomTopography
 using Downloads: download
 using JuliaFormatter
 using DelimitedFiles
-#using PyPlot: figure, plot, title, xlabel, ylabel, grid, legend, display
 using CairoMakie
 using OrdinaryDiffEq
-#using OrdinaryDiffEqLowStorageRK
 using Trixi
 
-
-##########################
-# some topography data from the Rhine close to the Theodor-Heuss-Brücke in Mainz
-#50.010910 8.275880
-#50.009480 8.270871
-#50.006184 8.274388
-#50.007914 8.278718
-
-############################
-
-#50.957095 6.978109
-#50.956847 6.963880
-#50.947861 6.964273
-#50.948108 6.978499 
-###########################
+###################################
 # Specify the limits of the topography data based on the coordinates
+# The following longitudianl and transversal coordinates are choosen
+# to cover the same area as the other dataset in the examples folder
 lon_min = 6.963880
 lon_max = 6.978499
 lat_min = 50.947861
@@ -74,10 +49,7 @@ lat_mean = (lat_min + lat_max) / 2
 #Loading the topography data
 #important: if you have a small area you might use hiher resolution: 
 # Note: 
-# ====
-# - latitude values in the southern hemisphere should have a minus sign (e.g., -2.8)
-# - longitude values that are "west" should *either* come with a minus sign *or* are defined by values >180
-
+#you can chose between different resolutions of the topography data.
 # | Dataset                 |   Resolution |   Description                                               |
 # |:----------------        | ------------ | ----------------------------------------------------------- |
 # | "@earth\\_relief\\_01s" |	1 arc sec 	 | SRTM tiles (14297 tiles, land only, 60S-60N) [NASA/USGS]    |
@@ -96,17 +68,15 @@ lat_mean = (lat_min + lat_max) / 2
 # | "@earth\\_relief\\_30m"	|  30 arc min	 | ETOPO1 after Gaussian spherical filtering (55 km fullwidth) |
 # | "@earth\\_relief\\_60m"	|  60 arc min	 | ETOPO1 after Gaussian spherical filtering (111 km fullwidth)|
 
-###################################
-
 
 Topo = import_topo(lon = [lon_min, lon_max], lat = [lat_min, lat_max], 
-                    file = "@earth_relief_01s")
+                    file = "@earth_relief_01s") # here we load the topography data
 
-p=ProjectionPoint(Lon = lon_mean, Lat = lat_mean)
+p=ProjectionPoint(Lon = lon_mean, Lat = lat_mean) # to use cartasian coordiantes we choose a projection point 
 
-Topo_Cart = convert2CartData(Topo, p) # here we get a first impression on what intervall to chose
-
-# the gridpoints have to fullfill the condition: Int(sqrt(length))
+Topo_Cart = convert2CartData(Topo, p) # here we use the projection point to convert the topography data to cartesian coordinates
+###################################
+#now we have to define the gridpoints for the cartesian coordinates
 
 low_x = -0.5
 high_x = 0.499
@@ -118,29 +88,32 @@ gridzize_y = 0.001
 values_x = collect(low_x:gridsize_x:high_x)
 values_y = collect(low_y:gridzize_y:high_y)
 
-##############
-#check if we have a right choice for our gridpoints
+###################################
+# the gridpoints have to fullfill the condition: Int(sqrt(length)) in TrixiBottomTopography
+# so check if we have a right choice for our gridpoints:
 function safe_computation(values_x, values_y)
     try
         Int(sqrt(length(values_x) * length(values_y)))
         return Int(sqrt(length(values_x) * length(values_y))), false
     catch e
         if e isa InexactError
-            println("There is an InexactError. the gridsizez has to be adjusted")
+            println("There is an InexactError. the gridsize has to be adjusted")
             return nothing, nothing, true
         else
             rethrow(e)
         end
     end
 end
-##################
 
+safe_computation(values_x, values_y) 
 
-safe_computation(values_x, values_y) # here we check if the gridpoints are ok
+###################################
 
-Topo_Cart_orth = CartData(xyz_grid(low_x:gridsize_x:high_x, low_y:gridzize_y:high_y, 0))
+Topo_Cart_orth = CartData(xyz_grid(low_x:gridsize_x:high_x, low_y:gridzize_y:high_y, 0)) # create a grid
 
-Topo_Cart_orth = project_CartData(Topo_Cart_orth, Topo, p)
+Topo_Cart_orth = project_CartData(Topo_Cart_orth, Topo, p) # project the topography data on the cartasian grid
+###################################
+# write the topography data to a file compatible with TrixiBottomTopography
 
 df_x = DataFrame(Topo_Cart_orth.x.val[:, :, 1], :auto);
 
@@ -148,56 +121,29 @@ df_y = DataFrame(Topo_Cart_orth.y.val[:, :, 1], :auto);
 
 df_z = DataFrame(Topo_Cart_orth.z.val[:, :, 1], :auto);
 
-# Kombiniere die DataFrames für x, y und z in einen DataFrame
-df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])) .*1000,  # here we have to convert the values to Float64
+# combine x, y, z into a DataFrame, warning: you have to scale the values to meters
+df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])) .*1000, 
                    y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])) .*1000,
                    z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .*1000)
 
-# write the data without header and space as delimiter 
-# Make sure the data directory exists
+
 data_dir = joinpath(@__DIR__, "data")
-mkpath(data_dir)  # Create the directory if it doesn't exist
 
 # Write directly to the data directory
-output_file = joinpath(data_dir, "test.xyz")
+output_file = joinpath(data_dir, "geo.xyz")
 open(output_file, "w") do file
     for row in eachrow(df_xyz)
-        # Round each value in the row to 2 decimal places
         rounded_row = [round(value, digits = 5) for value in row]
         println(file, join(rounded_row, " "))
     end
 end
 
-#------------------------------------------------------------
-#plotting the topography data
 
-# data = readdlm(joinpath(@__DIR__, "data", "test.xyz"))
+path_src_file = joinpath(data_dir, "geo.xyz")
 
-# # Extract x, y, z coordinates
-# x = data[:, 1]
-# y = data[:, 2]
-# z = data[:, 3]
-
-# # Create 3D scatter plot
-# fig = figure(figsize=(10, 8))
-# ax = fig.add_subplot(111, projection="3d")
-# scatter = ax.scatter(x, y, z, c=z, cmap="viridis")
-# PyPlot.colorbar(scatter)
-
-# ax.set_xlabel("ETRS89 East")
-# ax.set_ylabel("ETRS89 North")
-# ax.set_zlabel("DHHN2016 Height")
-# ax.set_title("3D Scatter Plot der Topographie")
-
-# display(fig)
-
-#------------------------------------------------------------
-# Download the raw bottom topography data
-path_src_file = joinpath(data_dir, "test.xyz") # path_src_file = joinpath(@__DIR__,"data", "test.xyz")
-
-path_out_file_1d_x = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
-path_out_file_1d_y = joinpath(data_dir, "rhine_data_1d_20_y_theodor.txt")
-path_out_file_2d = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
+path_out_file_1d_x = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")
+path_out_file_1d_y = joinpath(data_dir, "rhine_data_1d_20_y_geo.txt")
+path_out_file_2d = joinpath(data_dir, "rhine_data_2d_20_geo.txt")
 
 # Convert data
 convert_dgm_1d(path_src_file, path_out_file_1d_x; excerpt = 20, section = 100);
@@ -205,13 +151,12 @@ convert_dgm_1d(path_src_file, path_out_file_1d_y; excerpt = 20, direction = "y",
 convert_dgm_2d(path_src_file, path_out_file_2d; excerpt = 20)
 
 #################
-#now redoo the steps as in the other turoial steps. try if we can do b-spline interpolation and simulations with this data
+#now redoo the steps of the turoial and try if we can do b-spline interpolation and simulations with this data
+#1D:
 
-# Define data path
+data = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")
 
-data = joinpath(data_dir, "rhine_data_1d_x_theodor.txt")
-
-# Define B-spline structure: smoothing factor has to be 0, otherwise the data is not correct 
+# Define B-spline structure
 spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 
 spline_func(x) = spline_interpolation(spline_struct, x)
@@ -223,25 +168,16 @@ x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
 # Get interpolated values
 y_int_pts = spline_func.(x_int_pts)
 
-plot_topography(x_int_pts, y_int_pts; xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
+plot_topography(x_int_pts, y_int_pts; xlabel = "x[m]", ylabel = "z[m]")
 
 # Get the original interpolation knots
 x_knots = spline_struct.x
 y_knots = spline_func.(x_knots)
 
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
-                                         xlabel = "ETRS89 East", ylabel = "DHHN2016 Height")
+                                         xlabel = "x[m]", ylabel = "z[m]")
 
-####################
-#------------------------------------------------------------
-# Download one dimensional Rhine bottom data from gist
-#Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt")
 
-# B-spline interpolation of the underlying data
-#spline_struct = CubicBSpline(Rhine_data)
-#spline_func(x) = spline_interpolation(spline_struct, x)
-
-# look if we can do a simulation with this data in 1D
 equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 57.0)
 
 # Defining initial condition for the dam break problem
@@ -310,7 +246,7 @@ time = Observable(0.0)
 pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
 f = Figure()
 title_string = lift(t -> "time t = $(round(t, digits=3))", time)
-ax = Axis(f[1, 1], xlabel = "ETRS89 East", ylabel = "DHHN2016",title = title_string)
+ax = Axis(f[1, 1], xlabel = "x[m]", ylabel = "z[m]",title = title_string)
 
 height = lift(i -> pd_list[i].data[:, 1], j)
 bottom = lift(i -> pd_list[i].data[:, 3], j)
@@ -326,9 +262,10 @@ end
 
 
 ####################
-#now we have a look on the 2D interpolated data
+#now redoo the steps of the turoial and try if we can do b-spline interpolation and simulations with this data
+#2D:
 
-data = joinpath(data_dir, "rhine_data_2d_20_theodor.txt")
+data = joinpath(data_dir, "rhine_data_2d_20_geo.txt")
 
 spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 
@@ -344,9 +281,9 @@ y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
 
 plot_topography(x_int_pts, y_int_pts, z_int_pts;
-                xlabel = "East\n [km]",
-                ylabel = "North\n [km]",
-                zlabel = "Height\n [m]",
+                xlabel = "x\n [m]",
+                ylabel = "y\n [m]",
+                zlabel = "z\n [m]",
                 azimuth_angle = 54 * pi / 180,
                 elevation_angle = 27 * pi / 180)
 
@@ -358,22 +295,13 @@ z_knots = evaluate_bicubicspline_interpolant(spline_func, x_knots, y_knots)
 
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
                                          x_knots, y_knots, z_knots;
-                                         xlabel = "East\n [km]",
-                                         ylabel = "North\n [km]",
-                                         zlabel = "Height\n [m]",
+                                         xlabel = "x\n [m]",
+                                         ylabel = "y\n [m]",
+                                         zlabel = "z\n [m]",
                                          azimuth_angle = 54 * pi / 180,
                                          elevation_angle = 27 * pi / 180)
 
 
-
-#------------------------------------------------------------
-# look if we can do a simulation with this data in 2D
-
-#Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
-
-# B-spline interpolation of the underlying data
-#spline_struct = BicubicBSpline(Rhine_data)
-#spline_func(x,y) = spline_interpolation(spline_struct, x, y)
 
 equations = ShallowWaterEquations2D(gravity_constant = 9.81, H0 = 65.0)
 
@@ -452,7 +380,7 @@ f = Figure()
 title_string = lift(t ->  "time t = $(round(t, digits=3))", time)
 az = 130 * pi / 180
 el = 18 * pi / 180
-ax = Axis3(f[1, 1], xlabel = "E", ylabel = "N", zlabel = "H",
+ax = Axis3(f[1, 1], xlabel = "x[m]", ylabel = "y[m]", zlabel = "z[m]",
                   title = title_string, azimuth = az, elevation = el)
 
 height = lift(i -> pd_list[i].data[1], j)
@@ -467,5 +395,3 @@ record(f, "animation_2d.gif", 1:length(pd_list)) do tt
   j[] = tt
   time[] = sol.t[tt]
 end
-
-#------------------------------------------------------------
