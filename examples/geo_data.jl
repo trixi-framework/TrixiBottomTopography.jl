@@ -4,17 +4,17 @@
 ############################################################################
 
 import Pkg
-Pkg.activate(@__DIR__)
-#Pkg.instantiate()
-Pkg.add("GeophysicalModelGenerator")
-Pkg.add("GMT")
-Pkg.add("CSV")
-Pkg.add("DataFrames")
-Pkg.add("Downloads")
-Pkg.add("DelimitedFiles")
-Pkg.add("CairoMakie")
-Pkg.add("Trixi")
-Pkg.add("OrdinaryDiffEq")
+ Pkg.activate(@__DIR__)
+ Pkg.instantiate()
+# Pkg.add("GeophysicalModelGenerator")
+# Pkg.add("GMT")
+# Pkg.add("CSV")
+# Pkg.add("DataFrames")
+# Pkg.add("Downloads")
+# Pkg.add("DelimitedFiles")
+# Pkg.add("CairoMakie")
+# Pkg.add("Trixi")
+# Pkg.add("OrdinaryDiffEq")
 
 using GMT
 using GeophysicalModelGenerator
