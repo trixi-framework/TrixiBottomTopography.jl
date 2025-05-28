@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15122147.svg)](https://doi.org/10.5281/zenodo.15122147)
 
-**TrixiBottomTopography.jl** is a supplementary package to the numerical solvers [Trixi.jl](https://github.com/trixi-framework/Trixi.jl) and [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), which enables use of real world geographical data for the bottom topography function of the shallow water equations.
+**TrixiBottomTopography.jl** is a supplementary package to the numerical solver [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), which enables use of real world geographical data for the bottom topography function of the shallow water equations.
 
 The shallow water equations in one dimension
 ```math
@@ -59,17 +59,18 @@ be installed in addition to TrixiBottomTopography
 julia> using Pkg; Pkg.add("GLMakie")
 ```
 
-To use TrixiBottomTopography.jl together with the numerical solver framework [Trixi.jl](https://github.com/trixi-framework/Trixi.jl),
-you need both Trixi.jl and a relevant time integration sub-package of
+To use TrixiBottomTopography.jl together with the numerical solver framework [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl),
+you additionally need both [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
+and a relevant time integration sub-package of
 [OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl), e.g.,
 for high-order low-storage Runge-Kutta schemes. These can be added
 by executing
 ```julia
-julia> using Pkg; Pkg.add(["Trixi", "OrdinaryDiffEqLowStorageRK"])
+julia> using Pkg; Pkg.add(["Trixi", "TrixiShallowWater", "OrdinaryDiffEqLowStorageRK"])
 ```
-TrixiBottomTopography.jl can also be used together with
-[TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl), a solver suite specifically designed for shallow water flow applications.
-An example that combines TrixiBottomTopography.jl with wet/dry transitions and
+Two examples that combine TrixiBottomTopography.jl together with TrixiShallowWater.jl
+are available in the `examples` folder.
+An additional example that combines TrixiBottomTopography.jl with wet/dry transitions and
 shock capturing to model a tsunami runup is available as a
 [tutorial](https://trixi-framework.github.io/TrixiShallowWater.jl/stable/tutorials/elixir_shallowwater_monai_tsunami/)
 in TrixiShallowWater.jl.
@@ -83,7 +84,7 @@ cd TrixiBottomTopography.jl
 mkdir run
 cd run
 julia --project=. -e 'using Pkg; Pkg.develop(PackageSpec(path=".."))' # Install local TrixiBottomTopography.jl clone
-julia --project=. -e 'using Pkg; Pkg.add(["GLMakie", "Trixi", "OrdinaryDiffEqLowStorageRK"])' # Install additional packages
+julia --project=. -e 'using Pkg; Pkg.add(["GLMakie", "TrixiShallowWater", "Trixi", "OrdinaryDiffEqLowStorageRK"])' # Install additional packages
 ```
 Note that the additional packages are optional and can be omitted.
 
