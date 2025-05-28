@@ -84,7 +84,7 @@ cd TrixiBottomTopography.jl
 mkdir run
 cd run
 julia --project=. -e 'using Pkg; Pkg.develop(PackageSpec(path=".."))' # Install local TrixiBottomTopography.jl clone
-julia --project=. -e 'using Pkg; Pkg.add(["GLMakie", "TrixiShallowWater", "Trixi", "OrdinaryDiffEqLowStorageRK"])' # Install additional packages
+julia --project=. -e 'using Pkg; Pkg.add(["GLMakie", "Trixi", "TrixiShallowWater", "OrdinaryDiffEqLowStorageRK"])' # Install additional packages
 ```
 Note that the additional packages are optional and can be omitted.
 

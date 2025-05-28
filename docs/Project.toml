@@ -4,8 +4,8 @@ Changelog = "5217a498-cd5d-4ec6-b8c2-9b85a09b6e3e"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 OrdinaryDiffEqLowStorageRK = "b0944070-b475-4768-8dec-fb6eb410534d"
 Trixi = "a7f1ee26-1774-49b1-8366-f1abc58fbfcb"
-TrixiShallowWater = "804cb1fc-5b08-4398-a671-a789bfe091b3"
 TrixiBottomTopography = "86af9953-43df-404b-8eaa-d20d82623a82"
+TrixiShallowWater = "804cb1fc-5b08-4398-a671-a789bfe091b3"
 
 [compat]
 CairoMakie = "0.13"

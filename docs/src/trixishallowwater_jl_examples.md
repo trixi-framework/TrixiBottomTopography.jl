@@ -253,7 +253,7 @@ const spline_struct = BicubicBSpline(Rhine_data)
 spline_func(x::Float64, y::Float64) = spline_interpolation(spline_struct, x, y)
 ```
 
-Then the two dimensional shallow water equations are defined, where the gravitational constant
+Then the two dimensional shallow water equations are defined, where the gravitational acceleration
 has been chosen to be `9.81` and the initial water height `55.0`.
 Afterwards, the initial condition is defined. Similar to the one dimensional case,
 in the center of the domain, a circular part with a diameter of `100.0` is chosen
