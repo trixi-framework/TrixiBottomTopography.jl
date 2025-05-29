@@ -106,7 +106,7 @@ makedocs(;
                  "B-spline structure" => "structure.md",
                  "B-spline function" => "function.md"
              ],
-             "Trixi.jl examples" => "trixi_jl_examples.md",
+             "TrixiShallowWater.jl examples" => "trixishallowwater_jl_examples.md",
              "Advanced topics & developers" => ["Development" => "development.md",
                  "Style guide" => "styleguide.md",
                  "Testing" => "testing.md"],

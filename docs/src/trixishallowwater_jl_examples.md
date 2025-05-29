@@ -1,13 +1,14 @@
-# Examples with Trixi.jl
+# Examples with TrixiShallowWater.jl
 
 As mentioned in the [Home](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/)
-section of this documentation, TrixiBottomTopography.jl was initially developed as a
-supplementary package for the numerical solver [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
+section of this documentation, TrixiBottomTopography.jl was developed as a
+supplementary package for the numerical solver suite
+[TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl)
 to enable the user to use real world geographical data for the bottom topography
 function of the shallow water equations.
-TrixiBottomTopography.jl can also be used together with
-[TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl)
-a solver suite specifically designed for shallow water flow applications.
+TrixiShallowWater.jl itself is a spinoff of
+[Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
+that is specifically designed for shallow water flow applications.
 An example that combines TrixiBottomTopography.jl with wet/dry transitions and
 shock capturing to model a tsunami runup is available as a
 [tutorial](https://trixi-framework.github.io/TrixiShallowWater.jl/stable/tutorials/elixir_shallowwater_monai_tsunami/)
@@ -16,10 +17,10 @@ in TrixiShallowWater.jl.
 ## One dimensional dam break
 
 In this section, a one dimensional example is presented which uses the functionalities of
-TrixiBottomTopography.jl with [Trixi.jl](https://github.com/trixi-framework/Trixi.jl)
+TrixiBottomTopography.jl with [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl)
 to simulate a dam break problem.
 
-The underlying example file can be found [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_1D.jl).
+The underlying example file can be found [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixishallowwater_dam_break_1D.jl).
 
 First, all the necessary packages must be included at the beginning of the file.
 
@@ -29,6 +30,7 @@ using TrixiBottomTopography
 using CairoMakie
 using OrdinaryDiffEqLowStorageRK
 using Trixi
+using TrixiShallowWater
 ```
 
 - [CairoMakie.jl](https://github.com/JuliaPlots/CairoMakie.jl)
@@ -58,14 +60,14 @@ const spline_struct = CubicBSpline(Rhine_data)
 spline_func(x::Float64) = spline_interpolation(spline_struct, x)
 ```
 
-Now that the B-spline interpolation function is determined, the one dimensional shallow water equations implemented in Trixi.jl can be defined by calling:
+Now that the B-spline interpolation function is determined, the one dimensional shallow water equations implemented in TrixiShallowWater.jl can be defined by calling:
 
 ```@example trixi1d
 # Defining one dimensional shallow water equations
-equations = ShallowWaterEquations1D(gravity_constant = 1.0, H0 = 55.0)
+equations = ShallowWaterEquations1D(gravity = 1.0, H0 = 55.0)
 ```
 
-Here the gravity constant has been chosen to be $1.0$, and the background
+Here the constant gravititational acceleration has been chosen to be $1.0$, and the background
 total water height $H_0$ has been set to $55.0$.
 
 Next, the initial condition for the dam break problem can be defined.
@@ -93,7 +95,7 @@ end
 
 After the initial condition, we can set the boundary conditions.
 In this case, a reflective wall condition is chosen, which is already implemented
-in Trixi.jl for the one dimensional shallow water equations.
+in TrixiShallowWater.jl for the one dimensional shallow water equations.
 
 ```@example trixi1d
 # Setting initial condition
@@ -105,7 +107,8 @@ boundary_condition = boundary_condition_slip_wall
 
 The upcoming code parts will **not** be covered in full detail.
 To get a more profound understanding of the routines, please see the
-[Trixi.jl documentation](https://trixi-framework.github.io/TrixiDocumentation/stable/).
+[Trixi.jl documentation](https://trixi-framework.github.io/TrixiDocumentation/stable/)
+as well as the [TrixiShallowWater documentation](https://trixi-framework.github.io/TrixiShallowWater.jl/stable/).
 
 The following code snippet sets up the discontinuous Galerkin spectral element method (DGSEM).
 In this solver type, we can specify which flux functions for the surface and volume fluxes
@@ -223,7 +226,7 @@ nothing #hide
 
 ## Two dimensional dam break
 
-The underlying example file can be found [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixi_dam_break_2D.jl).
+The underlying example file can be found [here](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixishallowwater_dam_break_2D.jl).
 
 The two dimensional example is similar to the one dimensional case.
 
@@ -235,6 +238,7 @@ using TrixiBottomTopography
 using CairoMakie
 using OrdinaryDiffEqLowStorageRK
 using Trixi
+using TrixiShallowWater
 
 Rhine_data = download("https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt")
 nothing #hide
@@ -249,10 +253,14 @@ const spline_struct = BicubicBSpline(Rhine_data)
 spline_func(x::Float64, y::Float64) = spline_interpolation(spline_struct, x, y)
 ```
 
-Then the two dimensional shallow water equations are defined, where the gravitational constant has been chosen to be `3.0` and the initial water height `55.0`. Afterwards, the initial condition is defined. Similar to the one dimensional case, in the center of the domain, a circular part with a diameter of `100.0` is chosen where the initial water height is chosen to be `10.0` units higher.
+Then the two dimensional shallow water equations are defined, where the gravitational acceleration
+has been chosen to be `9.81` and the initial water height `55.0`.
+Afterwards, the initial condition is defined. Similar to the one dimensional case,
+in the center of the domain, a circular part with a diameter of `100.0` is chosen
+where the initial water height is chosen to be `10.0` units higher.
 
 ```@example trixi2d
-equations = ShallowWaterEquations2D(gravity_constant = 9.81, H0 = 55.0)
+equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 55.0)
 
 function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
 
