@@ -27,7 +27,6 @@ include("auxiliary/convert.jl")
 include("auxiliary/default_example.jl")
 include("auxiliary/create_geodata.jl")
 
-
 # Export the functions which are used for B-spline interpolation
 export LinearBSpline, CubicBSpline
 export BilinearBSpline, BicubicBSpline
@@ -37,7 +36,6 @@ export geo_topo_impression, create_topography_data
 
 # Export the functions which are used DGM data conversion
 export convert_dgm_1d, convert_dgm_2d, convert_geo_1d, convert_geo_2d
-
 
 # Note, Empty routines for visualization are included and exported. They are extended
 # in `ext/TrixiBottomTopographyMakieExt.jl` where their implementations are found.
