@@ -218,8 +218,8 @@ Inputs:
 - `direction`: Optional String that specifies if data should be read from "x" or "y" direction. Default is "x".
 - `section`: Optional integer which specifies which section of the other dimension should be chosen.
 """
-function convert_geo_1d(path_read::String, path_write::String; nx::Int, ny::Int, 
-                       excerpt = 1, direction = "x", section = 1)
+function convert_geo_1d(path_read::String, path_write::String; nx::Int, ny::Int,
+                        excerpt = 1, direction = "x", section = 1)
 
     # Check if dimensions are valid
     if nx <= 0 || ny <= 0
@@ -235,7 +235,7 @@ function convert_geo_1d(path_read::String, path_write::String; nx::Int, ny::Int,
     if (!(direction == "x") && !(direction == "y"))
         throw(ArgumentError("The input direction can either be \"x\" or \"y\""))
     end
-    
+
     # Verify section is valid
     if direction == "x" && section > ny
         throw(ArgumentError("Section value ($section) exceeds y-dimension ($ny)"))
@@ -250,12 +250,11 @@ function convert_geo_1d(path_read::String, path_write::String; nx::Int, ny::Int,
 
     # Get data length
     length_data = length(data)
-    
+
     # Verify the data length matches the specified dimensions
     if nx * ny != length_data
         throw(ArgumentError("Specified dimensions (nx=$nx, ny=$ny) don't match data length ($length_data)"))
     end
-    
 
     if direction == "x"
         # Create interim vectors which save all x and z values accordingly
@@ -272,7 +271,7 @@ function convert_geo_1d(path_read::String, path_write::String; nx::Int, ny::Int,
         # Save only the relevant data - adjust for rectangular grid
         # Get unique x values from the first row
         x_uniq = x_all[1:excerpt:nx]
-        
+
         # For the z values, reshape to nx×ny grid and select appropriate section
         z_matrix = reshape(z_all, (nx, ny))
         y_uniq = z_matrix[1:excerpt:nx, section]
@@ -292,11 +291,11 @@ function convert_geo_1d(path_read::String, path_write::String; nx::Int, ny::Int,
         # Save only the relevant data - adjust for rectangular grid
         # Get unique y values from the first column
         y_uniq = y_all[1:(excerpt * nx):length_data]
-        
+
         # For the z values, reshape to nx×ny grid and select appropriate section
         z_matrix = reshape(z_all, (nx, ny))
         x_uniq = z_matrix[section, 1:excerpt:ny]
-   end
+    end
 
     # Write the data to the file
     write_file = open(path_write, "w")
@@ -329,7 +328,8 @@ Inputs:
 - `ny`: Number of unique y values in the grid 
 - `excerpt`: Optional integer that specifies a stride through the data. Default is 1.
 """
-function convert_geo_2d(path_read::String, path_write::String; nx::Int, ny::Int, excerpt = 1)
+function convert_geo_2d(path_read::String, path_write::String; nx::Int, ny::Int,
+                        excerpt = 1)
     # Check if dimensions are valid
     if nx <= 0 || ny <= 0
         throw(ArgumentError("Dimensions nx and ny must be positive integers"))
@@ -342,7 +342,7 @@ function convert_geo_2d(path_read::String, path_write::String; nx::Int, ny::Int,
 
     # Get data length
     length_data = length(data)
-    
+
     # Verify the data length matches the specified dimensions
     if nx * ny != length_data
         throw(ArgumentError("Specified dimensions (nx=$nx, ny=$ny) don't match data length ($length_data)"))
@@ -364,10 +364,10 @@ function convert_geo_2d(path_read::String, path_write::String; nx::Int, ny::Int,
     # Save only the relevant data
     # Get unique x values from the rows
     x_uniq = x_all[1:excerpt:nx]
-    
+
     # Get unique y values from the columns
     y_uniq = y_all[1:(excerpt * nx):length_data]
-    
+
     # For the z values, reshape to nx×ny grid and select with stride
     z_matrix = reshape(z_all, (nx, ny))
     z_uniq = z_matrix[1:excerpt:nx, 1:excerpt:ny]
