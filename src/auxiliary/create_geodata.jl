@@ -41,9 +41,9 @@ Available resolutions for topography data:
 # # | "@earth\\_relief\\_60m"	|  60 arc min	 | ETOPO1 after Gaussian spherical filtering (111 km fullwidth)|
 
 """
-function geo_topo_impression(;resolution::String,lon_min::Float64, lon_max::Float64, lat_min::Float64, lat_max::Float64 )
-    
-    
+function geo_topo_impression(; resolution::String, lon_min::Float64, lon_max::Float64,
+                             lat_min::Float64, lat_max::Float64)
+
     # Specify the limits of the topography data based on the coordinates
     lon_mean = (lon_max + lon_min) / 2
     lat_mean = (lat_min + lat_max) / 2
@@ -55,8 +55,8 @@ function geo_topo_impression(;resolution::String,lon_min::Float64, lon_max::Floa
     p = ProjectionPoint(Lon = lon_mean, Lat = lat_mean) # to use cartasian coordiantes we choose a projection point here 
 
     Topo_Cart = convert2CartData(Topo, p) # here we use the projection point to convert the topography data to cartesian coordinates
-    
-    return Topo, p , Topo_Cart
+
+    return Topo, p, Topo_Cart
 end
 
 """
@@ -89,8 +89,8 @@ Takes the output from `geo_topo_impression()` and creates a regular grid for fur
 - The output file format is space-separated with columns: x y z
 """
 function create_topography_data(; low_x::Float64, high_x::Float64, gridsize_x::Float64,
-                                low_y::Float64, high_y::Float64, gridzize_y::Float64, write_path::String,dataname::String, Topo, p)
-
+                                low_y::Float64, high_y::Float64, gridzize_y::Float64,
+                                write_path::String, dataname::String, Topo, p)
     values_x = collect(low_x:gridsize_x:high_x)
     values_y = collect(low_y:gridzize_y:high_y)
 
@@ -100,13 +100,13 @@ function create_topography_data(; low_x::Float64, high_x::Float64, gridsize_x::F
 
     # combine x, y, z into a DataFrame, warning: you have to scale the values to meters
     df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])) .* 1000,
-                   y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])) .* 1000,
-                   z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .* 1000)
+                       y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])) .* 1000,
+                       z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .* 1000)
 
     data_dir = write_path
 
     # Write the data to a file and save it in the specified directory with the specified name
-    output_file = joinpath(data_dir,dataname )
+    output_file = joinpath(data_dir, dataname)
     open(output_file, "w") do file
         for row in eachrow(df_xyz)
             rounded_row = [round(value, digits = 5) for value in row]
