@@ -18,7 +18,9 @@ Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 TrixiBottomTopographyMakieExt = "Makie"
 
 [compat]
+DataFrames = "1.5"  
 Downloads = "1.6"
+GeophysicalModelGenerator = "0.7" 
 LinearAlgebra = "1"
 Makie = "0.21, 0.22"
 SparseArrays = "1"
