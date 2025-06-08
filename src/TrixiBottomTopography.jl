@@ -31,7 +31,6 @@ export LinearBSpline, CubicBSpline
 export BilinearBSpline, BicubicBSpline
 export spline_interpolation
 
-
 # Export the functions which are used DGM and GeophysicalModelgenerator data conversion
 export convert_dgm_1d, convert_dgm_2d, convert_geo_1d, convert_geo_2d
 
