@@ -2,30 +2,30 @@
 # This script creates data from GeophysicalModelGenerator    #
 # into data files which can be used by TrixiBottomTopography #
 ##############################################################
-
-# Include packages
-using GMT #needs to be used for import_topo from GeophysicalModelGenerator.jl
-using DataFrames # to create a DataFrame with the topography data
+using GeophysicalModelGenerator
 using TrixiBottomTopography
+using GMT
 
 # Get a first impression of the topography data
-Topo, p, Topo_Cart = geo_topo_impression(resolution = "@earth_relief_01s",
-                                         lon_min = 6.963880,
-                                         lon_max = 6.978499,
-                                         lat_min = 50.947861,
-                                         lat_max = 50.957095)
+Topo, p,
+Topo_Cart = geo_topo_impression(resolution = "@earth_relief_01s",
+                                lon_min = 6.963880,
+                                lon_max = 6.978499,
+                                lat_min = 50.947861,
+                                lat_max = 50.957095)
 
 #Create a file with the topography data
-df_xyz, Topo_Cart_orth = create_topography_data(low_x = -0.5,
-                                                high_x = 0.499,
-                                                gridsize_x = 0.001,
-                                                low_y = -0.5,
-                                                high_y = 0.499,
-                                                gridzize_y = 0.002,
-                                                write_path = joinpath(@__DIR__, "data"),
-                                                dataname = "geo.xyz",
-                                                Topo = Topo,
-                                                p = p)
+df_xyz,
+Topo_Cart_orth = create_topography_data(low_x = -0.5,
+                                        high_x = 0.499,
+                                        gridsize_x = 0.001,
+                                        low_y = -0.5,
+                                        high_y = 0.499,
+                                        gridzize_y = 0.002,
+                                        write_path = joinpath(@__DIR__, "data"),
+                                        dataname = "geo.xyz",
+                                        Topo = Topo,
+                                        p = p)
 
 # Define file paths
 data_dir = joinpath(@__DIR__, "data")
