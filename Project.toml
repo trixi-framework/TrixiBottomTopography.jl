@@ -22,7 +22,7 @@ TrixiBottomTopographyMakieExt = "Makie"
 [compat]
 DataFrames = "1.5"
 Downloads = "1.6"
-GeophysicalModelGenerator = "0.7"
+GeophysicalModelGenerator = "0.7.14"
 GMT = "1.0"
 LinearAlgebra = "1"
 Makie = "0.21, 0.22"
