@@ -47,16 +47,21 @@ Available resolutions for topography data:
 # # | "@earth\\_relief\\_60m"	|  60 arc min	 | ETOPO1 after Gaussian spherical filtering (111 km fullwidth)|
 
 """
-function geo_topo_impression(; resolution::String, lon_min::Float64, lon_max::Float64,
-                             lat_min::Float64, lat_max::Float64)
+function geo_topo_impression(;
+    resolution::String,
+    lon_min::Float64,
+    lon_max::Float64,
+    lat_min::Float64,
+    lat_max::Float64,
+)
 
     # Specify the limits of the topography data based on the coordinates
     lon_mean = (lon_max + lon_min) / 2
     lat_mean = (lat_min + lat_max) / 2
 
     # Loading the topography data
-    Topo = import_topo(lon = [lon_min, lon_max], lat = [lat_min, lat_max],
-                       file = resolution) # here we load the topography data
+    Topo =
+        import_topo(lon = [lon_min, lon_max], lat = [lat_min, lat_max], file = resolution) # here we load the topography data
 
     p = ProjectionPoint(Lon = lon_mean, Lat = lat_mean) # to use cartasian coordiantes we choose a projection point here 
 
@@ -94,9 +99,18 @@ Takes the output from `geo_topo_impression()` and creates a regular grid for fur
 - The output DataFrame and saved file will contain coordinates in meters
 - The output file format is space-separated with columns: x y z
 """
-function create_topography_data(; low_x::Float64, high_x::Float64, gridsize_x::Float64,
-                                low_y::Float64, high_y::Float64, gridsize_y::Float64,
-                                write_path::String, dataname::String, Topo, p)
+function create_topography_data(;
+    low_x::Float64,
+    high_x::Float64,
+    gridsize_x::Float64,
+    low_y::Float64,
+    high_y::Float64,
+    gridsize_y::Float64,
+    write_path::String,
+    dataname::String,
+    Topo,
+    p,
+)
     values_x = collect(low_x:gridsize_x:high_x)
     values_y = collect(low_y:gridsize_y:high_y)
 
@@ -105,9 +119,11 @@ function create_topography_data(; low_x::Float64, high_x::Float64, gridsize_x::F
     Topo_Cart_orth = project_CartData(Topo_Cart_orth, Topo, p) # project the topography data on the cartasian grid
 
     # combine x, y, z into a DataFrame, warning: you have to scale the values to meters
-    df_xyz = DataFrame(x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])) .* 1000,
-                       y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])) .* 1000,
-                       z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .* 1000)
+    df_xyz = DataFrame(
+        x = convert.(Float64, vec(Topo_Cart_orth.x.val[:, :, 1])) .* 1000,
+        y = convert.(Float64, vec(Topo_Cart_orth.y.val[:, :, 1])) .* 1000,
+        z = convert.(Float64, vec(Topo_Cart_orth.z.val[:, :, 1])) .* 1000,
+    )
 
     data_dir = write_path
 

@@ -45,7 +45,7 @@ function evaluate_bicubicspline_interpolant end
 function plot_topography end
 function plot_topography_with_interpolation_knots end
 export geo_topo_impression, create_topography_data
-export evaluate_bicubicspline_interpolant, plot_topography,
-       plot_topography_with_interpolation_knots
+export evaluate_bicubicspline_interpolant,
+    plot_topography, plot_topography_with_interpolation_knots
 
 end
