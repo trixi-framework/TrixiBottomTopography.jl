@@ -6,6 +6,7 @@ solution_*
 *.png
 *.gif
 *.xyz
+!examples/data/geo.xyz
 docs/build
 docs/src/authors.md
 docs/src/changelog.md
