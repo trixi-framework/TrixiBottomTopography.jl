@@ -34,7 +34,7 @@ Next, we load the converted 1D topography data that was created using the `conve
 
 ```@example geo1d
 # Load the converted 1D Rhine topography data
-data_dir = joinpath(@__DIR__, "data")
+data_dir = joinpath(@__DIR__, "../examples/data")
 data = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")
 ```
 
@@ -203,7 +203,7 @@ using Trixi2Vtk
 using WriteVTK
 
 # Load the converted 2D Rhine topography data
-data_dir = joinpath(@__DIR__, "data")
+data_dir = joinpath(@__DIR__, "../examples/data")
 data = joinpath(data_dir, "rhine_data_2d_20_geo.txt")
 ```
 
