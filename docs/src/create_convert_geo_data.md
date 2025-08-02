@@ -128,7 +128,7 @@ The function returns three important objects:
 Based on the topography data from `geo_topo_impression`, we can now create a structured grid onto which the topography data is then interpolated by using the `create_topography_data` function.
 
 ```@example create_convert_geo
-# Create output directory if it doesn't exist
+
 data_dir = joinpath(@__DIR__, "examples/data")
 mkpath(data_dir)
 
