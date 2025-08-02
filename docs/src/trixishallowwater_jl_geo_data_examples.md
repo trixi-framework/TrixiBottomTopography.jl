@@ -76,10 +76,6 @@ We define the 1D shallow water equations with appropriate physical parameters:
 equations = ShallowWaterEquations1D(gravity = 1.0, H0 = 55.0)
 ```
 
-**Key parameters:**
-- `gravity = 1.0`: Gravitational acceleration (simplified for this example)
-- `H0 = 55.0`: Undisturbed water height
-
 ### Initial condition for dam break
 
 The initial condition creates a dam break scenario where water is initially higher in a central region:
@@ -121,7 +117,7 @@ solver = DGSEM(polydeg = 3, surface_flux = (flux_hll, flux_nonconservative_fjord
 
 ### Mesh and semidiscretization
 
-Here we use a TreeMesh for the semidiscretization:
+Here we use a TreeMesh:
 
 ```@example geo1d
 ###############################################################################
@@ -204,7 +200,7 @@ using Trixi2Vtk
 using GeophysicalModelGenerator
 using GMT
 
-# Create data directory and generate sample data if it doesn't exist
+
 data_dir = joinpath(@__DIR__, "examples/data")
 mkpath(data_dir)
 

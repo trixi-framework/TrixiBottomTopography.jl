@@ -132,7 +132,7 @@ Based on the topography data from `geo_topo_impression`, we can now create a str
 data_dir = joinpath(@__DIR__, "examples/data")
 mkpath(data_dir)
 
-# Create a structured grid of topography data
+# Create a grid onto which the topography data is interpolated
 df_xyz, Topo_Cart_orth = create_topography_data(
     low_x = -0.5, 
     high_x = 0.499, 
