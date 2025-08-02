@@ -136,7 +136,7 @@ df_xyz, Topo_Cart_orth = create_topography_data(
     low_y = -0.5, 
     high_y = 0.499, 
     gridsize_y = 0.002, 
-    write_path = joinpath(@__DIR__, "TrixiBottomTopography.jl/examples/data"), 
+    write_path = joinpath(@__DIR__, "examples/data"), 
     dataname = "geo.xyz",
     Topo = Topo, 
     p = p
@@ -175,7 +175,7 @@ After creating the structured topography data with `create_topography_data`, we 
 
 ```@example create_convert_geo
 # Define file paths
-data_dir = joinpath(@__DIR__, "TrixiBottomTopography.jl/examples/data")
+data_dir = joinpath(@__DIR__, "examples/data")
 path_src_file = joinpath(data_dir, "geo.xyz")
 
 path_out_file_1d_x = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")

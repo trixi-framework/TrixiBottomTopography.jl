@@ -34,7 +34,7 @@ Next, we load the converted 1D topography data that was created using the `conve
 
 ```@example geo1d
 # Load the converted 1D Rhine topography data
-data_dir = joinpath(@__DIR__, "TrixiBottomTopography.jl/examples/data")
+data_dir = joinpath(@__DIR__, "examples/data")
 data = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")
 ```
 
@@ -200,10 +200,9 @@ using Trixi
 using TrixiShallowWater
 using CairoMakie
 using Trixi2Vtk
-using WriteVTK
 
 # Load the converted 2D Rhine topography data
-data_dir = joinpath(@__DIR__, "TrixiBottomTopography.jl/examples/data")
+data_dir = joinpath(@__DIR__, "examples/data")
 data = joinpath(data_dir, "rhine_data_2d_20_geo.txt")
 ```
 
@@ -309,7 +308,7 @@ ode = semidiscretize(semi, tspan)
 ###############################################################################
 # Clear the output directory if it exists and create it new for saving the output
 
-output_dir = "TrixiBottomTopography.jl/examples/data/out"
+output_dir = "examples/data/out"
 if isdir(output_dir)
     rm(output_dir, recursive = true)
 end
