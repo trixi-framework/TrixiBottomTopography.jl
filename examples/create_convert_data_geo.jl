@@ -5,6 +5,7 @@
 using GeophysicalModelGenerator
 using TrixiBottomTopography
 using GMT # needs to be installed for the functions geo_topo_impression and create_topography_data
+using DataFrames
 
 # Get a first impression of the topography data
 Topo, p, Topo_Cart = geo_topo_impression(
