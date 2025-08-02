@@ -32,8 +32,14 @@ plot_topography(x_int_pts, y_int_pts; xlabel = "x[m]", ylabel = "z[m]")
 x_knots = spline_struct.x
 y_knots = spline_func.(x_knots)
 
-plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
-                                         xlabel = "x[m]", ylabel = "z[m]")
+plot_topography_with_interpolation_knots(
+    x_int_pts,
+    y_int_pts,
+    x_knots,
+    y_knots;
+    xlabel = "x[m]",
+    ylabel = "z[m]",
+)
 
 equations = ShallowWaterEquations1D(gravity = 1.0, H0 = 55.0)
 # Defining initial condition for the dam break problem
@@ -60,22 +66,33 @@ boundary_condition = boundary_condition_slip_wall
 # Get the DG approximation space
 
 volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
-solver = DGSEM(polydeg = 3, surface_flux = (flux_hll, flux_nonconservative_fjordholm_etal),
-               volume_integral = VolumeIntegralFluxDifferencing(volume_flux))
+solver = DGSEM(
+    polydeg = 3,
+    surface_flux = (flux_hll, flux_nonconservative_fjordholm_etal),
+    volume_integral = VolumeIntegralFluxDifferencing(volume_flux),
+)
 
 ###############################################################################
 # Get the TreeMesh and setup a periodic mesh
 
 coordinates_min = spline_struct.x[1]
 coordinates_max = spline_struct.x[end]
-mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level = 3,
-                n_cells_max = 10_000,
-                periodicity = false)
+mesh = TreeMesh(
+    coordinates_min,
+    coordinates_max,
+    initial_refinement_level = 3,
+    n_cells_max = 10_000,
+    periodicity = false,
+)
 
 # create the semi discretization object
-semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
-                                    boundary_conditions = boundary_condition)
+semi = SemidiscretizationHyperbolic(
+    mesh,
+    equations,
+    initial_condition,
+    solver,
+    boundary_conditions = boundary_condition,
+)
 
 ###############################################################################
 # ODE solvers
@@ -90,14 +107,13 @@ ode = semidiscretize(semi, tspan)
 visnodes = range(tspan[1], tspan[2], length = 90)
 
 # use a Runge-Kutta method with error-based time step size control
-sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
-            saveat = visnodes)
+sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8, saveat = visnodes)
 
 # Create animation of the solution
 j = Observable(1)
 time = Observable(0.0)
 
-pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
+pd_list = [PlotData1D(sol.u[i], semi) for i = 1:length(sol.t)]
 f = Figure()
 title_string = lift(t -> "time t = $(round(t, digits=3))", time)
 ax = Axis(f[1, 1], xlabel = "x[m]", ylabel = "z[m]", title = title_string)
@@ -108,7 +124,7 @@ CairoMakie.lines!(ax, pd_list[1].x, height)
 CairoMakie.lines!(ax, pd_list[1].x, bottom)
 ylims!(ax, 30, 90)
 
-record(f, "animation.gif", 1:length(pd_list)) do tt
+record(f, "animation_geo.gif", 1:length(pd_list)) do tt
     j[] = tt
     time[] = sol.t[tt]
 end
