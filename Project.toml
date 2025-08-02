@@ -6,14 +6,14 @@ version = "0.1.4-DEV"
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Downloads = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+GMT = "5752ebe1-31b9-557e-87aa-f909b540aa54"
+GeophysicalModelGenerator = "3700c31b-fa53-48a6-808a-ef22d5a84742"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [weakdeps]
-GeophysicalModelGenerator = "3700c31b-fa53-48a6-808a-ef22d5a84742"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
-GMT = "5752ebe1-31b9-557e-87aa-f909b540aa54"
 
 [extensions]
 TrixiBottomTopographyGeophysicalModelGeneratorExt = "GeophysicalModelGenerator"
@@ -22,8 +22,8 @@ TrixiBottomTopographyMakieExt = "Makie"
 [compat]
 DataFrames = "1.5"
 Downloads = "1.6"
-GeophysicalModelGenerator = "0.7.14"
 GMT = "1.0"
+GeophysicalModelGenerator = "0.7.14"
 LinearAlgebra = "1"
 Makie = "0.21, 0.22"
 SparseArrays = "1"
