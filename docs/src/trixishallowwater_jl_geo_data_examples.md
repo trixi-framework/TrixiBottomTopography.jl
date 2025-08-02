@@ -10,7 +10,7 @@ The workflow follows these steps:
 4. Visualize the results.
 
 The example files used in this section can be found here:
--  1D example:  `example examples/trixishallowwater_damn_break_1D_geo_data.jl`
+-  1D example:  `examples/trixishallowwater_damn_break_1D_geo_data.jl`
 - 2D example: `examples/trixishallowwater_damn_break_2D_geo_data.jl`
 
 ## One dimensional dam break with real topography
@@ -19,7 +19,7 @@ This example demonstrates a 1D dam break simulation using real Rhine River topog
 
 ### Setup and data loading
 
-First, we include the necessary packages:
+First, we include the necessary packages and load the topography data:
 
 ```@example geo1d
 # Include packages
@@ -28,14 +28,51 @@ using OrdinaryDiffEqLowStorageRK
 using Trixi
 using TrixiShallowWater
 using CairoMakie
-```
+using GeophysicalModelGenerator
+using GMT
 
-Next, we load the converted 1D topography data that was created using the `convert_geo_1d` function:
-
-```@example geo1d
-# Load the converted 1D Rhine topography data
+# Create data directory and generate sample data if it doesn't exist
 data_dir = joinpath(@__DIR__, "examples/data")
-data = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")
+mkpath(data_dir)
+
+data_file = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")
+
+# Check if data file exists, if not create sample data
+if !isfile(data_file)
+    # Get topography data
+    Topo, p, Topo_Cart = geo_topo_impression(
+        resolution="@earth_relief_01s", 
+        lon_min=6.963880, 
+        lon_max=6.978499, 
+        lat_min=50.947861, 
+        lat_max=50.957095
+    )
+    
+    # Create structured grid
+    df_xyz, Topo_Cart_orth = create_topography_data(
+        low_x = -0.5, 
+        high_x = 0.499, 
+        gridsize_x = 0.001, 
+        low_y = -0.5, 
+        high_y = 0.499, 
+        gridsize_y = 0.002, 
+        write_path = data_dir, 
+        dataname = "geo.xyz",
+        Topo = Topo, 
+        p = p
+    )
+    
+    # Convert to 1D format
+    path_src_file = joinpath(data_dir, "geo.xyz")
+    nx = size(Topo_Cart_orth.x.val, 1)
+    ny = size(Topo_Cart_orth.y.val, 2)
+    
+    convert_geo_1d(path_src_file, data_file, nx=nx, ny=ny; 
+                   excerpt=20, section=10)
+end
+
+# Load the converted 1D Rhine topography data
+data = data_file
 ```
 
 ### B-spline interpolation
@@ -63,9 +100,7 @@ y_int_pts = spline_func.(x_int_pts)
 
 # Plot the topography
 plot_topography(x_int_pts, y_int_pts; xlabel = "x[m]", ylabel = "z[m]")
-
 ```
-
 
 ### Shallow water equations setup
 
@@ -200,10 +235,50 @@ using Trixi
 using TrixiShallowWater
 using CairoMakie
 using Trixi2Vtk
+using GeophysicalModelGenerator
+using GMT
+
+# Create data directory and generate sample data if it doesn't exist
+data_dir = joinpath(@__DIR__, "examples/data")
+mkpath(data_dir)
+
+data_file = joinpath(data_dir, "rhine_data_2d_20_geo.txt")
+
+# Check if data file exists, if not create sample data
+if !isfile(data_file)
+    # Get topography data
+    Topo, p, Topo_Cart = geo_topo_impression(
+        resolution="@earth_relief_01s", 
+        lon_min=6.963880, 
+        lon_max=6.978499, 
+        lat_min=50.947861, 
+        lat_max=50.957095
+    )
+    
+    # Create structured grid
+    df_xyz, Topo_Cart_orth = create_topography_data(
+        low_x = -0.5, 
+        high_x = 0.499, 
+        gridsize_x = 0.001, 
+        low_y = -0.5, 
+        high_y = 0.499, 
+        gridsize_y = 0.002, 
+        write_path = data_dir, 
+        dataname = "geo.xyz",
+        Topo = Topo, 
+        p = p
+    )
+    
+    # Convert to 2D format
+    path_src_file = joinpath(data_dir, "geo.xyz")
+    nx = size(Topo_Cart_orth.x.val, 1)
+    ny = size(Topo_Cart_orth.y.val, 2)
+    
+    convert_geo_2d(path_src_file, data_file, nx=nx, ny=ny; excerpt=20)
+end
 
 # Load the converted 2D Rhine topography data
-data_dir = joinpath(@__DIR__, "examples/data")
-data = joinpath(data_dir, "rhine_data_2d_20_geo.txt")
+data = data_file
 ```
 
 ### Bicubic B-spline interpolation
