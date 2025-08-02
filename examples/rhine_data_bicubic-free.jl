@@ -31,8 +31,15 @@ if isdefined(Main, :Makie)
     y_knots = spline_struct.y
     z_knots = evaluate_bicubicspline_interpolant(spline_func, x_knots, y_knots)
 
-    plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
-                                             x_knots, y_knots, z_knots;
-                                             xlabel = "ETRS89 East",
-                                             ylabel = "DHHN2016 Height", zlabel = "H")
+    plot_topography_with_interpolation_knots(
+        x_int_pts,
+        y_int_pts,
+        z_int_pts,
+        x_knots,
+        y_knots,
+        z_knots;
+        xlabel = "ETRS89 East",
+        ylabel = "DHHN2016 Height",
+        zlabel = "H",
+    )
 end

@@ -26,10 +26,14 @@ if isdefined(Main, :Makie)
     # Get interpolated matrix
     z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
 
-    plot_topography(x_int_pts, y_int_pts, z_int_pts;
-                    xlabel = "ETRS89\n East",
-                    ylabel = "ETRS89\n North",
-                    zlabel = "DHHN2016\n Height",
-                    azimuth_angle = 54 * pi / 180,
-                    elevation_angle = 27 * pi / 180)
+    plot_topography(
+        x_int_pts,
+        y_int_pts,
+        z_int_pts;
+        xlabel = "ETRS89\n East",
+        ylabel = "ETRS89\n North",
+        zlabel = "DHHN2016\n Height",
+        azimuth_angle = 54 * pi / 180,
+        elevation_angle = 27 * pi / 180,
+    )
 end
