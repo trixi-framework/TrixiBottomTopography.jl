@@ -95,10 +95,10 @@ Takes the output from `geo_topo_impression()` and creates a regular grid for fur
 - The output file format is space-separated with columns: x y z
 """
 function create_topography_data(; low_x::Float64, high_x::Float64, gridsize_x::Float64,
-                                low_y::Float64, high_y::Float64, gridzize_y::Float64,
+                                low_y::Float64, high_y::Float64, gridsize_y::Float64,
                                 write_path::String, dataname::String, Topo, p)
     values_x = collect(low_x:gridsize_x:high_x)
-    values_y = collect(low_y:gridzize_y:high_y)
+    values_y = collect(low_y:gridsize_y:high_y)
 
     Topo_Cart_orth = CartData(xyz_grid(values_x, values_y, 0)) # create a grid with the desired gridpoints
 
