@@ -63,7 +63,7 @@ function geo_topo_impression(;
     Topo =
         import_topo(lon = [lon_min, lon_max], lat = [lat_min, lat_max], file = resolution) # here we load the topography data
 
-    p = ProjectionPoint(Lon = lon_mean, Lat = lat_mean) # to use cartasian coordiantes we choose a projection point here 
+    p = ProjectionPoint(Lon = lon_mean, Lat = lat_mean) # to use cartesian coordinates we choose a projection point here
 
     Topo_Cart = convert2CartData(Topo, p) # here we use the projection point to convert the topography data to cartesian coordinates
 

@@ -1,7 +1,7 @@
-###############################################################################################
-# This example file visualises the topography data and creats a .gif file of a one dimensional# 
-#dam break where the bottom topography is generated with GeophysicalModelGenerator.           #
-###############################################################################################
+###################################################################################################
+# # This example file visualises the topography data and creates a .gif file of a one dimensional # 
+# dam break where the bottom topography is generated with GeophysicalModelGenerator.              #
+###################################################################################################
 
 using TrixiBottomTopography
 using OrdinaryDiffEqLowStorageRK

@@ -33,7 +33,7 @@ This function requires you to:
 
 The function returns three important objects:
 - `Topo`: The raw topography data from GeophysicalModelGenerator.
-- `p`: The projection point used for coordinate transformation. The projection point is choosen to be in the middle of the chosen area.
+- `p`: The projection point used for coordinate transformation. The projection point is chosen to be in the middle of the chosen area.
 - `Topo_Cart`: The topography data converted to Cartesian coordinates.
 
 <table style="border-collapse: collapse; width: 100%; border: 2px solid #666;">

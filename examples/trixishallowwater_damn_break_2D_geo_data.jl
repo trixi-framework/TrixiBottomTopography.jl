@@ -108,7 +108,7 @@ tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 
 ###############################################################################
-# Cler the output directory if it exists and create it new for saving the output later
+# Clear the output directory if it exists and create it new for saving the output later
 
 output_dir = "out"
 if isdir(output_dir)
