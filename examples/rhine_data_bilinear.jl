@@ -25,6 +25,12 @@ if isdefined(Main, :Makie)
     # Get interpolated matrix
     z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
 
-    plot_topography(x_int_pts, y_int_pts, z_int_pts;
-                    xlabel = "E", ylabel = "N", zlabel = "H")
+    plot_topography(
+        x_int_pts,
+        y_int_pts,
+        z_int_pts;
+        xlabel = "E",
+        ylabel = "N",
+        zlabel = "H",
+    )
 end
