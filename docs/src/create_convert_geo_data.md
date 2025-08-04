@@ -5,7 +5,7 @@ In this section, it is explained how to get real topography data using Geophysic
 
 To get a first impression of the desired topography, TrixiBottomTopography.jl provides the function `geo_topo_impression`. First, we import our packages to be able to use all the functions.
 
-```@example create_convert_geo
+```julia
 # Include packages
 using GeophysicalModelGenerator
 using TrixiBottomTopography
@@ -14,7 +14,7 @@ using GMT # needs to be installed for the functions geo_topo_impression and crea
 
 Next, we can run `geo_topo_impression` to load and preview the topography data:
 
-```@example create_convert_geo
+```julia
 # Get a first impression of the topography data
 Topo, p, Topo_Cart = geo_topo_impression(
     resolution="@earth_relief_01s", 
@@ -127,7 +127,7 @@ The function returns three important objects:
 
 Based on the topography data from `geo_topo_impression`, we can now create a structured grid onto which the topography data is then interpolated by using the `create_topography_data` function.
 
-```@example create_convert_geo
+```julia
 
 data_dir = joinpath(@__DIR__, "examples/data")
 mkpath(data_dir)
@@ -177,7 +177,7 @@ After creating the structured topography data with `create_topography_data`, we 
 
 ### Converting to 1D format
 
-```@example create_convert_geo
+```julia
 # Define file paths
 path_src_file = joinpath(data_dir, "geo.xyz")
 
@@ -206,7 +206,7 @@ The `convert_geo_1d` function parameters:
 
 ### Converting to 2D format
 
-```@example create_convert_geo
+```julia
 # Convert to 2D format
 convert_geo_2d(path_src_file, path_out_file_2d, nx=nx, ny=ny; excerpt=20)
 ```
