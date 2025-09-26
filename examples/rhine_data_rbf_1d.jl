@@ -18,7 +18,7 @@ itp = RBFInterpolation1D(data, kernel)
 # Define interpolation function
 itp_func(x) = itp(x)
 
-# Evaluate the cubic B-spline on a new set of nodes and plot
+# Evaluate the thin plate spline on a new set of nodes and plot
 if isdefined(Main, :Makie)
     nodes = nodeset(itp)
     x_knots = sort(unique(nodes[:, 1]))
