@@ -13,7 +13,7 @@ The arguments `args` and keyword arguments `kwargs` are passed to the `interpola
 See the [KernelInterpolation.jl documentation](https://joshualampert.github.io/KernelInterpolation.jl/stable/) for more details.
 """
 function TrixiBottomTopography.RBFInterpolation(nodeset::NodeSet, z, args...; kwargs...)
-	return interpolate(nodeset, z, args...; kwargs...)
+    return interpolate(nodeset, z, args...; kwargs...)
 end
 
 """
@@ -30,13 +30,13 @@ a `NodeSet` from KernelInterpolation.jl. Alternatively, the same interface as fo
 of elevation values or by providing a path to a text file containing the data `x`, `y`, and `z`.
 """
 function TrixiBottomTopography.RBFInterpolation1D(x, y, args...; kwargs...)
-	nodeset = NodeSet(vec([[xx] for xx in x]))
-	return TrixiBottomTopography.RBFInterpolation(nodeset, vec(y), args...; kwargs...)
+    nodeset = NodeSet(vec([[xx] for xx in x]))
+    return TrixiBottomTopography.RBFInterpolation(nodeset, vec(y), args...; kwargs...)
 end
 
 function TrixiBottomTopography.RBFInterpolation1D(path::String, args...; kwargs...)
-	x, y = TrixiBottomTopography.parse_txt_1D(path)
-	return TrixiBottomTopography.RBFInterpolation1D(x, y, args...; kwargs...)
+    x, y = TrixiBottomTopography.parse_txt_1D(path)
+    return TrixiBottomTopography.RBFInterpolation1D(x, y, args...; kwargs...)
 end
 
 """
@@ -53,13 +53,14 @@ a `NodeSet` from KernelInterpolation.jl. Alternatively, the same interface as fo
 of elevation values or by providing a path to a text file containing the data `x`, `y`, and `z`.
 """
 function TrixiBottomTopography.RBFInterpolation2D(x, y, z, args...; kwargs...)
-	nodeset = NodeSet(vec([[xx; yy] for xx in x, yy in y]))
-	return TrixiBottomTopography.RBFInterpolation(nodeset, vec(Matrix(z')), args...; kwargs...)
+    nodeset = NodeSet(vec([[xx; yy] for xx in x, yy in y]))
+    return TrixiBottomTopography.RBFInterpolation(nodeset, vec(Matrix(z')), args...;
+                                                  kwargs...)
 end
 
 function TrixiBottomTopography.RBFInterpolation2D(path::String, args...; kwargs...)
-	x, y, z = TrixiBottomTopography.parse_txt_2D(path)
-	return TrixiBottomTopography.RBFInterpolation2D(x, y, z, args...; kwargs...)
+    x, y, z = TrixiBottomTopography.parse_txt_2D(path)
+    return TrixiBottomTopography.RBFInterpolation2D(x, y, z, args...; kwargs...)
 end
 
 end
