@@ -18,7 +18,7 @@ TrixiBottomTopographyMakieExt = "Makie"
 [compat]
 Downloads = "1.6"
 LinearAlgebra = "1"
-Makie = "0.21, 0.22"
+Makie = "0.21, 0.22, 0.24"
 SparseArrays = "1"
 StaticArrays = "1.9"
 julia = "1.10"
