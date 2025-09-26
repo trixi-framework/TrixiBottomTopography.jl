@@ -103,13 +103,7 @@ Note that the number of `x` and `y` values have to be the same.
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/b05a90e66025ee1ebddf444a32c3fa01/raw/90d375c1ac11b26589aab1fe92bd0e6f6daf37b7/Rhine_data_1D_10.txt)
 """
 function LinearBSpline(path::String)
-    file = open(path)
-    lines = readlines(file)
-    close(file)
-
-    num_elements = parse(Int64, lines[2])
-    x = [parse(Float64, val) for val in lines[4:(3 + num_elements)]]
-    y = [parse(Float64, val) for val in lines[(5 + num_elements):end]]
+    x, y = parse_txt_1D(path)
 
     LinearBSpline(x, y)
 end
@@ -327,13 +321,7 @@ Note that the number of `x` and `y` values have to be the same.
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/b05a90e66025ee1ebddf444a32c3fa01/raw/90d375c1ac11b26589aab1fe92bd0e6f6daf37b7/Rhine_data_1D_10.txt)
 """
 function CubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
-    file = open(path)
-    lines = readlines(file)
-    close(file)
-
-    num_elements = parse(Int64, lines[2])
-    x = [parse(Float64, val) for val in lines[4:(3 + num_elements)]]
-    y = [parse(Float64, val) for val in lines[(5 + num_elements):end]]
+    x, y = parse_txt_1D(path)
 
     CubicBSpline(x, y; end_condition = end_condition, smoothing_factor = smoothing_factor)
 end
