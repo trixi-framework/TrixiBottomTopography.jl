@@ -11,6 +11,11 @@ using TrixiBottomTopography
 import TrixiBottomTopography: evaluate_two_dimensional_interpolant, plot_topography,
                               plot_topography_with_interpolation_knots
 
+# To keep functionality we allow for the old function name `evaluate_bicubicspline_interpolant` to be used.
+# From a front end perspective nothing changes; however, if one starts Julia with `--depwarn=yes`
+# a warning would be thrown when one uses the deprecated function name.
+@deprecate evaluate_bicubicspline_interpolant(spline, x, y) evaluate_two_dimensional_interpolant(spline, x, y)
+
 """
     evaluate_two_dimensional_interpolant(spline, x, y)
 
