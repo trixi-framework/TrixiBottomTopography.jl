@@ -15,6 +15,7 @@ using KernelInterpolation: ThinPlateSplineKernel
     itp_func(x, y) = itp([x; y])
 
     # Test function at arbitrary point
+    # The system is relatively ill-conditioned, so we need a bit looser tolerance here
     @test isapprox(itp_func(357555, 5646555), 39.2864500818805; atol = 1e-8)
 end
 
