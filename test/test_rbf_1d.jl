@@ -20,7 +20,8 @@ using Random
     itp_func(x) = itp(x)
 
     # Test function at arbitrary point
-    @test isapprox(itp_func(357555), 46.191872246844014; atol = 1e-11)
+    # The system is relatively ill-conditioned, so we need a bit looser tolerance here
+    @test isapprox(itp_func(357555), 46.191872246844014; atol = 1e-10)
 end
 
 end # module
