@@ -36,10 +36,10 @@ export convert_dgm_1d, convert_dgm_2d
 
 # Note, Empty routines for visualization are included and exported. They are extended
 # in `ext/TrixiBottomTopographyMakieExt.jl` where their implementations are found.
-function evaluate_bicubicspline_interpolant end
+function evaluate_two_dimensional_interpolant end
 function plot_topography end
 function plot_topography_with_interpolation_knots end
-export evaluate_bicubicspline_interpolant, plot_topography,
+export evaluate_two_dimensional_interpolant, plot_topography,
        plot_topography_with_interpolation_knots
 
 end

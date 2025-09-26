@@ -8,17 +8,17 @@ using Makie: Makie
 using TrixiBottomTopography
 
 # Import functions such that they can be extended with new methods
-import TrixiBottomTopography: evaluate_bicubicspline_interpolant, plot_topography,
+import TrixiBottomTopography: evaluate_two_dimensional_interpolant, plot_topography,
                               plot_topography_with_interpolation_knots
 
 """
-    evaluate_bicubicspline_interpolant(spline, x, y)
+    evaluate_two_dimensional_interpolant(spline, x, y)
 
 Helper function to sample the bicubic spline function `spline`
 at the interpolation nodes `x` (with size `n`) and `y` (with size `m`)
 and return the values in an array `z` of size `m` by `n`.
 """
-function evaluate_bicubicspline_interpolant(spline, x, y)
+function evaluate_two_dimensional_interpolant(spline, x, y)
 
     # Get dimensions for solution matrix
     n = length(x)
