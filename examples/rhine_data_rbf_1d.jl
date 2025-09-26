@@ -12,7 +12,9 @@ using KernelInterpolation
 root_dir = pkgdir(TrixiBottomTopography)
 data = joinpath(root_dir, "examples", "data", "rhine_data_1d_20_x.txt")
 
-itp = RBFInterpolation1D(data, ThinPlateSplineKernel{1}())
+# Define RBF structure
+kernel = ThinPlateSplineKernel{1}()
+itp = RBFInterpolation1D(data, kernel)
 # Define interpolation function
 itp_func(x) = itp(x)
 

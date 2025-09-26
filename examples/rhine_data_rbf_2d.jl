@@ -12,7 +12,8 @@ root_dir = pkgdir(TrixiBottomTopography)
 data = joinpath(root_dir, "examples", "data", "rhine_data_2d_20.txt")
 
 # Define RBF structure
-itp = RBFInterpolation2D(data, ThinPlateSplineKernel{2}())
+kernel = ThinPlateSplineKernel{2}()
+itp = RBFInterpolation2D(data, kernel)
 # Define interpolation function
 itp_func(x, y) = itp([x; y])
 
