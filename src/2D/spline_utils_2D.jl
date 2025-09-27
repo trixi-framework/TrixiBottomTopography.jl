@@ -207,3 +207,19 @@ function calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
 
     return transpose(reshape(z_smth, (n, m)))
 end
+
+function parse_txt_2D(path)
+    file = open(path)
+    lines = readlines(file)
+    close(file)
+
+    n = parse(Int64, lines[2])
+    m = parse(Int64, lines[4])
+
+    x = [parse(Float64, val) for val in lines[6:(5 + n)]]
+    y = [parse(Float64, val) for val in lines[(7 + n):(6 + n + m)]]
+    z_tmp = [parse(Float64, val) for val in lines[(8 + n + m):end]]
+
+    z = transpose(reshape(z_tmp, (n, m)))
+    return x, y, Matrix(z)
+end

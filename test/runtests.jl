@@ -29,4 +29,14 @@ using Test
     @testset "Bicubic B-spline interpolation" begin
         include("test_bicubic_b_spline.jl")
     end
+
+    # 1D RBF interpolation
+    @testset "1D RBF interpolation" begin
+        include("test_rbf_1d.jl")
+    end
+
+    # 2D RBF interpolation
+    @testset "2D RBF interpolation" begin
+        include("test_rbf_2d.jl")
+    end
 end

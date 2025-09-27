@@ -130,20 +130,9 @@ The .txt file has to have the following structure to be interpreted by this func
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/7b1b943eac142d5bc836bb818fe83a5a/raw/74228e349e91fbfe1563479f99943b469f26ac62/Rhine_data_2D_10.txt)
 """
 function BilinearBSpline(path::String)
-    file = open(path)
-    lines = readlines(file)
-    close(file)
+    x, y, z = parse_txt_2D(path)
 
-    n = parse(Int64, lines[2])
-    m = parse(Int64, lines[4])
-
-    x = [parse(Float64, val) for val in lines[6:(5 + n)]]
-    y = [parse(Float64, val) for val in lines[(7 + n):(6 + n + m)]]
-    z_tmp = [parse(Float64, val) for val in lines[(8 + n + m):end]]
-
-    z = transpose(reshape(z_tmp, (n, m)))
-
-    BilinearBSpline(x, y, Matrix(z))
+    BilinearBSpline(x, y, z)
 end
 
 ######################################
@@ -566,20 +555,8 @@ The .txt file has to have the following structure to be interpreted by this func
 
 An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/7b1b943eac142d5bc836bb818fe83a5a/raw/74228e349e91fbfe1563479f99943b469f26ac62/Rhine_data_2D_10.txt)
 """
-function BicubicBSpline(path::String; end_condition = "free", smoothing_factor = 0.0)
-    file = open(path)
-    lines = readlines(file)
-    close(file)
+function BicubicBSpline(path::String; kwargs...)
+    x, y, z = parse_txt_2D(path)
 
-    n = parse(Int64, lines[2])
-    m = parse(Int64, lines[4])
-
-    x = [parse(Float64, val) for val in lines[6:(5 + n)]]
-    y = [parse(Float64, val) for val in lines[(7 + n):(6 + n + m)]]
-    z_tmp = [parse(Float64, val) for val in lines[(8 + n + m):end]]
-
-    z = transpose(reshape(z_tmp, (n, m)))
-
-    BicubicBSpline(x, y, Matrix(z); end_condition = end_condition,
-                   smoothing_factor = smoothing_factor)
+    BicubicBSpline(x, y, z; kwargs...)
 end
