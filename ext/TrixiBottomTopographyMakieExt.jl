@@ -15,7 +15,8 @@ import TrixiBottomTopography: evaluate_two_dimensional_interpolant, plot_topogra
 # From a front end perspective nothing changes; however, if one starts Julia with `--depwarn=yes`
 # a warning would be thrown when one uses the deprecated function name.
 function TrixiBottomTopography.evaluate_bicubicspline_interpolant(spline, x, y)
-    Base.depwarn("evaluate_bicubicspline_interpolant is deprecated. Use evaluate_two_dimensional_interpolant instead.", :evaluate_bicubicspline_interpolant)
+    Base.depwarn("evaluate_bicubicspline_interpolant is deprecated. Use evaluate_two_dimensional_interpolant instead.",
+                 :evaluate_bicubicspline_interpolant)
     return evaluate_two_dimensional_interpolant(spline, x, y)
 end
 
