@@ -116,11 +116,11 @@ y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 
 To fill a matrix `z_int_pts`, which contains the corresponding `z` values
 for `x_int_pts` and `y_int_pts`, we use the helper function
-`evaluate_bicubicspline_interpolant`.
+`evaluate_two_dimensional_interpolant`.
 
 ```@example 2d
 # Get interpolated matrix
-z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
+z_int_pts = evaluate_two_dimensional_interpolant(spline_func, x_int_pts, y_int_pts)
 ```
 
 Plotting the interpolated values gives the representation directly below the
@@ -142,7 +142,7 @@ with the interpolation knots as follows
 # Get the original interpolation knots
 x_knots = spline_struct.x
 y_knots = spline_struct.y
-z_knots = evaluate_bicubicspline_interpolant(spline_func, x_knots, y_knots)
+z_knots = evaluate_two_dimensional_interpolant(spline_func, x_knots, y_knots)
 
 plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
                                          x_knots, y_knots, z_knots;
