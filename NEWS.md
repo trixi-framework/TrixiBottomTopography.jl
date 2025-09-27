@@ -18,6 +18,6 @@ for human readability.
 
 #### Deprecated
 
-- Helper function `evaluate_bicubicspline_interpolant` renamed to be `evaluate_two_dimensional_interpolant`
+- Helper function `evaluate_bicubicspline_interpolant` renamed to be `evaluate_two_dimensional_interpolant` [#75]
 
 #### Removed
