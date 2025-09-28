@@ -89,7 +89,9 @@ rm(joinpath(@__DIR__, "src", "changelog_tmp.md"))
 
 # Make documentation
 makedocs(;
-         modules = [TrixiBottomTopography],
+         modules = [TrixiBottomTopography,
+                    TrixiBottomTopography.MakieExt,
+                    TrixiBottomTopography.KernelInterpolationExt],
          authors = "Andrew R. Winters <andrew.ross.winters@liu.se>, Michael Schlottke-Lakemper <michael@sloede.com>",
          sitename = "TrixiBottomTopography.jl",
          format = Documenter.HTML(;
@@ -110,12 +112,12 @@ makedocs(;
              "Advanced topics & developers" => ["Development" => "development.md",
                  "Style guide" => "styleguide.md",
                  "Testing" => "testing.md"],
+             "Reference" => "reference.md",
              "Changelog" => "changelog.md",
              "Authors" => "authors.md",
              "Contributing" => "contributing.md",
              "Code of Conduct" => "code_of_conduct.md",
-             "License" => "license.md",
-             "Reference" => "reference.md"])
+             "License" => "license.md"])
 
 # Documenter can also automatically deploy documentation to gh-pages.
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
