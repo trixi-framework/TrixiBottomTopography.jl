@@ -9,7 +9,7 @@ for human readability.
 
 #### Added
 
-- Added scattered radial basis function interpolation using [KernelInterpolation.jl](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/changelog/) [#73]
+- Added scattered radial basis function interpolation using [KernelInterpolation.jl](https://github.com/JoshuaLampert/KernelInterpolation.jl) [#73]
 - Implementation of visualization routines `plot_topography` and `plot_topography_with_interpolation_knots`
 
 #### Changed
