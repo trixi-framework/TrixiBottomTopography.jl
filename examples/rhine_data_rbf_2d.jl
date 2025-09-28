@@ -22,7 +22,7 @@ if isdefined(Main, :Makie)
     nodes = nodeset(itp)
     x_knots = sort(unique(nodes[:, 1]))
     y_knots = sort(unique(nodes[:, 2]))
-    z_knots = evaluate_bicubicspline_interpolant(itp_func, x_knots, y_knots)
+    z_knots = evaluate_two_dimensional_interpolant(itp_func, x_knots, y_knots)
 
     # Define interpolation points
     n = 100
@@ -30,7 +30,7 @@ if isdefined(Main, :Makie)
     y_int_pts = Vector(LinRange(y_knots[1], y_knots[end], n))
 
     # Get interpolated matrix
-    z_int_pts = evaluate_bicubicspline_interpolant(itp_func, x_int_pts, y_int_pts)
+    z_int_pts = evaluate_two_dimensional_interpolant(itp_func, x_int_pts, y_int_pts)
 
     plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
                                              x_knots, y_knots, z_knots;
