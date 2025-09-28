@@ -37,7 +37,7 @@ This package contains the following main functionalities:
 - Converting geographical data given in form of `.xyz` files, e.g., from the [DGM data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/) provided by [Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw) to make it readable for TrixiBottomTopography.jl
 - Setting up a B-spline interpolation structure in one and two dimensions which contains all the relevant information to define a B-spline interpolation function with additional specifications
 - Using the B-spline structure to set up a B-spline interpolation function
-- Setting up a radial basis function interpolation based on scattered data leveraging [KernelInterpolation.jl](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/changelog/)
+- Setting up a radial basis function interpolation based on scattered data leveraging [KernelInterpolation.jl](https://github.com/JoshuaLampert/KernelInterpolation.jl)
 
 A detailed description of the functionalities can be found in the [documentation](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/) to this package.
 
