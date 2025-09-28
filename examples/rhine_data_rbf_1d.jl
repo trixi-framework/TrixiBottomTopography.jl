@@ -1,7 +1,7 @@
 ###############################################################################
 # Script which uses the functionalities implemented in TrixiBottomTopography  #
 # to plot a one dimensional RBF interpolated section of the Rhine river with  #
-# data extracted along the y-direction.                                       #
+# data extracted along the x-direction.                                       #
 ###############################################################################
 
 # Include packages
