@@ -24,10 +24,10 @@ Create a 1D radial basis function (RBF) interpolant using [KernelInterpolation.j
 The arguments `args` and keyword arguments `kwargs` are passed to the `interpolate` function of KernelInterpolation.jl.
 See the [KernelInterpolation.jl documentation](https://joshualampert.github.io/KernelInterpolation.jl/stable/) for more details.
 
-The RBF interpolant can be created with [`RBFInterpolation`](@ref) from a set of scattered nodes and corresponding elevation values `z` using
-a `NodeSet` from KernelInterpolation.jl. Alternatively, the same interface as for [`BicubicBSpline`](@ref) and
-[`BilinearBSpline`](@ref) can be used with `RBFInterpolation1D`, i.e., either by providing vectors `x` and `y` of coordinates and a matrix `z`
-of elevation values or by providing a path to a text file containing the data `x`, `y`, and `z`.
+The RBF interpolant can be created with [`RBFInterpolation`](@ref) from a set of scattered nodes and corresponding elevation values `y` using
+a `NodeSet` from KernelInterpolation.jl. Alternatively, the same interface as for [`LinearBSpline`](@ref) and
+[`CubicBSpline`](@ref) can be used with `RBFInterpolation1D`, i.e., either by providing vectors `x` of coordinates and `y`
+of elevation values or by providing a path to a text file containing the data `x` and `y`.
 """
 function TrixiBottomTopography.RBFInterpolation1D(x, y, args...; kwargs...)
     nodeset = NodeSet(vec([[xx] for xx in x]))
@@ -48,8 +48,8 @@ The arguments `args` and keyword arguments `kwargs` are passed to the `interpola
 See the [KernelInterpolation.jl documentation](https://joshualampert.github.io/KernelInterpolation.jl/stable/) for more details.
 
 The RBF interpolant can be created with [`RBFInterpolation`](@ref) from a set of scattered nodes and corresponding elevation values `z` using
-a `NodeSet` from KernelInterpolation.jl. Alternatively, the same interface as for [`BicubicBSpline`](@ref) and
-[`BilinearBSpline`](@ref) can be used with `RBFInterpolation2D`, i.e., either by providing vectors `x` and `y` of coordinates and a matrix `z`
+a `NodeSet` from KernelInterpolation.jl. Alternatively, the same interface as for [`BilinearBSpline`](@ref) and
+[`BicubicBSpline`](@ref) can be used with `RBFInterpolation2D`, i.e., either by providing vectors `x` and `y` of coordinates and a matrix `z`
 of elevation values or by providing a path to a text file containing the data `x`, `y`, and `z`.
 """
 function TrixiBottomTopography.RBFInterpolation2D(x, y, z, args...; kwargs...)
