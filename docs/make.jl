@@ -90,8 +90,8 @@ rm(joinpath(@__DIR__, "src", "changelog_tmp.md"))
 # Make documentation
 makedocs(;
          modules = [TrixiBottomTopography,
-                    TrixiBottomTopography.MakieExt,
-                    TrixiBottomTopography.KernelInterpolationExt],
+             TrixiBottomTopography.MakieExt,
+             TrixiBottomTopography.KernelInterpolationExt],
          authors = "Andrew R. Winters <andrew.ross.winters@liu.se>, Michael Schlottke-Lakemper <michael@sloede.com>",
          sitename = "TrixiBottomTopography.jl",
          format = Documenter.HTML(;
