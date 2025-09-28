@@ -2,6 +2,9 @@ using Documenter
 import Pkg
 using TrixiBottomTopography
 using Changelog: Changelog
+# To load the extensions
+import CairoMakie
+import KernelInterpolation
 
 # Copy list of authors to not need to synchronize it manually.
 # Since the authors header exists twice we create a unique identifier for the docs section.
