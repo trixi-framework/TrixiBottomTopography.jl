@@ -1,27 +1,26 @@
-
 # Examples with real topography data from GeophysicalModelGenerator.jl
 
-This section demonstrates how to use the topography data created with GeophysicalModelGenerator.jl functions (`geo_topo_impression` and `create_topography_data`) in combination with [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl) to simulate shallow water flow over real-world topography.
+This section demonstrates how to use the topography data created with [GeophysicalModelGenerator.jl](https://github.com/JuliaGeodynamics/GeophysicalModelGenerator.jl) functions (`geo_topo_impression` and `create_topography_data`) in combination with [TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl) to simulate shallow water flow over real-world topography.
 
 The workflow follows these steps:
-1. Load the converted topography data files (as shown in `docs/src/create_convert_geo_data.md`).
+1. Load the converted topography data files (as shown in [docs/src/create_convert_geo_data.md](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/create_convert_geo_data/)).
 2. Create B-spline interpolations of the topography.
 3. Set up and run shallow water simulations.
 4. Visualize the results.
 
 The example files used in this section can be found here:
--  1D example:  `examples/trixishallowwater_damn_break_1D_geo_data.jl`
-- 2D example: `examples/trixishallowwater_damn_break_2D_geo_data.jl`
+-  1D example:  [examples/trixishallowwater_damn_break_1D_geo_data.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixishallowwater_damn_break_1D_geo_data.jl)
+- 2D example:  [examples/trixishallowwater_damn_break_2D_geo_data.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixishallowwater_damn_break_2D_geo_data.jl) 
 
 ## One dimensional dam break with real topography
 
-This example demonstrates a 1D dam break simulation using real Rhine River topography data processed through the GeophysicalModelGenerator workflow.
+This example demonstrates a 1D dam break simulation using real Rhine river topography data processed through the [GeophysicalModelGenerator.jl](https://github.com/JuliaGeodynamics/GeophysicalModelGenerator.jl).
 
 ### Setup and data loading
 
 First, we include the necessary packages and load the topography data:
 
-```julia
+```@example geo_trixi_1D
 # Include packages
 using TrixiBottomTopography
 using OrdinaryDiffEqLowStorageRK
@@ -38,14 +37,13 @@ mkpath(data_dir)
 data_file = joinpath(data_dir, "rhine_data_1d_20_x_geo.txt")
 
 data = data_file
-
 ```
 
 ### B-spline interpolation
 
 The topography data is interpolated using cubic B-splines to create a smooth bottom function:
 
-```julia
+```@example geo_trixi_1D
 # Define B-spline structure
 spline_struct = CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 
@@ -56,7 +54,7 @@ spline_func(x) = spline_interpolation(spline_struct, x)
 
 Before running the simulation, we can visualize the interpolated topography:
 
-```julia
+```@example geo_trixi_1D
 # Define interpolation points
 n = 100
 x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
@@ -72,7 +70,7 @@ plot_topography(x_int_pts, y_int_pts; xlabel = "x[m]", ylabel = "z[m]")
 
 We define the 1D shallow water equations with appropriate physical parameters:
 
-```julia
+```@example geo_trixi_1D
 equations = ShallowWaterEquations1D(gravity = 1.0, H0 = 55.0)
 ```
 
@@ -80,7 +78,7 @@ equations = ShallowWaterEquations1D(gravity = 1.0, H0 = 55.0)
 
 The initial condition creates a dam break scenario where water is initially higher in a central region:
 
-```julia
+```@example geo_trixi_1D
 # Defining initial condition for the dam break problem
 function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
     inicenter = SVector(0.0)
@@ -106,7 +104,7 @@ boundary_condition = boundary_condition_slip_wall
 
 Get the DG approximation in space:
 
-```julia
+```@example geo_trixi_1D
 ###############################################################################
 # Get the DG approximation space
 
@@ -119,7 +117,7 @@ solver = DGSEM(polydeg = 3, surface_flux = (flux_hll, flux_nonconservative_fjord
 
 Here we use a TreeMesh:
 
-```julia
+```@example geo_trixi_1D
 ###############################################################################
 # Get the TreeMesh and setup a periodic mesh
 
@@ -139,7 +137,7 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
 
 Finally solving the PDE:
 
-```julia
+```@example geo_trixi_1D
 ###############################################################################
 # ODE solvers
 
@@ -161,7 +159,7 @@ sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
 
 The solution is visualized as an animation showing the evolution of water height over the real topography:
 
-```julia
+```@example geo_trixi_1D
 # Create animation of the solution
 j = Observable(1)
 time = Observable(0.0)
@@ -185,11 +183,11 @@ end
 
 ## Two dimensional dam break with real topography
 
-This example extends the simulation to 2D, using the real Rhine River topography data processed through GeophysicalModelGenerator.
+This example extends the simulation to 2D, using the real Rhine river topography data processed through [GeophysicalModelGenerator.jl](https://github.com/JuliaGeodynamics/GeophysicalModelGenerator.jl).
 
 ### Setup and data loading
 
-```julia
+```@example geo_trixi_2D
 # Include packages
 using TrixiBottomTopography
 using OrdinaryDiffEqLowStorageRK
@@ -207,14 +205,13 @@ mkpath(data_dir)
 data_file = joinpath(data_dir, "rhine_data_2d_20_geo.txt")
 
 data = data_file
-
 ```
 
 ### Bicubic B-spline interpolation
 
 For 2D topography, we use bicubic B-splines:
 
-```julia
+```@example geo_trixi_2D
 # B-spline interpolation of the underlying data
 spline_struct = BicubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 999)
 
@@ -224,7 +221,7 @@ spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
 ### Visualization of 2D topography
 
-```julia
+```@example geo_trixi_2D
 # Define interpolation points
 n = 100
 x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
@@ -244,7 +241,7 @@ plot_topography(x_int_pts, y_int_pts, z_int_pts;
 
 ### 2D shallow water equations
 
-```julia
+```@example geo_trixi_2D
 equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 70.0)
 
 function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
@@ -275,7 +272,7 @@ boundary_condition = Dict(:x_neg => boundary_condition_slip_wall,
 
 ### 2D solver and mesh setup
 
-```julia
+```@example geo_trixi_2D
 ###############################################################################
 # Get the DG approximation space
 
@@ -299,13 +296,15 @@ mesh = P4estMesh((1, 1);
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
                                     boundary_conditions = boundary_condition)
 ```
-**Note on mesh choice**: For this 2D simulation, we use `P4estMesh` instead of a `TreeMesh` (as used in the 1D case) because the `TreeMesh` requires cubic domains which we do not have here.
+
+**Note on mesh choice**: For this 2D simulation, we use [`P4estMesh`](https://trixi-framework.github.io/TrixiDocumentation/stable/meshes/p4est_mesh/) instead of a [`TreeMesh`](https://trixi-framework.github.io/TrixiDocumentation/stable/meshes/tree_mesh/) (as used in the 1D case) because the [`TreeMesh`](https://trixi-framework.github.io/TrixiDocumentation/stable/meshes/tree_mesh/) requires cubic domains which we do not have here.
+
 
 ### Solution with callbacks and output
 
 For the 2D case, we set up callbacks to save the solution for post-processing with ParaView:
 
-```julia
+```@example geo_trixi_2D
 tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
 
@@ -342,9 +341,10 @@ sol = solve(ode, RDPK3SpFSAL49(stage_limiter!), dt = 1.0, adaptive = false,
 
 ### Post-processing for ParaView
 
-The 2D results are converted to VTK format for visualization in ParaView:
+The 2D results are converted via [Trixi2Vtk](https://github.com/trixi-framework/Trixi2Vtk.jl) to VTK format for visualization in ParaView:
 
-```julia
+```
+@example geo_trixi_2D
 # Save mesh and convert to VTK format
 Trixi.save_mesh_file(mesh, output_dir)
 trixi2vtk(joinpath(output_dir, "solution_*.h5"), output_directory = output_dir)

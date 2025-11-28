@@ -6,10 +6,11 @@ solution_*
 *.png
 *.gif
 *.xyz
-!examples/data/geo.xyz
 docs/build
 docs/src/authors.md
 docs/src/changelog.md
 docs/src/code_of_conduct.md
 docs/src/contributing.md
 docs/src/index.md
+
+.vscode/

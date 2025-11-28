@@ -1,11 +1,12 @@
 # Create and convert real topography data
-In this section, it is explained how to get real topography data using GeophysicalModelGenerator.jl and make it accessible to TrixiBottomTopography. The necessary structure of the data for TrixiBottomTopography is explained in the `docs/src/conversion.md` file. In the file `docs/src/trixishallowwater_jl_geo_data_examples`, it is then explained how to properly run simulations with this data. In the following, we will consider the example file `create_convert_data_geo.jl`.
+In this section, it is explained how to get real topography data using [GeophysicalModelGenerator.jl](https://github.com/JuliaGeodynamics/GeophysicalModelGenerator.jl) and make it accessible to [TrixiBottomTopography.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl).
+The necessary structure of the data for [TrixiBottomTopography.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl) is explained in the [docs/src/conversion.md](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/conversion/) file. In the file [docs/src/trixishallowwater_jl_geo_data_examples.md](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/trixishallowwater_jl_geo_data_examples/), it is then explained how to properly run simulations with this data. In the following, we will consider the example file [create_convert_data_geo.jl`](https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/convert_data_geo.jl).
 
 ## Getting an impression of the topography data
 
 To get a first impression of the desired topography, TrixiBottomTopography.jl provides the function `geo_topo_impression`. First, we import our packages to be able to use all the functions.
 
-```julia
+```@example geo_data
 # Include packages
 using GeophysicalModelGenerator
 using TrixiBottomTopography
@@ -14,7 +15,7 @@ using GMT # needs to be installed for the functions geo_topo_impression and crea
 
 Next, we can run `geo_topo_impression` to load and preview the topography data:
 
-```julia
+```@example geo_data
 # Get a first impression of the topography data
 Topo, p, Topo_Cart = geo_topo_impression(
     resolution="@earth_relief_01s", 
@@ -27,7 +28,7 @@ Topo, p, Topo_Cart = geo_topo_impression(
 
 This function requires you to:
 
-- **Define the geographic region**: Specify the longitude and latitude coordinates for your area of interest. The values used here correspond to the example from `docs/src/conversion.md`.
+- **Define the geographic region**: Specify the longitude and latitude coordinates for your area of interest. The values used here correspond to the example from [docs/src/conversion.md](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/conversion/).
 
 - **Choose the data resolution**: Select from the available topography datasets. Higher resolution means more detailed data but larger file sizes.
 
@@ -127,7 +128,7 @@ The function returns three important objects:
 
 Based on the topography data from `geo_topo_impression`, we can now create a structured grid onto which the topography data is then interpolated by using the `create_topography_data` function.
 
-```julia
+```@example geo_data
 
 data_dir = joinpath(@__DIR__, "examples/data")
 mkpath(data_dir)
@@ -170,14 +171,14 @@ For more detailed information about the coordinate projections and transformatio
 
 ## Conversion functions
 
-After creating the structured topography data with `create_topography_data`, we need to convert the `geo.xyz` file into the correct format required by TrixiBottomTopography. The required format is explained in `docs/src/conversion.md`. TrixiBottomTopography provides two specialized functions for this conversion using not only quadratic but also rectangular domains:
+After creating the structured topography data with `create_topography_data`, we need to convert the `geo.xyz` file into the correct format required by TrixiBottomTopography. The required format is explained in [docs/src/conversion.md](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/conversion/). TrixiBottomTopography provides two specialized functions for this conversion using not only quadratic but also rectangular domains:
 
 - `convert_geo_1d`: For one-dimensional interpolation along either x or y direction.
 - `convert_geo_2d`: For two-dimensional interpolation preserving the full grid structure.
 
 ### Converting to 1D format
 
-```julia
+```@example geo_data
 # Define file paths
 path_src_file = joinpath(data_dir, "geo.xyz")
 
@@ -206,9 +207,9 @@ The `convert_geo_1d` function parameters:
 
 ### Converting to 2D format
 
-```julia
+```@example geo_data
 # Convert to 2D format
 convert_geo_2d(path_src_file, path_out_file_2d, nx=nx, ny=ny; excerpt=20)
 ```
 
-The `convert_geo_2d` function preserves the two-dimensional structure while applying the stride parameter to reduce data density.
+The `convert_geo_2d` function preserves the two-dimensional structure while applying the stride parameter to reduce data density, just as the [`convert_dgm_2d`]((https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/conversion/)) function does.

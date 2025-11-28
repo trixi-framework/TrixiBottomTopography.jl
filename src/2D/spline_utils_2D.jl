@@ -168,8 +168,8 @@ function calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
     z_smth = zeros(p, 1)
 
     # Fill K part of matrix L
-    for i = 1:p
-        for j = (i+1):p
+    for i in 1:p
+        for j in (i + 1):p
             p_i = [x_hat[i], y_hat[i]]
             p_j = [x_hat[j], y_hat[j]]
             U = tps_base_func(norm(p_i .- p_j))
@@ -181,13 +181,13 @@ function calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
     # Fill rest of matrix L
     L[1:p, 1:p] = L[1:p, 1:p] + lambda * diagm(ones(p))
 
-    L[1:p, p+1] = ones(p)
-    L[1:p, p+2] = x_hat
-    L[1:p, p+3] = y_hat
+    L[1:p, p + 1] = ones(p)
+    L[1:p, p + 2] = x_hat
+    L[1:p, p + 3] = y_hat
 
-    L[p+1, 1:p] = ones(p)
-    L[p+2, 1:p] = x_hat
-    L[p+3, 1:p] = y_hat
+    L[p + 1, 1:p] = ones(p)
+    L[p + 2, 1:p] = x_hat
+    L[p + 3, 1:p] = y_hat
 
     # Fill part z of rhs
     rhs[1:p, 1] = z_hat
@@ -196,10 +196,10 @@ function calc_tps(lambda::Number, x::Vector, y::Vector, z::Matrix)
     coeff = L \ rhs
 
     # Fill matrix grid with smoothed z values
-    for i = 1:p
-        z_smth[i] = coeff[p+1] + coeff[p+2] * x_hat[i] + coeff[p+3] * y_hat[i]
+    for i in 1:p
+        z_smth[i] = coeff[p + 1] + coeff[p + 2] * x_hat[i] + coeff[p + 3] * y_hat[i]
         p_i = [x_hat[i], y_hat[i]]
-        for k = 1:p
+        for k in 1:p
             p_k = [x_hat[k], y_hat[k]]
             z_smth[i] = z_smth[i] + coeff[k] * tps_base_func(norm(p_i .- p_k))
         end

@@ -31,16 +31,14 @@ y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
 
 # Plot the topography
-plot_topography(
-    x_int_pts,
-    y_int_pts,
-    z_int_pts;
-    xlabel = "x\n [m]",
-    ylabel = "y\n [m]",
-    zlabel = "z\n [m]",
-    azimuth_angle = 54 * pi / 180,
-    elevation_angle = 27 * pi / 180,
-)
+plot_topography(x_int_pts,
+                y_int_pts,
+                z_int_pts;
+                xlabel = "x\n [m]",
+                ylabel = "y\n [m]",
+                zlabel = "z\n [m]",
+                azimuth_angle = 54 * pi / 180,
+                elevation_angle = 27 * pi / 180,)
 
 equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 70.0) # 55, 65
 
@@ -65,44 +63,36 @@ initial_condition = initial_condition_wave
 
 # Setting the boundary to be a free-slip wall for a P4estMesh
 
-boundary_condition = Dict(
-    :x_neg => boundary_condition_slip_wall,
-    :y_neg => boundary_condition_slip_wall,
-    :y_pos => boundary_condition_slip_wall,
-    :x_pos => boundary_condition_slip_wall,
-)
+boundary_condition = Dict(:x_neg => boundary_condition_slip_wall,
+                          :y_neg => boundary_condition_slip_wall,
+                          :y_pos => boundary_condition_slip_wall,
+                          :x_pos => boundary_condition_slip_wall)
 
 ###############################################################################
 # Get the DG approximation space
 
 volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
-solver = DGSEM(
-    polydeg = 3,
-    surface_flux = (flux_fjordholm_etal, flux_nonconservative_fjordholm_etal),
-    volume_integral = VolumeIntegralFluxDifferencing(volume_flux),
-)
+solver = DGSEM(polydeg = 3,
+               surface_flux = (flux_fjordholm_etal, flux_nonconservative_fjordholm_etal),
+               volume_integral = VolumeIntegralFluxDifferencing(volume_flux))
 
 ###############################################################################
 # create the mesh and semidiscretization
 coordinates_min = (spline_struct.x[1], spline_struct.y[1])
 coordinates_max = (spline_struct.x[end], spline_struct.y[end])
 
-mesh_1 = P4estMesh(
-    (1, 1);
-    polydeg = 1,
-    coordinates_min = coordinates_min,
-    coordinates_max = coordinates_max,
-    initial_refinement_level = 6,
-    periodicity = false,
-)
+mesh_1 = P4estMesh((1, 1);
+                   polydeg = 1,
+                   coordinates_min = coordinates_min,
+                   coordinates_max = coordinates_max,
+                   initial_refinement_level = 6,
+                   periodicity = false,)
 
-semi = SemidiscretizationHyperbolic(
-    mesh_1,
-    equations,
-    initial_condition,
-    solver,
-    boundary_conditions = boundary_condition,
-)
+semi = SemidiscretizationHyperbolic(mesh_1,
+                                    equations,
+                                    initial_condition,
+                                    solver,
+                                    boundary_conditions = boundary_condition)
 
 tspan = (0.0, 100.0)
 ode = semidiscretize(semi, tspan)
@@ -121,13 +111,11 @@ mkpath(output_dir)
 
 stepsize_callback = StepsizeCallback(cfl = 0.6)
 
-save_solution = SaveSolutionCallback(
-    interval = 2,
-    save_initial_solution = true,
-    save_final_solution = true,
-    output_directory = output_dir,
-    solution_variables = cons2prim,
-)
+save_solution = SaveSolutionCallback(interval = 2,
+                                     save_initial_solution = true,
+                                     save_final_solution = true,
+                                     output_directory = output_dir,
+                                     solution_variables = cons2prim)
 
 callbacks = CallbackSet(stepsize_callback, save_solution);#amr_callback,
 
@@ -135,13 +123,11 @@ callbacks = CallbackSet(stepsize_callback, save_solution);#amr_callback,
 
 stage_limiter! = PositivityPreservingLimiterShallowWater(variables = (waterheight,)) #stage limiter for the water height
 
-sol = solve(
-    ode,
-    RDPK3SpFSAL49(stage_limiter!),
-    dt = 1.0,
-    adaptive = false,
-    callback = callbacks,
-) # the stepsize_callback will adjust the time step size automatically
+sol = solve(ode,
+            RDPK3SpFSAL49(stage_limiter!),
+            dt = 1.0,
+            adaptive = false,
+            callback = callbacks) # the stepsize_callback will adjust the time step size automatically
 
 # To visualize the solution and bathymetry we post-processing the Trixi.jl output file(s)
 # with the Trixi2Vtk.jl functionality and plot them with ParaView.

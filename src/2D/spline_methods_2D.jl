@@ -55,10 +55,8 @@ function spline_interpolation(b_spline::BilinearBSpline, x::Number, y::Number)
     # in the `BilinearBSpline` constructor
     ny_vec = @SVector [ny, 1]
     my_vec = @SVector [my, 1]
-    Q_temp = @SMatrix [
-        Q[i, j] Q[i+1, j]
-        Q[i, j+1] Q[i+1, j+1]
-    ]
+    Q_temp = @SMatrix [Q[i, j] Q[i + 1, j];
+                       Q[i, j + 1] Q[i + 1, j + 1]]
 
     c = ny_vec' * IP * Q_temp * IP' * my_vec
 
@@ -132,12 +130,10 @@ function spline_interpolation(b_spline::BicubicBSpline, x::Number, y::Number)
     # in the `BicubicBSpline` constructor
     ny_vec = @SVector [ny^3, ny^2, ny, 1]
     my_vec = @SVector [my^3, my^2, my, 1]
-    Q_temp = @SMatrix [
-        Q[i, j] Q[i+1, j] Q[i+2, j] Q[i+3, j]
-        Q[i, j+1] Q[i+1, j+1] Q[i+2, j+1] Q[i+3, j+1]
-        Q[i, j+2] Q[i+1, j+2] Q[i+2, j+2] Q[i+3, j+2]
-        Q[i, j+3] Q[i+1, j+3] Q[i+2, j+3] Q[i+3, j+3]
-    ]
+    Q_temp = @SMatrix [Q[i, j] Q[i + 1, j] Q[i + 2, j] Q[i + 3, j];
+                       Q[i, j + 1] Q[i + 1, j + 1] Q[i + 2, j + 1] Q[i + 3, j + 1];
+                       Q[i, j + 2] Q[i + 1, j + 2] Q[i + 2, j + 2] Q[i + 3, j + 2];
+                       Q[i, j + 3] Q[i + 1, j + 3] Q[i + 2, j + 3] Q[i + 3, j + 3]]
 
     c = (1 / 36) * (ny_vec' * IP * Q_temp * IP' * my_vec)
 

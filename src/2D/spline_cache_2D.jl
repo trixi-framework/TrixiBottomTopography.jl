@@ -19,7 +19,7 @@ These attributes are:
 - `Q`: Matrix which contains the control points
 - `IP`: Coefficients matrix
 """
-mutable struct BilinearBSpline{x_type,y_type,Delta_type,Q_type,IP_type}
+mutable struct BilinearBSpline{x_type, y_type, Delta_type, Q_type, IP_type}
     x::x_type
     y::y_type
     Delta::Delta_type
@@ -97,10 +97,8 @@ function BilinearBSpline(x::Vector, y::Vector, z::Matrix)
     Delta = x[2] - x[1]
 
     P = vcat(reshape(z', (m * n, 1)))
-    IP = @SMatrix [
-        -1 1
-        1 0
-    ]
+    IP = @SMatrix [-1 1;
+                   1 0]
 
     Q = reshape(P, (n, m))
 
@@ -139,9 +137,9 @@ function BilinearBSpline(path::String)
     n = parse(Int64, lines[2])
     m = parse(Int64, lines[4])
 
-    x = [parse(Float64, val) for val in lines[6:(5+n)]]
-    y = [parse(Float64, val) for val in lines[(7+n):(6+n+m)]]
-    z_tmp = [parse(Float64, val) for val in lines[(8+n+m):end]]
+    x = [parse(Float64, val) for val in lines[6:(5 + n)]]
+    y = [parse(Float64, val) for val in lines[(7 + n):(6 + n + m)]]
+    z_tmp = [parse(Float64, val) for val in lines[(8 + n + m):end]]
 
     z = transpose(reshape(z_tmp, (n, m)))
 
@@ -168,7 +166,7 @@ These attributes are:
 - `Q`: Matrix which contains the control points
 - `IP`: Coefficients matrix
 """
-mutable struct BicubicBSpline{x_type,y_type,Delta_type,Q_type,IP_type}
+mutable struct BicubicBSpline{x_type, y_type, Delta_type, Q_type, IP_type}
     x::x_type
     y::y_type
     Delta::Delta_type
@@ -281,13 +279,8 @@ A reference for the calculations in this script can be found in Chapter 2 of
   Cubic and bicubic spline interpolation in Python.
   [hal-03017566v2](https://hal.archives-ouvertes.fr/hal-03017566v2)
 """
-function BicubicBSpline(
-    x::Vector,
-    y::Vector,
-    z::Matrix;
-    end_condition = "free",
-    smoothing_factor = 0.0,
-)
+function BicubicBSpline(x::Vector, y::Vector, z::Matrix; end_condition = "free",
+                        smoothing_factor = 0.0)
     n = length(x)
     m = length(y)
 
@@ -307,28 +300,26 @@ function BicubicBSpline(
     inner_elmts = m * n
     P = vcat(reshape(z', (inner_elmts, 1)), zeros(boundary_elmts))
 
-    IP = @SMatrix [
-        -1 3 -3 1
-        3 -6 3 0
-        -3 0 3 0
-        1 4 1 0
-    ]
+    IP = @SMatrix [-1 3 -3 1;
+                   3 -6 3 0;
+                   -3 0 3 0;
+                   1 4 1 0]
 
     # Mapping matrix Phi
     Phi = spzeros((m + 2) * (n + 2), (m + 2) * (n + 2))
 
     # Fill inner control point matrix
     idx = 0
-    for i = 1:inner_elmts
-        Phi[i, idx+1] = 1
-        Phi[i, idx+2] = 4
-        Phi[i, idx+3] = 1
-        Phi[i, idx+(n+2)+1] = 4
-        Phi[i, idx+(n+2)+2] = 16
-        Phi[i, idx+(n+2)+3] = 4
-        Phi[i, idx+2*(n+2)+1] = 1
-        Phi[i, idx+2*(n+2)+2] = 4
-        Phi[i, idx+2*(n+2)+3] = 1
+    for i in 1:inner_elmts
+        Phi[i, idx + 1] = 1
+        Phi[i, idx + 2] = 4
+        Phi[i, idx + 3] = 1
+        Phi[i, idx + (n + 2) + 1] = 4
+        Phi[i, idx + (n + 2) + 2] = 16
+        Phi[i, idx + (n + 2) + 3] = 4
+        Phi[i, idx + 2 * (n + 2) + 1] = 1
+        Phi[i, idx + 2 * (n + 2) + 2] = 4
+        Phi[i, idx + 2 * (n + 2) + 3] = 1
 
         if (i % n) == 0
             idx += 3
@@ -349,37 +340,37 @@ function BicubicBSpline(
 
         # Q_{j,1} - 2Q_{j,2} + Q_{j,3} = 0
         idx = 0
-        for i = (inner_elmts+1):(inner_elmts+m)
-            Phi[i, idx+(n+2)+1] = 1
-            Phi[i, idx+(n+2)+2] = -2
-            Phi[i, idx+(n+2)+3] = 1
+        for i in (inner_elmts + 1):(inner_elmts + m)
+            Phi[i, idx + (n + 2) + 1] = 1
+            Phi[i, idx + (n + 2) + 2] = -2
+            Phi[i, idx + (n + 2) + 3] = 1
             idx += (n + 2)
         end
 
         # Q_{j,n} - 2Q_{j,n+1} + Q_{j,n+2} = 0
         idx = 0
-        for i = (inner_elmts+(m+1)):(inner_elmts+(2*m))
-            Phi[i, idx+(n+2)+(n)] = 1
-            Phi[i, idx+(n+2)+(n+1)] = -2
-            Phi[i, idx+(n+2)+(n+2)] = 1
+        for i in (inner_elmts + (m + 1)):(inner_elmts + (2 * m))
+            Phi[i, idx + (n + 2) + (n)] = 1
+            Phi[i, idx + (n + 2) + (n + 1)] = -2
+            Phi[i, idx + (n + 2) + (n + 2)] = 1
             idx += (n + 2)
         end
 
         # Q_{1,i} - 2Q_{2,i} + Q_{3,i} = 0
         idx = 0
-        for i = (inner_elmts+(2*m)+1):(inner_elmts+(2*m)+n)
-            Phi[i, idx+2] = 1
-            Phi[i, idx+(n+2)+2] = -2
-            Phi[i, idx+2*(n+2)+2] = 1
+        for i in (inner_elmts + (2 * m) + 1):(inner_elmts + (2 * m) + n)
+            Phi[i, idx + 2] = 1
+            Phi[i, idx + (n + 2) + 2] = -2
+            Phi[i, idx + 2 * (n + 2) + 2] = 1
             idx += 1
         end
 
         # Q_{m,i} - 2Q_{m+1,i} + Q_{m+2,i} = 0
         idx = (m - 1) * (n + 2)
-        for i = (inner_elmts+(2*m)+(n+1)):(inner_elmts+(2*m)+(2*n))
-            Phi[i, idx+2] = 1
-            Phi[i, idx+(n+2)+2] = -2
-            Phi[i, idx+2*(n+2)+2] = 1
+        for i in (inner_elmts + (2 * m) + (n + 1)):(inner_elmts + (2 * m) + (2 * n))
+            Phi[i, idx + 2] = 1
+            Phi[i, idx + (n + 2) + 2] = -2
+            Phi[i, idx + 2 * (n + 2) + 2] = 1
             idx += 1
         end
 
@@ -387,23 +378,23 @@ function BicubicBSpline(
 
         # Q_{1,1} - 2Q_{2,2} + Q_{3,3} = 0
         Phi[(i), 1] = 1
-        Phi[(i), (n+2)+2] = -2
-        Phi[(i), (2)*(n+2)+3] = 1
+        Phi[(i), (n + 2) + 2] = -2
+        Phi[(i), (2) * (n + 2) + 3] = 1
 
         # Q_{m+2,1} - 2Q_{m+1,2} + Q_{m,3} = 0
-        Phi[(i+1), (n+2)] = 1
-        Phi[(i+1), (2)*(n+2)-1] = -2
-        Phi[(i+1), (3)*(n+2)-2] = 1
+        Phi[(i + 1), (n + 2)] = 1
+        Phi[(i + 1), (2) * (n + 2) - 1] = -2
+        Phi[(i + 1), (3) * (n + 2) - 2] = 1
 
         # Q_{1,n+2} - 2Q_{2,n+1} + Q_{3,n} = 0
-        Phi[(i+2), (m-1)*(n+2)+3] = 1
-        Phi[(i+2), (m)*(n+2)+2] = -2
-        Phi[(i+2), (m+1)*(n+2)+1] = 1
+        Phi[(i + 2), (m - 1) * (n + 2) + 3] = 1
+        Phi[(i + 2), (m) * (n + 2) + 2] = -2
+        Phi[(i + 2), (m + 1) * (n + 2) + 1] = 1
 
         # Q_{m,n} - 2Q_{m+1,n+1} + Q_{m+2,n+2} = 0
-        Phi[(i+3), (m)*(n+2)-2] = 1
-        Phi[(i+3), (m+1)*(n+2)-1] = -2
-        Phi[(i+3), (m+2)*(n+2)] = 1
+        Phi[(i + 3), (m) * (n + 2) - 2] = 1
+        Phi[(i + 3), (m + 1) * (n + 2) - 1] = -2
+        Phi[(i + 3), (m + 2) * (n + 2)] = 1
 
         # For the sparse matrix `Phi` using the built-in `qr` function
         # is more numerically stable than the standard `LDLt` procedure
@@ -425,85 +416,85 @@ function BicubicBSpline(
 
         # Continuity of the third `x` derivative between the leftmost and second leftmost patch
         idx = 0
-        for i = (inner_elmts+1):(inner_elmts+m)
-            Phi[i, idx+1] = -1
-            Phi[i, idx+2] = 4
-            Phi[i, idx+3] = -6
-            Phi[i, idx+4] = 4
-            Phi[i, idx+5] = -1
-            Phi[i, idx+(n+2)+1] = -4
-            Phi[i, idx+(n+2)+2] = 16
-            Phi[i, idx+(n+2)+3] = -24
-            Phi[i, idx+(n+2)+4] = 16
-            Phi[i, idx+(n+2)+5] = -4
-            Phi[i, idx+2*(n+2)+1] = -1
-            Phi[i, idx+2*(n+2)+2] = 4
-            Phi[i, idx+2*(n+2)+3] = -6
-            Phi[i, idx+2*(n+2)+4] = 4
-            Phi[i, idx+2*(n+2)+5] = -1
+        for i in (inner_elmts + 1):(inner_elmts + m)
+            Phi[i, idx + 1] = -1
+            Phi[i, idx + 2] = 4
+            Phi[i, idx + 3] = -6
+            Phi[i, idx + 4] = 4
+            Phi[i, idx + 5] = -1
+            Phi[i, idx + (n + 2) + 1] = -4
+            Phi[i, idx + (n + 2) + 2] = 16
+            Phi[i, idx + (n + 2) + 3] = -24
+            Phi[i, idx + (n + 2) + 4] = 16
+            Phi[i, idx + (n + 2) + 5] = -4
+            Phi[i, idx + 2 * (n + 2) + 1] = -1
+            Phi[i, idx + 2 * (n + 2) + 2] = 4
+            Phi[i, idx + 2 * (n + 2) + 3] = -6
+            Phi[i, idx + 2 * (n + 2) + 4] = 4
+            Phi[i, idx + 2 * (n + 2) + 5] = -1
             idx += (n + 2)
         end
 
         # Continuity of the third `x` derivative between the rightmost and second rightmost patch
         idx = (n + 2) + 1
-        for i = (inner_elmts+(m+1)):(inner_elmts+(2*m))
-            Phi[i, idx-5] = -1
-            Phi[i, idx-4] = 4
-            Phi[i, idx-3] = -6
-            Phi[i, idx-2] = 4
-            Phi[i, idx-1] = -1
-            Phi[i, idx+(n+2)-5] = -4
-            Phi[i, idx+(n+2)-4] = 16
-            Phi[i, idx+(n+2)-3] = -24
-            Phi[i, idx+(n+2)-2] = 16
-            Phi[i, idx+(n+2)-1] = -4
-            Phi[i, idx+2*(n+2)-5] = -1
-            Phi[i, idx+2*(n+2)-4] = 4
-            Phi[i, idx+2*(n+2)-3] = -6
-            Phi[i, idx+2*(n+2)-2] = 4
-            Phi[i, idx+2*(n+2)-1] = -1
+        for i in (inner_elmts + (m + 1)):(inner_elmts + (2 * m))
+            Phi[i, idx - 5] = -1
+            Phi[i, idx - 4] = 4
+            Phi[i, idx - 3] = -6
+            Phi[i, idx - 2] = 4
+            Phi[i, idx - 1] = -1
+            Phi[i, idx + (n + 2) - 5] = -4
+            Phi[i, idx + (n + 2) - 4] = 16
+            Phi[i, idx + (n + 2) - 3] = -24
+            Phi[i, idx + (n + 2) - 2] = 16
+            Phi[i, idx + (n + 2) - 1] = -4
+            Phi[i, idx + 2 * (n + 2) - 5] = -1
+            Phi[i, idx + 2 * (n + 2) - 4] = 4
+            Phi[i, idx + 2 * (n + 2) - 3] = -6
+            Phi[i, idx + 2 * (n + 2) - 2] = 4
+            Phi[i, idx + 2 * (n + 2) - 1] = -1
             idx += (n + 2)
         end
 
         # Continuity of the third `y` derivative between the patch at the top and the patch below
         idx = 0
-        for i = (inner_elmts+(2*m)+1):(inner_elmts+(2*m)+n)
-            Phi[i, idx+1] = -1
-            Phi[i, idx+2] = -4
-            Phi[i, idx+3] = -1
-            Phi[i, idx+(n+2)+1] = 4
-            Phi[i, idx+(n+2)+2] = 16
-            Phi[i, idx+(n+2)+3] = 4
-            Phi[i, idx+2*(n+2)+1] = -6
-            Phi[i, idx+2*(n+2)+2] = -24
-            Phi[i, idx+2*(n+2)+3] = -6
-            Phi[i, idx+3*(n+2)+1] = 4
-            Phi[i, idx+3*(n+2)+2] = 16
-            Phi[i, idx+3*(n+2)+3] = 4
-            Phi[i, idx+4*(n+2)+1] = -1
-            Phi[i, idx+4*(n+2)+2] = -4
-            Phi[i, idx+4*(n+2)+3] = -1
+        for i in (inner_elmts + (2 * m) + 1):(inner_elmts + (2 * m) + n)
+            Phi[i, idx + 1] = -1
+            Phi[i, idx + 2] = -4
+            Phi[i, idx + 3] = -1
+            Phi[i, idx + (n + 2) + 1] = 4
+            Phi[i, idx + (n + 2) + 2] = 16
+            Phi[i, idx + (n + 2) + 3] = 4
+            Phi[i, idx + 2 * (n + 2) + 1] = -6
+            Phi[i, idx + 2 * (n + 2) + 2] = -24
+            Phi[i, idx + 2 * (n + 2) + 3] = -6
+            Phi[i, idx + 3 * (n + 2) + 1] = 4
+            Phi[i, idx + 3 * (n + 2) + 2] = 16
+            Phi[i, idx + 3 * (n + 2) + 3] = 4
+            Phi[i, idx + 4 * (n + 2) + 1] = -1
+            Phi[i, idx + 4 * (n + 2) + 2] = -4
+            Phi[i, idx + 4 * (n + 2) + 3] = -1
             idx += 1
         end
 
         # Continuity of the third `y` derivative between the patch at the bottom and the patch above
         idx = (m - 3) * (n + 2)
-        for i = (inner_elmts+(2*m)+(n+1)):(inner_elmts+(2*m)+(2*n))
-            Phi[i, idx+1] = -1
-            Phi[i, idx+2] = -4
-            Phi[i, idx+3] = -1
-            Phi[i, idx+(n+2)+1] = 4
-            Phi[i, idx+(n+2)+2] = 16
-            Phi[i, idx+(n+2)+3] = 4
-            Phi[i, idx+2*(n+2)+1] = -6
-            Phi[i, idx+2*(n+2)+2] = -24
-            Phi[i, idx+2*(n+2)+3] = -6
-            Phi[i, idx+3*(n+2)+1] = 4
-            Phi[i, idx+3*(n+2)+2] = 16
-            Phi[i, idx+3*(n+2)+3] = 4
-            Phi[i, idx+4*(n+2)+1] = -1
-            Phi[i, idx+4*(n+2)+2] = -4
-            Phi[i, idx+4*(n+2)+3] = -1
+        for i in (inner_elmts + (2 * m) + (n + 1)):(inner_elmts + (2 * m) + (2 * n))
+            Phi[i, idx + 1] = -1
+            Phi[i, idx + 2] = -4
+            Phi[i, idx + 3] = -1
+            Phi[i, idx + (n + 2) + 1] = 4
+            Phi[i, idx + (n + 2) + 2] = 16
+            Phi[i, idx + (n + 2) + 3] = 4
+            Phi[i, idx + 2 * (n + 2) + 1] = -6
+            Phi[i, idx + 2 * (n + 2) + 2] = -24
+            Phi[i, idx + 2 * (n + 2) + 3] = -6
+            Phi[i, idx + 3 * (n + 2) + 1] = 4
+            Phi[i, idx + 3 * (n + 2) + 2] = 16
+            Phi[i, idx + 3 * (n + 2) + 3] = 4
+            Phi[i, idx + 4 * (n + 2) + 1] = -1
+            Phi[i, idx + 4 * (n + 2) + 2] = -4
+            Phi[i, idx + 4 * (n + 2) + 3] = -1
             idx += 1
         end
 
@@ -512,26 +503,26 @@ function BicubicBSpline(
         # Q_{1,1} - Q_{1,2} - Q_{2,1} + Q_{2,2} = 0
         Phi[(i), 1] = 1
         Phi[(i), 2] = -1
-        Phi[(i), (n+2)+1] = -1
-        Phi[(i), (n+2)+2] = 1
+        Phi[(i), (n + 2) + 1] = -1
+        Phi[(i), (n + 2) + 2] = 1
 
         # Q_{m-1,1} + Q_{m,1} + Q_{m-1,2} - Q_{m,2} = 0
-        Phi[(i+1), (n+2)-1] = -1
-        Phi[(i+1), (n+2)] = 1
-        Phi[(i+1), 2*(n+2)-1] = 1
-        Phi[(i+1), 2*(n+2)] = -1
+        Phi[(i + 1), (n + 2) - 1] = -1
+        Phi[(i + 1), (n + 2)] = 1
+        Phi[(i + 1), 2 * (n + 2) - 1] = 1
+        Phi[(i + 1), 2 * (n + 2)] = -1
 
         # Q_{1,n-1} + Q_{2,n} + Q_{1,n-1} - Q_{2,n} = 0
-        Phi[(i+2), (m)*(n+2)+1] = -1
-        Phi[(i+2), (m)*(n+2)+2] = 1
-        Phi[(i+2), (m+1)*(n+2)+1] = 1
-        Phi[(i+2), (m+1)*(n+2)+2] = -1
+        Phi[(i + 2), (m) * (n + 2) + 1] = -1
+        Phi[(i + 2), (m) * (n + 2) + 2] = 1
+        Phi[(i + 2), (m + 1) * (n + 2) + 1] = 1
+        Phi[(i + 2), (m + 1) * (n + 2) + 2] = -1
 
         # Q_{m-1,n-1} - Q_{m,n-1} - Q_{m-1,n} + Q_{m,n} = 0
-        Phi[(i+3), (m+1)*(n+2)-1] = 1
-        Phi[(i+3), (m+1)*(n+2)] = -1
-        Phi[(i+3), (m+2)*(n+2)-1] = -1
-        Phi[(i+3), (m+2)*(n+2)] = 1
+        Phi[(i + 3), (m + 1) * (n + 2) - 1] = 1
+        Phi[(i + 3), (m + 1) * (n + 2)] = -1
+        Phi[(i + 3), (m + 2) * (n + 2) - 1] = -1
+        Phi[(i + 3), (m + 2) * (n + 2)] = 1
 
         # For the sparse matrix `Phi` using the built-in `qr` function
         # is more numerically stable than the standard `LDLt` procedure
@@ -583,17 +574,12 @@ function BicubicBSpline(path::String; end_condition = "free", smoothing_factor =
     n = parse(Int64, lines[2])
     m = parse(Int64, lines[4])
 
-    x = [parse(Float64, val) for val in lines[6:(5+n)]]
-    y = [parse(Float64, val) for val in lines[(7+n):(6+n+m)]]
-    z_tmp = [parse(Float64, val) for val in lines[(8+n+m):end]]
+    x = [parse(Float64, val) for val in lines[6:(5 + n)]]
+    y = [parse(Float64, val) for val in lines[(7 + n):(6 + n + m)]]
+    z_tmp = [parse(Float64, val) for val in lines[(8 + n + m):end]]
 
     z = transpose(reshape(z_tmp, (n, m)))
 
-    BicubicBSpline(
-        x,
-        y,
-        Matrix(z);
-        end_condition = end_condition,
-        smoothing_factor = smoothing_factor,
-    )
+    BicubicBSpline(x, y, Matrix(z); end_condition = end_condition,
+                   smoothing_factor = smoothing_factor)
 end

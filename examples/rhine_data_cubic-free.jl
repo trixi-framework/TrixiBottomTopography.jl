@@ -25,10 +25,7 @@ if isdefined(Main, :Makie)
     # Get interpolated values
     y_int_pts = spline_func.(x_int_pts)
 
-    plot_topography(
-        x_int_pts,
-        y_int_pts;
-        xlabel = "ETRS89 East",
-        ylabel = "DHHN2016 Height",
-    )
+    plot_topography(x_int_pts, y_int_pts;
+                    xlabel = "ETRS89 East",
+                    ylabel = "DHHN2016 Height")
 end

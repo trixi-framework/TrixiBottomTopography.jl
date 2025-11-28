@@ -2,11 +2,8 @@
 
 using Pkg
 Pkg.activate(; temp = true, io = devnull)
-Pkg.add(
-    PackageSpec(name = "JuliaFormatter", version = "1.0.60");
-    preserve = PRESERVE_ALL,
-    io = devnull,
-)
+Pkg.add(PackageSpec(name = "JuliaFormatter", version = "1.0.60"); preserve = PRESERVE_ALL,
+        io = devnull)
 
 using JuliaFormatter: format_file
 
@@ -17,9 +14,7 @@ function main()
         println()
         println("positional arguments:")
         println()
-        println(
-            "    PATH        One or more paths (directories or files) to format. Default: '.'",
-        )
+        println("    PATH        One or more paths (directories or files) to format. Default: '.'")
         return nothing
     end
 

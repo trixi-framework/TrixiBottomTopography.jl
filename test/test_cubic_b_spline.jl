@@ -59,8 +59,8 @@ end
     data = joinpath(root_dir, "test", "data", "rhine_1d_10_y_100.txt")
 
     # Define B-spline structure
-    spline_struct =
-        CubicBSpline(data; end_condition = "not-a-knot", smoothing_factor = 9999)
+    spline_struct = CubicBSpline(data; end_condition = "not-a-knot",
+                                 smoothing_factor = 9999)
     # Define B-spline interpolation function
     spline_func(x) = spline_interpolation(spline_struct, x)
 

@@ -79,11 +79,11 @@ function spline_smoothing(lambda::Number, Delta::Number, y::Vector)
     Delta_2_iip2 = 1 ./ Delta_vec
 
     Delta_2 = zeros(n - 2, n)
-    Delta_2[:, 1:(n-2)] = diagm(Delta_2_ii)
-    Delta_2[:, 2:(n-1)] += diagm(Delta_2_iip1)
+    Delta_2[:, 1:(n - 2)] = diagm(Delta_2_ii)
+    Delta_2[:, 2:(n - 1)] += diagm(Delta_2_iip1)
     Delta_2[:, 3:n] += diagm(Delta_2_iip2)
 
-    W_im1i = Delta_vec[1:(end-1)] ./ 6
+    W_im1i = Delta_vec[1:(end - 1)] ./ 6
     W_ii = (2 * Delta_vec) ./ 3
     W = SymTridiagonal(W_ii, W_im1i)
 

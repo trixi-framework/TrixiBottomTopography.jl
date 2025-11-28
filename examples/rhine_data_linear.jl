@@ -29,13 +29,8 @@ if isdefined(Main, :Makie)
     x_knots = spline_struct.x
     y_knots = spline_func.(x_knots)
 
-    plot_topography_with_interpolation_knots(
-        x_int_pts,
-        y_int_pts,
-        x_knots,
-        y_knots;
-        xlabel = "ETRS89 East",
-        ylabel = "DHHN2016 Height",
-        legend_position = :rb,
-    )
+    plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
+                                             xlabel = "ETRS89 East",
+                                             ylabel = "DHHN2016 Height",
+                                             legend_position = :rb)
 end
