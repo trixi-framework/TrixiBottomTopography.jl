@@ -1,5 +1,5 @@
 # Package extension for adding Makie-based features to TrixiBottomTopography.jl
-module TrixiBottomTopographyMakieExt
+module MakieExt
 
 # Required for visualization code
 using Makie: Makie
@@ -8,17 +8,26 @@ using Makie: Makie
 using TrixiBottomTopography
 
 # Import functions such that they can be extended with new methods
-import TrixiBottomTopography: evaluate_bicubicspline_interpolant, plot_topography,
+import TrixiBottomTopography: evaluate_two_dimensional_interpolant, plot_topography,
                               plot_topography_with_interpolation_knots
 
+# To keep functionality we allow for the old function name `evaluate_bicubicspline_interpolant` to be used.
+# From a front end perspective nothing changes; however, if one starts Julia with `--depwarn=yes`
+# a warning would be thrown when one uses the deprecated function name.
+function TrixiBottomTopography.evaluate_bicubicspline_interpolant(spline, x, y)
+    Base.depwarn("evaluate_bicubicspline_interpolant is deprecated. Use evaluate_two_dimensional_interpolant instead.",
+                 :evaluate_bicubicspline_interpolant)
+    return evaluate_two_dimensional_interpolant(spline, x, y)
+end
+
 """
-    evaluate_bicubicspline_interpolant(spline, x, y)
+    evaluate_two_dimensional_interpolant(spline, x, y)
 
 Helper function to sample the bicubic spline function `spline`
 at the interpolation nodes `x` (with size `n`) and `y` (with size `m`)
 and return the values in an array `z` of size `m` by `n`.
 """
-function evaluate_bicubicspline_interpolant(spline, x, y)
+function evaluate_two_dimensional_interpolant(spline, x, y)
 
     # Get dimensions for solution matrix
     n = length(x)

@@ -24,7 +24,7 @@ if isdefined(Main, :Makie)
     y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))
 
     # Get interpolated matrix
-    z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)
+    z_int_pts = evaluate_two_dimensional_interpolant(spline_func, x_int_pts, y_int_pts)
 
     plot_topography(x_int_pts, y_int_pts, z_int_pts;
                     xlabel = "ETRS89\n East",

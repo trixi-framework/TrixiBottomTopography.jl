@@ -1,7 +1,7 @@
 name = "TrixiBottomTopography"
 uuid = "86af9953-43df-404b-8eaa-d20d82623a82"
 authors = ["maxbertrand1996 <maxbertrand1996@googlemail.com>", "Andrew R. Winters <andrew.ross.winters@liu.se>"]
-version = "0.1.4-DEV"
+version = "0.1.5-DEV"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
@@ -13,19 +13,22 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [weakdeps]
+KernelInterpolation = "95686e15-3c94-4443-8f08-76d06d509f7b"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 
 [extensions]
 TrixiBottomTopographyGeophysicalModelGeneratorExt = "GeophysicalModelGenerator"
-TrixiBottomTopographyMakieExt = "Makie"
+KernelInterpolationExt = "KernelInterpolation"
+MakieExt = "Makie"
 
 [compat]
 DataFrames = "1.5"
 Downloads = "1.6"
+KernelInterpolation = "0.3.5"
 GMT = "1.0"
 GeophysicalModelGenerator = "0.7.14"
 LinearAlgebra = "1"
-Makie = "0.21, 0.22"
+Makie = "0.21, 0.22, 0.24"
 SparseArrays = "1"
 StaticArrays = "1.9"
 julia = "1.10"
