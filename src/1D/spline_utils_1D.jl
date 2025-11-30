@@ -90,9 +90,6 @@ function spline_smoothing(lambda::Number, Delta::Number, y::Vector)
     K = transpose(Delta_2) * inv(W) * Delta_2
 
     return inv(diagm(ones(n)) + lambda * K) * y
-<<<<<<< HEAD
-end
-=======
 end
 
 function parse_txt_1D(path)
@@ -106,4 +103,3 @@ function parse_txt_1D(path)
 
     return x, y
 end
->>>>>>> upstream/main

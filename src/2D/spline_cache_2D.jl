@@ -558,20 +558,5 @@ An example can be found [here](https://gist.githubusercontent.com/maxbertrand199
 function BicubicBSpline(path::String; kwargs...)
     x, y, z = parse_txt_2D(path)
 
-<<<<<<< HEAD
-    n = parse(Int64, lines[2])
-    m = parse(Int64, lines[4])
-
-    x = [parse(Float64, val) for val in lines[6:(5 + n)]]
-    y = [parse(Float64, val) for val in lines[(7 + n):(6 + n + m)]]
-    z_tmp = [parse(Float64, val) for val in lines[(8 + n + m):end]]
-
-    z = transpose(reshape(z_tmp, (n, m)))
-
-    BicubicBSpline(x, y, Matrix(z); end_condition = end_condition,
-                   smoothing_factor = smoothing_factor)
-end
-=======
     BicubicBSpline(x, y, z; kwargs...)
 end
->>>>>>> upstream/main
