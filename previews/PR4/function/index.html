@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>B-spline function · TrixiBottomTopography.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/function/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">TrixiBottomTopography.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><span class="tocitem">Overview</span><ul><li><a class="tocitem" href="../conversion/">Data Conversion</a></li><li><a class="tocitem" href="../structure/">B-spline structure</a></li><li class="is-active"><a class="tocitem" href>B-spline function</a><ul class="internal"><li><a class="tocitem" href="#One-dimensional-case"><span>One dimensional case</span></a></li><li><a class="tocitem" href="#Two-dimensional-case"><span>Two dimensional case</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../reference/">Reference</a></li><li><a class="tocitem" href="../licence/">Licence</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Overview</a></li><li class="is-active"><a href>B-spline function</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>B-spline function</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/docs/src/function.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="B-spline-interpolation-function"><a class="docs-heading-anchor" href="#B-spline-interpolation-function">B-spline interpolation function</a><a id="B-spline-interpolation-function-1"></a><a class="docs-heading-anchor-permalink" href="#B-spline-interpolation-function" title="Permalink"></a></h1><p>If the the B-spline structure is defined, it can be used to define the B-spline interpolation function. In this chapter, we are goin to continue with the examples in the previous chapter for the one and two dimensional case.</p><h2 id="One-dimensional-case"><a class="docs-heading-anchor" href="#One-dimensional-case">One dimensional case</a><a id="One-dimensional-case-1"></a><a class="docs-heading-anchor-permalink" href="#One-dimensional-case" title="Permalink"></a></h2><p>In the previous chapter we started looking at the example file <a href="https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/9f6c7e967a3b094dbfa43688d25a8998fce40014/examples/rhine_data_cubic-nak.jl">rhine_data_cubic-nak.jl</a> from the <a href="https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/9f6c7e967a3b094dbfa43688d25a8998fce40014/examples">examples folder</a> where we already defined the B-spline structure for the cubic B-spline interpolation with not-a-knot end condition and smoothing.</p><pre><code class="language-julia hljs"># Include packages
+using TrixiBottomTopography
+using Plots
+
+# Get root directory
+dir_path = pkgdir(TrixiBottomTopography)
+
+# Define data path
+data = string(dir_path, &quot;/examples/data/rhine_data_1d_20_x.txt&quot;)
+
+# Define B-spline structure
+spline_struct = CubicBSpline(data; end_condition = &quot;not-a-knot&quot;, smoothing_factor = 999)</code></pre><p>To define the B-spline interpolation function with respect to a variable <code>x</code>, we use the <code>spline_interpolation</code> function which for the one dimensional case which is implemented as <a href="https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{LinearBSpline,%20Any}"><code>spline_interpolation(linear_struct, x)</code></a> and <a href="https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{CubicBSpline,%20Any}"><code>spline_interpolation(cubic_struct, x)</code></a>.</p><pre><code class="language-julia hljs"># Define B-spline interpolation function
+spline_func(x) = spline_interpolation(spline_struct, x)</code></pre><p>This defines the cubic B-spline interpolation function with not-a-knot end condition and smoothing with respect to variable <code>x</code>. If we want to visualize the interpolation function with 100 interpolation points, we define:</p><pre><code class="language-julia hljs"># Define interpolation points
+n = 100
+x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))</code></pre><p>and receive the corresponding <code>y</code> values by:</p><pre><code class="language-julia hljs"># Get interpolated values
+y_int_pts = spline_func.(x_int_pts)</code></pre><p>Plotting the interpolated points, using </p><pre><code class="language-julia hljs"># Plotting
+pyplot()
+plot(x_int_pts, y_int_pts,
+     xlabel=&quot;ETRS89 East&quot;, ylabel=&quot;DHHN2016 Height&quot;,
+     label=&quot;Bottom topography&quot;, 
+     title=&quot;Cubic B-spline interpolation with not-a-knot end condition and smoothing&quot;)</code></pre><p>gives the following representation:</p><p><img src="https://raw.githubusercontent.com/maxbertrand1996/TrixiBottomTopography.jl/main/assets/images/Cubic_nak_smth.png" alt="image"/></p><h2 id="Two-dimensional-case"><a class="docs-heading-anchor" href="#Two-dimensional-case">Two dimensional case</a><a id="Two-dimensional-case-1"></a><a class="docs-heading-anchor-permalink" href="#Two-dimensional-case" title="Permalink"></a></h2><p>In the previous chapter we started looking at the example file <a href="https://github.com/maxbertrand1996/TrixiBottomTopography.jl/blob/main/examples/rhine_data_bicubic-nak.jl">rhine_data_bicubic-nak.jl</a> from the <a href="https://github.com/maxbertrand1996/TrixiBottomTopography.jl/tree/9f6c7e967a3b094dbfa43688d25a8998fce40014/examples">examples folder</a> where we already defined the B-spline structure for the bicubic B-spline interpolation with not-a-knot end condition and smoothing.</p><pre><code class="language-julia hljs"># Include packages
+using TrixiBottomTopography
+using Plots
+
+# Get root directory
+dir_path = pkgdir(TrixiBottomTopography)
+
+# Define data path
+data = string(dir_path, &quot;/examples/data/rhine_data_2d_20.txt&quot;)
+
+# Define B-spline structure
+spline_struct = BicubicBSpline(data; end_condition = &quot;not-a-knot&quot;, smoothing_factor = 9999)</code></pre><p>To define the B-spline interpolation function with respect to a variables <code>x</code> and <code>y</code>, we use the <code>spline_interpolation</code> function which for the two dimensional case which is implemented as <a href="https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{BilinearBSpline,%20Any,%20Any}"><code>spline_interpolation(bilinear_struct, x, y)</code></a> and <a href="https://maxbertrand1996.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{BicubicBSpline,%20Any,%20Any}"><code>spline_interpolation(bicubic_struct, x, y)</code></a>.</p><pre><code class="language-julia hljs"># Define B-spline interpolation function
+spline_func(x,y) = spline_interpolation(spline_struct, x, y)</code></pre><p>This defines the bicubic B-spline interpolation function with not-a-knot end condition and smoothing with respect to variables <code>x</code> and <code>y</code>. If we want to visualize the interpolation function with 100 interpolation points in each direction, we define:</p><pre><code class="language-julia hljs"># Define interpolation points
+n = 100
+x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
+y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))</code></pre><p>To fill a matrix <code>z_int_pts</code> which contains the corresponding <code>z</code> values for <code>x_int_pts</code> and <code>y_int_pts</code>, we define a helperfunction <code>fill_sol_mat</code>:</p><pre><code class="language-julia hljs"># Helperfunction to fill the solution matrix
+# Input parameters:
+#  - f: spline function
+#  - x: vector of x values
+#  - y: vector of y values
+function fill_sol_mat(f, x, y)
+    
+  # Get dimensions for solution matrix
+  n = length(x)
+  m = length(y)
+
+  # Create empty solution matrix
+  z = zeros(n,m)
+
+  # Fill solution matrix
+  for i in 1:n, j in 1:m
+    # Evaluate spline functions
+    # at given x,y values
+    z[j,i] = f(x[i], y[j])
+  end
+
+  # Return solution matrix
+  return z
+end</code></pre><p>and receive the <code>z_int_pts</code> values by setting:</p><pre><code class="language-julia hljs"># Get interpolated matrix
+z_int_pts = fill_sol_mat(spline_func, x_int_pts, y_int_pts)</code></pre><p>Plotting the interpolated values</p><pre><code class="language-julia hljs"># Plotting
+pyplot()
+surface(x_int_pts, y_int_pts, z_int_pts, camera=(-30,30),
+        xlabel=&quot;ETRS89\n East&quot;, ylabel=&quot;ETRS89\n North&quot;, zlabel=&quot;DHHN2016\n Height&quot;, 
+        label=&quot;Bottom topography&quot;, 
+        title=&quot;Cubic B-spline interpolation with not-a-knot end condition&quot;)</code></pre><p>gives the following representation:</p><p><img src="https://raw.githubusercontent.com/maxbertrand1996/TrixiBottomTopography.jl/main/assets/images/Bicubic_nak_smth.png" alt="image"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../structure/">« B-spline structure</a><a class="docs-footer-nextpage" href="../reference/">Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Tuesday 8 November 2022 09:08">Tuesday 8 November 2022</span>. Using Julia version 1.6.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
