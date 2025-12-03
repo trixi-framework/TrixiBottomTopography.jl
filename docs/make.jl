@@ -127,4 +127,7 @@ makedocs(;
 # for more information.
 deploydocs(repo = "github.com/trixi-framework/TrixiBottomTopography.jl.git",
            devbranch = "main",
-           push_preview = true)
+           # Only push previews if all the relevant environment variables are non-empty.
+           push_preview = all(!isempty,
+                              (get(ENV, "GITHUB_TOKEN", ""),
+                               get(ENV, "DOCUMENTER_KEY", ""))))
