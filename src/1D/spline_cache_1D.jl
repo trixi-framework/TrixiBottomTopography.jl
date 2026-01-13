@@ -325,3 +325,146 @@ function CubicBSpline(path::String; kwargs...)
 
     CubicBSpline(x, y; kwargs...)
 end
+########################
+### Lavery Spline ###
+########################
+
+# Lavery Spline structure
+"""
+    LaverySpline(x, z, b, weight, integral_steps)
+
+One dimensional Lavery spline structure.
+
+The attributes are:
+- `x`: Vector of data points in x-direction (knot points)
+- `z`: Vector of data values in z-direction
+- `b`: Vector of slope coefficients at each knot point
+- `weight`: Regularization weight for the slope coefficients (default: 1e-4)
+- `integral_steps`: Number of integration steps for computation (default: 100)
+
+"""
+mutable struct LaverySpline{x_type, z_type, b_type}
+    x::x_type
+    z::z_type
+    b::b_type
+    weight::Float64
+    integral_steps::Int
+end
+
+# Fill structure
+@doc raw"""
+    LaverySpline(xData::AbstractVector, zData::AbstractVector; 
+                 weight::Float64 = 1e-4, 
+                 integral_steps::Int = 100)
+
+This function calculates the inputs for the structure [`LaverySpline`](@ref).
+The input values are:
+- `xData`: Vector of x-coordinates of the data points (knots)
+- `zData`: Vector of z-coordinates (function values) at the data points
+- `weight`: Regularization parameter for smoothness (default: 1e-4)
+- `integral_steps`: Number of discrete points for integration (default: 100)
+
+First the data is sorted via [`sort_data`](@ref) to guarantee that the `x` values
+are in ascending order.
+
+The Lavery spline is computed by solving an optimization problem.
+
+The optimization problem is formulated as a linear program and solved using HiGHS.jl.
+"""
+function LaverySpline(xData::AbstractVector, zData::AbstractVector; 
+                      weight::Float64 = 1e-4, 
+                      integral_steps::Int = 100)
+    
+    if length(xData) != length(zData)
+        throw(DimensionMismatch("Vectors xData and zData have to contain the same number of values"))
+    end
+    
+    if length(xData) < 2
+        throw(ArgumentError("To perform Lavery spline interpolation, we need an vector
+                             that contains at least 2 values."))
+    end
+    
+    # Sort data to ensure ascending x values
+    xData, zData = sort_data(collect(xData), collect(zData))
+    
+    len = length(xData)
+    
+    # helper functions
+    h(i) = xData[i+1] - xData[i]
+    deltaZ(i) = (zData[i+1] - zData[i]) / h(i)
+    
+    # optimization model
+    model = Model(HiGHS.Optimizer)
+    set_silent(model)  # Suppress solver output
+    set_attribute(model, "presolve", "on")
+    set_attribute(model, "solver", "ipm")  # Interior Point Method
+    
+    # variables
+    @variable(model, b[1:len])  # Slope coefficients at knots
+    
+    # Domains for summation
+    bDomain = 1:len
+    sumDomain = 1:(len - 1)
+    
+    # Integration points (normalized to [-0.5, 0.5] for each patch)
+    integralDomain = range(-0.5, 0.5, integral_steps)
+    
+    # Auxiliary variables for absolute values
+    @variable(model, abs_E[sumDomain, integralDomain] >= 0)  # |second derivative|
+    @variable(model, abs_b[1:len] >= 0)  # |b_i|
+    
+    # Second derivative of cubic spline at integration point
+    integralArgument(i, t) = (-1 + 6*t) * b[i] + (1 + 6*t) * b[i+1] - 12 * deltaZ(i) * t
+    
+    # Objective: minimize curvature integral + regularization term
+    @objective(model, Min, 
+        sum(sum(abs_E[i, t] / integral_steps for t in integralDomain) 
+            for i in sumDomain) +
+        sum(weight * abs_b[i] for i in bDomain)
+    )
+    
+    # Constraints for absolute value of second derivative
+    @constraint(model, argPos[t in integralDomain, i in sumDomain],
+                abs_E[i, t] >= integralArgument(i, t))
+    @constraint(model, argNeg[t in integralDomain, i in sumDomain],
+                abs_E[i, t] >= -integralArgument(i, t))
+    
+    # Constraints for absolute value of b
+    @constraint(model, bPos[i in bDomain], abs_b[i] >= b[i])
+    @constraint(model, bNeg[i in bDomain], abs_b[i] >= -b[i])
+    
+    # Solve optimization problem
+    optimize!(model)
+    
+    # Extract solution
+    b_values = value.(b)
+    
+    LaverySpline(xData, zData, b_values, weight, integral_steps)
+end
+
+# Read from file
+"""
+    LaverySpline(path::String; weight::Float64 = 1e-4, integral_steps::Int = 100)
+
+A function that reads in the `x` and `z` values for [`LaverySpline`](@ref) from a .txt file.
+The input values are:
+- `path`: String of a path of the specific .txt file
+- `weight`: Regularization parameter for smoothness (default: 1e-4)
+- `integral_steps`: Number of discrete points for integration (default: 100)
+
+The .txt file has to have the following structure to be interpreted by this function:
+- First line: comment `# Number of x values`
+- Second line: integer which gives the number of `x` values
+- Third line: comment `# x values`
+- Following lines: the `x` values where each value has its own line
+- Line after the x-values: comment `# z values`
+- Remaining lines: `z` values where each value has its own line
+
+Note that the number of `x` and `z` values have to be the same.
+An example can be found [here](https://gist.githubusercontent.com/maxbertrand1996/b05a90e66025ee1ebddf444a32c3fa01/raw/90d375c1ac11b26589aab1fe92bd0e6f6daf37b7/Rhine_data_1D_10.txt)
+"""
+function LaverySpline(path::String; kwargs...)
+    x, z = parse_txt_1D(path)
+    
+    LaverySpline(x, z; kwargs...)
+end

@@ -121,3 +121,31 @@ function spline_interpolation(b_spline::CubicBSpline, x::Number)
 
     return c_i3
 end
+# Lavery spline interpolation
+@doc raw"""
+    spline_interpolation(lavery_spline::LaverySpline, x::Number)
+
+Evaluates the Lavery spline at a single point `x`.
+"""
+function spline_interpolation(lavery_spline::LaverySpline, x::Number)
+    xData = lavery_spline.x
+    zData = lavery_spline.z
+    b = lavery_spline.b
+    
+    # Find the patch containing x
+    i = max(1, min(searchsortedlast(xData, x), length(xData) - 1))
+    
+    # Helper functions for this patch
+    h_i = xData[i+1] - xData[i]
+    deltaZ_i = (zData[i+1] - zData[i]) / h_i
+    
+    # Local coordinate within patch
+    xi = x - xData[i]
+    
+    # Evaluate cubic polynomial
+    z_val = zData[i] + b[i] * xi +
+            (1/h_i) * (-(2*b[i] + b[i+1]) + 3*deltaZ_i) * xi^2 +
+            (1/h_i^2) * (b[i] + b[i+1] - 2*deltaZ_i) * xi^3
+    
+    return z_val
+end
