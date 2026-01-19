@@ -1,5 +1,7 @@
 # Number of x values
 10
+# Number of y values
+10
 # x values
 0
 1
@@ -11,8 +13,6 @@
 7
 8
 9
-# Number of y values
-10
 # y values
 0
 1
