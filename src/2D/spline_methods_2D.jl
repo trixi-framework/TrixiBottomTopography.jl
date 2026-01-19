@@ -251,19 +251,26 @@ function spline_interpolation(lavery_spline::LaverySpline2D, x::Number, y::Numbe
         zy_ip1jp1 = bx[i + 1, j]
     end
 
-    # Evaluation of the spline on Sibson element 1. This is Eq. (2.26) in Eriksson and Jemsson
-    z_val = ((1 - 3 * xt^2 + 2 * xt^3 - 3 * yt^2 + 3 * xt * yt^2 + yt^3) * z_ij
-            + dx * (xt - 2 * xt^2 + xt^3 - 0.5 * yt^2 + 0.5 * xt * yt^2) * zx_ij
-            + dy * (yt - xt * yt - 1.5 * yt^2 + xt * yt^2 + 0.5 * yt^3) * zy_ij
-            + (3 * xt^2 - 2 * xt^3 - 3 * xt * yt^2 + yt^3) * z_ip1j
-            + dx * (-xt^2 + xt^3 + 0.5 * xt * yt^2) * zx_ip1j
-            + dy * (xt * yt - 0.5 * yt^2 - xt * yt^2 + 0.5 * yt^3) * zy_ip1j
-            + (3 * yt^2 - 3 * xt * yt^2 - yt^3) * z_ijp1
-            + dx * (0.5 * yt^2 - 0.5 * xt * yt^2) * zx_ijp1
-            + dy * (-yt^2 + xt * yt^2 + 0.5 * yt^3) * zy_ijp1
-            + (3 * xt * yt^2 - yt^3) * z_ip1jp1
-            + dx * (-0.5 * xt * yt^2) * zx_ip1jp1
-            + dy * (-xt * yt^2 + 0.5 * yt^3) * zy_ip1jp1)
+    # Evaluation of the spline on Sibson element 1.
+    # The original expression is Eq. (2.26) in Eriksson and Jemsson, the version below
+    # has been factored via Horner's rule for faster computation.
+
+    # Precompute powers that can be reused
+    xt2 = xt * xt
+    yt2 = yt * yt
+    xtyt2 = xt * yt2
+    z_val = ((xt * (xt * (2 * xt - 3) + 3 * yt2) + 1 + yt2 * (yt - 3)) * z_ij
+            + dx * (xt * (xt * (xt - 2) + 1 + 0.5 * yt2) - 0.5 * yt2) * zx_ij
+            + dy * (yt * (yt * (0.5 * yt + xt - 1.5) + (1 - xt))) * zy_ij
+            + (xt2 * (3 - 2 * xt) + yt2 * (yt - 3 * xt)) * z_ip1j
+            + dx * (xt2 * (xt - 1) + 0.5 * xtyt2) * zx_ip1j
+            + dy * (yt * (xt + yt * (0.5 * yt - xt - 0.5))) * zy_ip1j
+            + yt2 * (3 - yt - 3 * xt) * z_ijp1
+            + dx * 0.5 * yt2 * (1 - xt) * zx_ijp1
+            + dy * yt2 * (xt + 0.5 * yt - 1) * zy_ijp1
+            + yt2 * (3 * xt - yt) * z_ip1jp1
+            + dx * (-0.5 * xtyt2) * zx_ip1jp1
+            + dy * yt2 * (0.5*yt - xt) * zy_ip1jp1)
 
     return z_val
 end
