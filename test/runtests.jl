@@ -44,4 +44,9 @@ using Test
     @testset "1D Lavery spline interpolation" begin
         include("test_lavery_spline_1d.jl")
     end
+
+    # 2D Lavery splines
+    @testset "2D Lavery spline interpolation" begin
+        include("test_lavery_spline_2d.jl")
+    end
 end

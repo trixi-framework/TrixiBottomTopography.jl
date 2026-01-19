@@ -10,9 +10,9 @@ using HiGHS
     root_dir = pkgdir(TrixiBottomTopography)
     data = joinpath(root_dir, "test", "data", "rhine_1d_10_x_1.txt")
 
-    # Define Lavery-spline structure
+    # Define Lavery spline structure
     spline_struct = LaverySpline1D(data)
-    # Define Lavery-spline interpolation function
+    # Define Lavery spline interpolation function
     spline_func(x) = spline_interpolation(spline_struct, x)
 
     # Test function at arbitrary point
