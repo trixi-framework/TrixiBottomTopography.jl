@@ -589,7 +589,7 @@ end
 
 # Fill structure
 @doc raw"""
-    LaverySpline2D(xData::AbstractVector, yData::AbstractVector, zData::AbstractVector;
+    LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix;
                    lambda::Float64 = 1e-1,
                    N::Int = 5)
 
@@ -616,9 +616,9 @@ References:
    Uni- and bivariate interpolation of multiscale data using cubic L1 splines.
    [DiVA1918338](https://www.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf)
 """
-function LaverySpline2D(xData, yData, zData;
-                       lambda::Float64 = 1e-1,
-                       N::Int = 5)
+function LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix;
+                        lambda::Float64 = 1e-1,
+                        N::Int = 5)
     I = length(xData)
     J = length(yData)
 
@@ -637,17 +637,12 @@ function LaverySpline2D(xData, yData, zData;
     )
     set_silent(model)
 
-    # model = Model(HiGHS.Optimizer) # HiHGS solver
-    # #model = Model(Gurobi.Optimizer) # Gurobi solver
-
-    # set_attribute(model, "presolve", "on")
-    # set_attribute(model, "solver", "ipm") # Interior Point Method
-    # # set_attribute(model, "parallel", "on")
-    # # set_attribute(model, "ipm_optimality_tolerance", 1e-4)
-    # # set_attribute(model, "solver", "simplex") # Simplex Solver
-
     deltaX = [xData[i + 1] - xData[i] for i in 1:I-1]   # x-step length
     deltaY = [yData[j + 1] - yData[j] for j in 1:J-1]   # y-step length
+
+    # Convenience values for inverse of the grid spacing
+    inv_dx = 1 ./ deltaX
+    inv_dy = 1 ./ deltaY
 
     # N is the number of integration points in each sub-piece
     domain = collect(range(0, 1, step = 1 / (2 * N)))
@@ -656,25 +651,25 @@ function LaverySpline2D(xData, yData, zData;
     @variable(model, by[1:I, 1:J]) # dzdy(x_i,y_i)
 
     # Compute all the second derivatives in each of the patches
-    d2zdx2_1 = [(1 / (deltaX[i]^2)) * ((-6 + 12 * xTilde) * zData[i, j]
-                + deltaX[i] * (-4 + 6 * xTilde)*bx[i, j]
-                + (6 - 12 * xTilde) * zData[i+1, j]
+    d2zdx2_1 = [inv_dx[i]^2 * ((-6 + 12 * xTilde) * zData[i, j]
+                + deltaX[i] * (-4 + 6 * xTilde) * bx[i, j]
+                + (6 - 12 * xTilde) * zData[i + 1, j]
                 + deltaX[i] * (-2 + 6 * xTilde) * bx[i + 1, j])
                 for i in 1:I-1, j in 1:J-1, xTilde in domain]
 
-    d2zdxdy_1= [(1 / (deltaX[i] * deltaY[j])) * (
-                6 * yTilde * ((zData[i, j] + zData[i + 1, j + 1]) - (zData[i + 1, j]+zData[i, j + 1]))
+    d2zdxdy_1= [inv_dx[i] * inv_dy[j] * (
+                6 * yTilde * ((zData[i, j] + zData[i + 1, j + 1]) - (zData[i + 1, j] + zData[i, j + 1]))
                 +deltaX[i] * yTilde * ((bx[i, j] + bx[i + 1, j]) - (bx[i, j + 1] + bx[i + 1, j + 1]))
                 +deltaY[j] * ((by[i + 1, j] - by[i, j]) +
                 2 * yTilde * ( (by[i, j] + by[i, j + 1]) - (by[i + 1, j] + by[i + 1, j + 1]))))
                 for i in 1:I-1, j in 1:J-1, yTilde in domain]
 
-    d2zdy2_1 = [(1 / (deltaY[j]^2)) * ((-6 + 6 * xTilde + 6 * yTilde) * zData[i, j]
+    d2zdy2_1 = [inv_dy[j]^2 * ((-6 + 6 * xTilde + 6 * yTilde) * zData[i, j]
                 + deltaX[i] * (-1 + xTilde) * bx[i, j]
                 + deltaY[j] * (-3 + 2 * xTilde + 3 * yTilde) * by[i, j]
-                + (-6 * xTilde + 6 * yTilde) * zData[i+1, j]
+                + (-6 * xTilde + 6 * yTilde) * zData[i + 1, j]
                 + deltaX[i] * xTilde * bx[i + 1, j]
-                + deltaY[j] * (-1 -2 * xTilde + 3 * yTilde) * by[i + 1, j]
+                + deltaY[j] * (-1 - 2 * xTilde + 3 * yTilde) * by[i + 1, j]
                 + (6 - 6 * xTilde - 6 * yTilde) * zData[i, j + 1]
                 + deltaX[i] * (1 - xTilde) * bx[i, j + 1]
                 + deltaY[j] * (-2 + 2 * xTilde + 3 * yTilde) * by[i, j + 1]
@@ -683,20 +678,20 @@ function LaverySpline2D(xData, yData, zData;
                 + deltaY[j] * (-2 * xTilde + 3 * yTilde) * by[i + 1, j + 1])
                 for i in 1:I-1, j in 1:J-1, xTilde in domain, yTilde in domain]
 
-    d2zdx2_2 = [(1 / (deltaY[j]^2)) * ((-6 + 12 * yTilde) * zData[i + 1, j]
+    d2zdx2_2 = [inv_dy[j]^2 * ((-6 + 12 * yTilde) * zData[i + 1, j]
                 + deltaY[j] * (-4 + 6 * yTilde) * by[i + 1, j]
                 + (6 - 12 * yTilde) * zData[i + 1, j + 1]
                 + deltaY[j] * (-2 + 6 * yTilde) * by[i + 1, j + 1])
                 for i in 1:I-1, j in 1:J-1, yTilde in domain]
 
-    d2zdxdy_2 = [(1 / (deltaY[j] * deltaX[i])) * (
+    d2zdxdy_2 = [inv_dy[j] * inv_dx[i] * (
                 6 * (1 - xTilde) * ((zData[i + 1, j] + zData[i, j + 1]) - (zData[i + 1, j + 1] + zData[i, j]))
                 + deltaY[j] * (1 - xTilde) * ((by[i + 1, j] + by[i + 1, j + 1]) - (by[i, j] + by[i, j + 1]) )
                 + deltaX[i] * ((-bx[i + 1, j + 1] + bx[i + 1, j]) +
                 2 * (1 - xTilde) * ((bx[i + 1, j] + bx[i, j]) - (-bx[i + 1, j + 1] - bx[i, j + 1]))))
                 for i in 1:I-1, j in 1:J-1, xTilde in domain]
 
-    d2zdy2_2 = [(1 / (deltaY[j]^2)) * ((-6 + 6 * yTilde + 6 * (1 - xTilde)) * zData[i + 1, j]
+    d2zdy2_2 = [inv_dx[i]^2 * ((-6 + 6 * yTilde + 6 * (1 - xTilde)) * zData[i + 1, j]
                 + deltaY[j] * (-1 + yTilde) * by[i + 1, j]
                 + deltaX[i] * (-3 + 2 * yTilde + 3 * (1 - xTilde)) * (-bx[i + 1, j])
                 + (-6 * yTilde + 6 * (1 - xTilde)) * zData[i + 1, j + 1]
@@ -710,20 +705,20 @@ function LaverySpline2D(xData, yData, zData;
                 + deltaX[i] * (-2 * yTilde + 3 * (1 - xTilde)) * (-bx[i, j + 1]))
                 for i in 1:I-1, j in 1:J-1, xTilde in domain, yTilde in domain]
 
-    d2zdx2_3 = [(1 / (deltaX[i]^2)) * ((-6 + 12 * (1 - xTilde)) * zData[i + 1, j + 1]
+    d2zdx2_3 = [inv_dx[i]^2 * ((-6 + 12 * (1 - xTilde)) * zData[i + 1, j + 1]
                 + deltaX[i] * (-4 + 6 * (1 - xTilde)) * bx[i + 1, j + 1]
                 + (6 - 12 * (1 - xTilde)) * zData[i, j + 1]
                 + deltaX[i] * (-2 + 6 * (1 - xTilde)) * bx[i, j + 1])
                 for i in 1:I-1, j in 1:J-1, xTilde in domain]
 
-    d2zdxdy_3 = [(1 / (deltaX[i] * deltaY[j])) * (
+    d2zdxdy_3 = [inv_dx[i] * inv_dy[j] * (
                 6 * (1 - yTilde) * ((zData[i + 1, j + 1] + zData[i, j]) - (zData[i, j + 1] + zData[i + 1, j]))
-                + deltaX[i] * (1 - yTilde) *((bx[i + 1, j + 1] + bx[i, j + 1]) - (bx[i + 1, j] + bx[i, j]))
+                + deltaX[i] * (1 - yTilde) * ((bx[i + 1, j + 1] + bx[i, j + 1]) - (bx[i + 1, j] + bx[i, j]))
                 + deltaY[j] * ((by[i, j + 1] - by[i + 1, j + 1]) +
                 2 * (1 - yTilde) * ((by[i + 1, j + 1] + by[i + 1, j]) - (by[i, j + 1] + by[i, j]))))
                 for i in 1:I-1, j in 1:J-1, yTilde in domain]
 
-    d2zdy2_3 = [(1 / (deltaY[j]^2)) * ((-6 + 6 * (1 - xTilde) + 6 * (1 - yTilde)) * zData[i + 1, j + 1]
+    d2zdy2_3 = [inv_dy[j]^2 * ((-6 + 6 * (1 - xTilde) + 6 * (1 - yTilde)) * zData[i + 1, j + 1]
                 + deltaX[i] * (-1 + (1 - xTilde)) * bx[i + 1, j + 1]
                 + deltaY[j] * (-3 + 2 * (1 - xTilde) + 3 * (1 - yTilde)) * by[i + 1, j + 1]
                 + (-6 * (1 - xTilde) + 6 * (1 - yTilde)) * zData[i, j + 1]
@@ -737,20 +732,20 @@ function LaverySpline2D(xData, yData, zData;
                 + deltaY[j] * (-2 * (1 - xTilde) + 3 * (1 - yTilde)) * by[i, j])
                 for i in 1:I-1, j in 1:J-1, xTilde in domain, yTilde in domain]
 
-    d2zdx2_4 = [(1 / (deltaY[j]^2)) * ((-6 + 12 * (1 - yTilde)) * zData[i, j + 1]
+    d2zdx2_4 = [inv_dy[j]^2 * ((-6 + 12 * (1 - yTilde)) * zData[i, j + 1]
                 + deltaY[j] * (-4 + 6 * (1 - yTilde)) * (-bx[i, j + 1])
                 + (6 - 12 * (1 - yTilde)) * zData[i, j]
                 + deltaY[j] * (-2 + 6 * (1 - yTilde)) * (-bx[i,j]))
                 for i in 1:I-1, j in 1:J-1, yTilde in domain]
 
-    d2zdxdy_4 = [(1 / (deltaX[i] * deltaY[j])) * (
+    d2zdxdy_4 = [inv_dx[i] * inv_dy[j] * (
                 6 * xTilde * ((zData[i, j + 1] + zData[i + 1, j]) - (zData[i, j] + zData[i + 1, j + 1]))
                 + deltaY[j] * xTilde * ((-bx[i, j + 1] - bx[i, j]) - (-bx[i + 1, j + 1] - bx[i + 1, j]))
                 + deltaX[i] * ((by[i, j] - by[i, j + 1])
                 + 2 * xTilde * ((by[i, j + 1] + by[i + 1, j + 1]) - (by[i, j] + by[i + 1, j]))))
                 for i in 1:I-1, j in 1:J-1, xTilde in domain]
 
-    d2zdy2_4 = [(1 / (deltaX[i]^2)) * ((-6 + 6 * (1 - yTilde) + 6 * xTilde) * zData[i, j + 1]
+    d2zdy2_4 = [inv_dx[i]^2 * ((-6 + 6 * (1 - yTilde) + 6 * xTilde) * zData[i, j + 1]
                 + deltaY[j] * (-1 + (1 - yTilde)) * (-bx[i, j + 1])
                 + deltaX[i] * (-3 + 2 * (1 - yTilde) + 3 * xTilde) * by[i, j + 1]
                 + (-6 * (1 - yTilde) + 6 * xTilde) * zData[i, j]
@@ -839,11 +834,11 @@ function LaverySpline2D(xData, yData, zData;
     @constraint(model, neg_d2zdy2_4[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_4[i, j, k, l] >= -d2zdy2_4[i, j, k, l])
 
     # Remaining constraints on the coefficients
-    @constraint(model, pos_bx[i in 1:I-1, j in 1:J-1], abs_bx[i,j] >=  bx[i,j])
-    @constraint(model, neg_bx[i in 1:I-1, j in 1:J-1], abs_bx[i,j] >= -bx[i,j])
+    @constraint(model, pos_bx[i in 1:I, j in 1:J], abs_bx[i, j] >=  bx[i, j])
+    @constraint(model, neg_bx[i in 1:I, j in 1:J], abs_bx[i, j] >= -bx[i, j])
 
-    @constraint(model, pos_by[i in 1:I-1, j in 1:J], abs_by[i,j] >=  by[i,j])
-    @constraint(model, neg_by[i in 1:I-1, j in 1:J], abs_by[i,j] >= -by[i,j])
+    @constraint(model, pos_by[i in 1:I, j in 1:J], abs_by[i, j] >=  by[i, j])
+    @constraint(model, neg_by[i in 1:I, j in 1:J], abs_by[i, j] >= -by[i, j])
 
     # Solve the optimization problem
     optimize!(model)
@@ -852,4 +847,35 @@ function LaverySpline2D(xData, yData, zData;
     by = Array(value.(by))
 
     return LaverySpline2D(xData, yData, zData, bx, by, lambda, N)
+end
+
+# Read from file
+"""
+    LaverySpline2D(path::String; lambda::Float64 = 1e-1, N::Int = 5)
+
+A function which reads in the `x`, `y` and `z` values for [`LaverySpline2D`](@ref) from a .txt file.
+The input values are:
+- `path`: String of a path of the specific .txt file
+- `lambda`: Regularization parameter for smoothness (default: 1e-1)
+- `N`: Number of discrete points for integration (default: 5)
+
+The .txt file has to have the following structure to be interpreted by this function:
+- First line: comment `# Number of x values`
+- Second line: integer which gives the number of `x` values
+- Third line: comment `# Number of y values`
+- Fourth line: integer which gives the number of `y` values
+- Fifth line: comment `# x values`
+- Following lines: the `x` values where each value has its own line
+- Line after the x-values: comment `# y values`
+- Following lines: `y` values where each value has its own line
+- Line after the y-values: comment `# z values`
+- Remaining lines: values for `z` where each value has its own line and is in th following order:
+                   z_11, z_12, ... z_1n, z_21, ... z_2n, ..., z_m1, ..., z_mn
+"""
+function LaverySpline2D(path::String; kwargs...)
+    x, y, z = parse_txt_2D(path)
+
+    # The Lavery spline constructor expects the `z` data in a slightly different order
+    z = Matrix(transpose(z))
+    LaverySpline2D(x, y, z; kwargs...)
 end
