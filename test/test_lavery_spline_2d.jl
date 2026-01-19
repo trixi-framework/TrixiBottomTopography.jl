@@ -17,8 +17,19 @@ using HiGHS
     # Define Lavery spline interpolation function
     spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
-    # Test function at arbitrary point
+    # Test function at arbitrary points.
+
+    # Evaluation in first Sibson element
     @test spline_func(1.5, 4.1) ≈ 1.514
+
+    # Evaluation in second Sibson element
+    @test spline_func(1.75, 4.53) ≈ 2.615
+
+    # Evaluation in third Sibson element
+    @test spline_func(1.5, 4.53) ≈ 1.772473
+
+    # Evaluation in fourth Sibson element
+    @test spline_func(1.25, 4.53) ≈ 0.929946
 end
 
 end # module
