@@ -42,6 +42,6 @@ using Test
 
     # 1D Lavery splines
     @testset "1D Lavery spline interpolation" begin
-        include("test_lavery_spline_1D.jl")
+        include("test_lavery_spline_1d.jl")
     end
 end
