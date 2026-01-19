@@ -174,62 +174,96 @@ function spline_interpolation(lavery_spline::LaverySpline2D, x::Number, y::Numbe
     yTilde = (y - yData[j]) / dy_j # Transforms y in [y_i,y_i+1] to yTilde in [0,1]
 
     z_val = 0
-    slope = dy_j/dx_i
+    slope = dy_j / dx_i
 
-    # Depending on the location within the patch, use a different evaluation version
+    # Depending in which Sibson element the `(x,y)` point is present the variables may change roles.
     if (y <= yData[j] + (x - xData[i]) * slope && y <= yData[j+1] - (x - xData[i]) * slope)
-        z_val = ((1 - 3 * xTilde^2 + 2 * xTilde^3 - 3 * yTilde^2 + 3 * xTilde * yTilde^2 + yTilde^3) * zData[i, j]
-                + dx_i * (xTilde - 2 * xTilde^2 + xTilde^3 - 0.5 * yTilde^2 + 0.5 * xTilde * yTilde^2) * bx[i, j]
-                + dy_j * (yTilde - xTilde * yTilde - 1.5 * yTilde^2 + xTilde * yTilde^2 + 0.5 * yTilde^3) * by[i, j]
-                + (3 * xTilde^2 - 2 * xTilde^3 - 3 * xTilde * yTilde^2 + yTilde^3) * zData[i + 1, j]
-                + dx_i * (-xTilde^2 + xTilde^3 + 0.5 * xTilde * yTilde^2) * bx[i + 1, j]
-                + dy_j * (xTilde * yTilde - 0.5 * yTilde^2 - xTilde * yTilde^2 + 0.5 * yTilde^3) * by[i + 1, j]
-                + (3 * yTilde^2 - 3 * xTilde * yTilde^2 - yTilde^3) * zData[i, j + 1]
-                + dx_i * (0.5 * yTilde^2 - 0.5 * xTilde * yTilde^2) * bx[i, j + 1]
-                + dy_j * (-yTilde^2 + xTilde * yTilde^2 + 0.5 * yTilde^3) * by[i, j + 1]
-                + (3 * xTilde * yTilde^2 - yTilde^3) * zData[i + 1, j + 1]
-                + dx_i * (-0.5 * xTilde * yTilde^2) * bx[i + 1,j + 1]
-                + dy_j * (-xTilde * yTilde^2 + 0.5 * yTilde^3) * by[i + 1, j + 1])
+        # Sibson element 1 (default)
+        xt = xTilde
+        yt = yTilde
+        dx = dx_i
+        dy = dy_j
+        z_ij = zData[i, j]
+        zx_ij = bx[i, j]
+        zy_ij = by[i, j]
+        z_ip1j = zData[i + 1, j]
+        zx_ip1j = bx[i + 1, j]
+        zy_ip1j = by[i + 1, j]
+        z_ijp1 = zData[i, j + 1]
+        zx_ijp1 = bx[i, j + 1]
+        zy_ijp1 = by[i, j + 1]
+        z_ip1jp1 = zData[i + 1, j + 1]
+        zx_ip1jp1 = bx[i + 1, j + 1]
+        zy_ip1jp1 = by[i + 1, j + 1]
     elseif (y <= yData[j] + (x - xData[i]) * slope && y >= yData[j+1] - (x - xData[i]) * slope)
-        z_val = ((1 - 3 * yTilde^2 + 2 * yTilde^3 - 3 * (1 - xTilde)^2 + 3 * yTilde * (1 - xTilde)^2 + (1 - xTilde )^3) * zData[i + 1, j]
-                + dy_j * (yTilde - 2 * yTilde^2 + yTilde^3 - 0.5 * (1 - xTilde)^2 + 0.5 * yTilde * (1 - xTilde)^2) * by[i + 1, j]
-                + dx_i * ((1 - xTilde) - yTilde * (1 - xTilde) - 1.5 * (1 - xTilde)^2 + yTilde * (1 - xTilde)^2 + 0.5 * (1 - xTilde)^3) * (-bx[i + 1, j])
-                + (3 * yTilde^2 - 2 * yTilde^3 - 3 * yTilde * (1 - xTilde)^2 + (1 - xTilde)^3) * zData[i + 1, j + 1]
-                + dy_j * (-yTilde^2 + yTilde^3 + 0.5 * yTilde * (1 - xTilde)^2) * by[i + 1, j + 1]
-                + dx_i * (yTilde * (1 - xTilde) - 0.5 * (1 - xTilde)^2 - yTilde * (1 - xTilde)^2 + 0.5 * (1 - xTilde)^3) * (-bx[i + 1, j + 1])
-                + (3 * (1 - xTilde)^2 - 3 * yTilde * (1 - xTilde)^2 - (1 - xTilde)^3) * zData[i, j]
-                + dy_j * (0.5 * (1 - xTilde)^2 - 0.5 * yTilde * (1 - xTilde)^2) * by[i, j]
-                + dx_i * (-(1 - xTilde)^2 + yTilde * (1 - xTilde)^2 + 0.5 * (1 - xTilde)^3) * (-bx[i, j])
-                + (3 * yTilde * (1 - xTilde)^2 - (1 - xTilde)^3) * zData[i, j + 1]
-                + dy_j * (-0.5 * yTilde * (1 - xTilde)^2) * by[i, j + 1]
-                + dx_i * (-yTilde * (1 - xTilde)^2 + 0.5 * (1 - xTilde)^3) * (-bx[i, j + 1]))
+        # Sibson element 2; Eq. (2.27)
+        xt = yTilde
+        yt = 1 - xTilde
+        dx = dy_j
+        dy = dx_i
+        z_ij = zData[i + 1, j]
+        zx_ij = by[i + 1, j]
+        zy_ij = -bx[i + 1, j]
+        z_ip1j = zData[i + 1, j + 1]
+        zx_ip1j = by[i + 1, j + 1]
+        zy_ip1j = -bx[i + 1, j + 1]
+        z_ijp1 = zData[i, j]
+        zx_ijp1 = by[i, j]
+        zy_ijp1 = -bx[i, j]
+        z_ip1jp1 = zData[i, j + 1]
+        zx_ip1jp1 = by[i, j + 1]
+        zy_ip1jp1 = -bx[i, j + 1]
     elseif (y >= yData[j] + (x - xData[i]) * slope && y >= yData[j+1] - (x - xData[i]) * slope)
-        z_val = ((1 - 3 * (1 - xTilde)^2 + 2 * (1 - xTilde)^3 - 3 * (1 - yTilde)^2 + 3 * (1 - xTilde) * (1 - yTilde)^2 + (1 - yTilde)^3) * zData[i + 1, j + 1]
-                + dy_j * ((1 - xTilde) - 2 * (1 - xTilde)^2 + (1 - xTilde)^3 - 0.5 * (1 - yTilde)^2 + 0.5 * (1 - xTilde) * (1 - yTilde)^2) * (-bx[i + 1, j + 1])
-                + dx_i * ((1 - yTilde) - (1 - xTilde) * (1 - yTilde) - 1.5 * (1 - yTilde)^2 + (1 - xTilde) * (1 - yTilde)^2 + 0.5 * (1 - yTilde)^3) * (-by[i + 1, j + 1])
-                + (3 * (1 - xTilde)^2 - 2 * (1 - xTilde)^3 - 3 * (1 - xTilde) * (1 - yTilde)^2 + (1 - yTilde)^3) * zData[i, j + 1]
-                + dy_j * (-(1 - xTilde)^2 + (1 - xTilde)^3 + 0.5 * (1 - xTilde) * (1 - yTilde)^2) * (-bx[i, j + 1])
-                + dx_i * ((1 - xTilde) * (1 - yTilde) - 0.5*(1 - yTilde)^2 - (1 - xTilde) * (1 - yTilde)^2 + 0.5 * (1 - yTilde)^3) * (-by[i, j + 1])
-                + (3 * (1 - yTilde)^2 - 3 * (1 - xTilde) * (1 - yTilde)^2 - (1 - yTilde)^3) * zData[i + 1, j]
-                + dy_j * (0.5 * (1 - yTilde)^2 - 0.5 * (1 - xTilde) * (1 - yTilde)^2) * (-bx[i + 1, j])
-                + dx_i * (-(1 - yTilde)^2 + (1 - xTilde) * (1 - yTilde)^2 + 0.5 * (1 - yTilde)^3) * (-by[i+1,j])
-                + (3 * (1 - xTilde) * (1 - yTilde)^2 - (1 - yTilde)^3) * zData[i, j]
-                + dy_j * (-0.5 * (1 - xTilde) * (1 - yTilde)^2) * (-bx[i, j])
-                + dx_i * (-(1 - xTilde) * (1 - yTilde)^2 + 0.5 * (1 - yTilde)^3) * (-by[i, j]))
+        # Sibson element 3; Eq. (2.28)
+        xt = 1 - xTilde
+        yt = 1 - yTilde
+        dx = dx_i
+        dy = dy_j
+        z_ij = zData[i + 1, j + 1]
+        zx_ij = -bx[i + 1, j + 1]
+        zy_ij = -by[i + 1, j + 1]
+        z_ip1j = zData[i, j + 1]
+        zx_ip1j = -bx[i, j + 1]
+        zy_ip1j = -by[i, j + 1]
+        z_ijp1 = zData[i + 1, j]
+        zx_ijp1 = -bx[i + 1, j]
+        zy_ijp1 = -by[i + 1, j]
+        z_ip1jp1 = zData[i, j]
+        zx_ip1jp1 = -bx[i, j]
+        zy_ip1jp1 = -by[i, j]
     elseif (y >= yData[j] + (x - xData[i]) * slope && y <= yData[j+1] - (x - xData[i]) * slope)
-        z_val = ((1 - 3 * (1 - yTilde)^2 + 2 * (1 - yTilde)^3 - 3 * xTilde^2 + 3 * (1 - yTilde) * xTilde^2 + xTilde^3) * zData[i, j + 1]
-                + dy_j * ((1 - yTilde) - 2 * (1 - yTilde)^2 + (1 - yTilde)^3 - 0.5 * xTilde^2 + 0.5 * (1 - yTilde) * xTilde^2) * (-by[i, j + 1])
-                + dx_i * (xTilde - (1 - yTilde) * xTilde - 1.5 * xTilde^2 + (1 - yTilde) * xTilde^2 + 0.5 * xTilde^3) * bx[i, j + 1]
-                + (3 * (1 - yTilde)^2 - 2 * (1 - yTilde)^3 - 3 * (1 - yTilde) * xTilde^2 + xTilde^3) * zData[i, j]
-                + dy_j * (-(1 - yTilde)^2 + (1 - yTilde)^3 + 0.5 * (1 - yTilde) * xTilde^2) * (-by[i, j])
-                + dx_i * ((1 - yTilde) * xTilde - 0.5 * xTilde^2 - (1 - yTilde) * xTilde^2 + 0.5 * xTilde^3) * (bx[i, j])
-                + (3 * xTilde^2 - 3 * (1 - yTilde) * xTilde^2 - xTilde^3) * zData[i + 1, j + 1]
-                + dy_j * (0.5 * xTilde^2 - 0.5 * (1 - yTilde) * xTilde^2) * (-by[i + 1, j + 1])
-                + dx_i * (-xTilde^2 + (1 - yTilde) * xTilde^2 + 0.5 * xTilde^3) * bx[i + 1, j + 1]
-                + (3 * (1 - yTilde) * xTilde^2 - xTilde^3) * zData[i + 1, j]
-                + dy_j * (-0.5 * (1 - yTilde) * xTilde^2) * (-by[i + 1, j])
-                + dx_i * (-(1 - yTilde) * xTilde^2 + 0.5 * xTilde^3) * bx[i + 1, j])
+        # Sibson element 4; Eq. (2.29)
+        xt = 1 - yTilde
+        yt = xTilde
+        dx = dy_j
+        dy = dx_i
+        z_ij = zData[i, j + 1]
+        zx_ij = -by[i, j + 1]
+        zy_ij = bx[i, j + 1]
+        z_ip1j = zData[i, j]
+        zx_ip1j = -by[i, j]
+        zy_ip1j = bx[i, j]
+        z_ijp1 = zData[i + 1, j + 1]
+        zx_ijp1 = -by[i + 1, j + 1]
+        zy_ijp1 = bx[i + 1, j + 1]
+        z_ip1jp1 = zData[i + 1, j]
+        zx_ip1jp1 = -by[i + 1, j]
+        zy_ip1jp1 = bx[i + 1, j]
     end
+
+    # Evaluation of the spline on Sibson element 1. This is Eq. (2.26) in Eriksson and Jemsson
+    z_val = ((1 - 3 * xt^2 + 2 * xt^3 - 3 * yt^2 + 3 * xt * yt^2 + yt^3) * z_ij
+            + dx * (xt - 2 * xt^2 + xt^3 - 0.5 * yt^2 + 0.5 * xt * yt^2) * zx_ij
+            + dy * (yt - xt * yt - 1.5 * yt^2 + xt * yt^2 + 0.5 * yt^3) * zy_ij
+            + (3 * xt^2 - 2 * xt^3 - 3 * xt * yt^2 + yt^3) * z_ip1j
+            + dx * (-xt^2 + xt^3 + 0.5 * xt * yt^2) * zx_ip1j
+            + dy * (xt * yt - 0.5 * yt^2 - xt * yt^2 + 0.5 * yt^3) * zy_ip1j
+            + (3 * yt^2 - 3 * xt * yt^2 - yt^3) * z_ijp1
+            + dx * (0.5 * yt^2 - 0.5 * xt * yt^2) * zx_ijp1
+            + dy * (-yt^2 + xt * yt^2 + 0.5 * yt^3) * zy_ijp1
+            + (3 * xt * yt^2 - yt^3) * z_ip1jp1
+            + dx * (-0.5 * xt * yt^2) * zx_ip1jp1
+            + dy * (-xt * yt^2 + 0.5 * yt^3) * zy_ip1jp1)
 
     return z_val
 end
