@@ -390,8 +390,7 @@ function build_lavery_spline_model(len::Int, weight::Float64, integral_steps::In
 
     return LaverySplineModel(model,
                              b, abs_b, abs_E,
-                             deltaZ,
-                             )
+                             deltaZ)
 end
 
 # Lavery Spline structure
