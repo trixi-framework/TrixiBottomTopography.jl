@@ -8,18 +8,21 @@ using TrixiBottomTopography
 
 # Load in data from one of the examples from Eriksson and Jemsson thesis
 # https://liu.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf
-x_knots = [0,1,2,3,4,5,6]
-y_knots = [0,1,2,3,4,5,6]
-z_knots = [0 0 0 0 0 0 0;
-           0 0 0 0 0 0 0;
-           0 0 1 1 1 0 0;
-           0 0 1 1 1 0 0;
-           0 0 1 1 1 0 0;
-           0 0 0 0 0 0 0;
-           0 0 0 0 0 0 0]
+x_knots = [0,1,2,3,4,5,6,7,8,9]
+y_knots = [0,1,2,3,4,5,6,7,8,9]
+z_knots = [1 1 1 0 0 4 4 4 4 1;
+           1 1 1 0 0 1 1 1 1 1;
+           1 1 1 3 3 3 3 3 3 3;
+           2 2 2 1 0 0 0 0 0 0;
+           3 3 3 1 0 0 0 0 0 0;
+           4 4 4 1 0 0 2 2 0 0;
+           1 0 3 1 0 0 2 2 0 0;
+           1 0 3 1 0 0 0 0 0 0;
+           1 0 3 0 0 0 0 0 0 0;
+           0 0 0 0 0 0 0 0 0 0]
 
 # Lavery spline that does not generate new extrema
-spline_struct = LaverySpline2D(x_knots, y_knots, z_knots)
+spline_struct = LaverySpline2D(x_knots, y_knots, z_knots; lambda = 5.0)
 # Define Lavery spline interpolation function
 spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
