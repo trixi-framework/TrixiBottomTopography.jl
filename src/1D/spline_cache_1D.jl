@@ -421,7 +421,7 @@ end
                    weight::Float64 = 1e-4,
                    integral_steps::Int = 10)
 
-This function calculates the inputs for the structure [`LaverySpline`](@ref).
+This function calculates the inputs for the structure [`LaverySpline1D`](@ref).
 The input values are:
 - `xData`: Vector of x-coordinates of the data points (knots)
 - `zData`: Vector of z-coordinates (function values) at the data points

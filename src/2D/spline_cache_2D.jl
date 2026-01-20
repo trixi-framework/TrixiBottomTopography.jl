@@ -573,11 +573,11 @@ The attributes are:
 - `z`: Matrix of data values in the z-direction
 - `bx`: Matrix of slope coefficients at each knot point
 - `by`: Matrix of slope coefficients at each knot point
-- `lambda`: Regularization weight for the slope coefficients (default: 1e-1)
+- `lambda`: Regularization weight for the slope coefficients (default: 1.0)
 - `N`: Number of integration steps for computation (default: 5)
 
 """
-mutable struct LaverySpline2D#{x_type, z_type, b_type}
+mutable struct LaverySpline2D
     x::Vector
     y::Vector
     z::Array
@@ -590,15 +590,15 @@ end
 # Fill structure
 @doc raw"""
     LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix;
-                   lambda::Float64 = 1e-1,
+                   lambda::Float64 = 1.0,
                    N::Int = 5)
 
-This function calculates the inputs for the structure [`LaverySpline`](@ref).
+This function calculates the inputs for the structure [`LaverySpline2D`](@ref).
 The input values are:
 - `xData`: Vector of x-coordinates of the data points (knots)
 - `yData`: Vector of y-coordinates of the data points (knots)
 - `zData`: Matrix of z-coordinates (function values) at the data points
-- `lambda`: Regularization parameter for smoothness (default: 1e-1)
+- `lambda`: Regularization parameter for smoothness (default: 1.0)
 - `N`: Number of discrete points for integration (default: 5)
 
 First the data is sorted via [`sort_data`](@ref) to guarantee that the `x`, `y`, and `z`
@@ -617,7 +617,7 @@ References:
    [DiVA1918338](https://www.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf)
 """
 function LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix;
-                        lambda::Float64 = 1e-1,
+                        lambda::Float64 = 1.0,
                         N::Int = 5)
     I = length(xData)
     J = length(yData)
@@ -851,12 +851,12 @@ end
 
 # Read from file
 """
-    LaverySpline2D(path::String; lambda::Float64 = 1e-1, N::Int = 5)
+    LaverySpline2D(path::String; lambda::Float64 = 1.0, N::Int = 5)
 
 A function which reads in the `x`, `y` and `z` values for [`LaverySpline2D`](@ref) from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
-- `lambda`: Regularization parameter for smoothness (default: 1e-1)
+- `lambda`: Regularization parameter for smoothness (default: 1.0)
 - `N`: Number of discrete points for integration (default: 5)
 
 The .txt file has to have the following structure to be interpreted by this function:
