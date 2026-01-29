@@ -8,8 +8,8 @@ using TrixiBottomTopography
 
 # Load in data from one of the examples from Eriksson and Jemsson thesis
 # https://liu.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf
-x_knots = [0,1,2,3,4,5,6,7,8,9]
-y_knots = [0,1,2,3,4,5,6,7,8,9]
+x_knots = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+y_knots = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 z_knots = [1 1 1 0 0 4 4 4 4 1;
            1 1 1 0 0 1 1 1 1 1;
            1 1 1 3 3 3 3 3 3 3;
