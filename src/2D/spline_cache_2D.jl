@@ -626,12 +626,11 @@ References:
 - Lu Yu, Qingwei Jin, John E. Lavery, and Shu-Cherng Fang (2010)
    Univariate Cubic L1 Interpolating Splines: Spline Functional, Window Size and Analysis-based Algorithm.
    [DOI: 10.3390/a3030311](https://doi.org/10.3390/a3030311)
-- Ziteng Wang, John Lavery & Shu-Cherng Fang (2014)
+- Ziteng Wang, John Lavery, and Shu-Cherng Fang (2014)
    Approximation of Irregular Geometric Data by Locally Calculated Univariate Cubic L1 Spline Fits
    [DOI: 10.1007/s40745-014-0002-z](https://doi.org/10.1007/s40745-014-0002-z)
 """
 function LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix; lambda::Float64 = 0.0)
-
     I = length(xData)
     J = length(yData)
 
@@ -648,40 +647,41 @@ function LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix; lambda::Flo
 
     model = Model(optimizer_with_attributes(HiGHS.Optimizer,
                                             "solver" => "simplex",
-                                            "presolve" => "on",))
+                                            "presolve" => "on"))
     set_silent(model)
 
     # Setup the variables
     @variable(model, bx[1:I, 1:J])
     @variable(model, by[1:I, 1:J])
 
-    @variable(model, abs_dxbx[1:I-1, 1:J] >= 0)
-    @variable(model, abs_dyby[1:I, 1:J-1] >= 0)
-    @variable(model, abs_dybx[1:I, 1:J-1] >= 0)
-    @variable(model, abs_dxby[1:I-1, 1:J] >= 0)
+    @variable(model, abs_dxbx[1:(I - 1), 1:J]>=0)
+    @variable(model, abs_dyby[1:I, 1:(J - 1)]>=0)
+    @variable(model, abs_dybx[1:I, 1:(J - 1)]>=0)
+    @variable(model, abs_dxby[1:(I - 1), 1:J]>=0)
 
     # Absolute value constraints on the gradients
-    @constraint(model, [i=1:I-1, j=1:J], abs_dxbx[i,j] >=  bx[i+1,j] - bx[i,j])
-    @constraint(model, [i=1:I-1, j=1:J], abs_dxbx[i,j] >= -bx[i+1,j] + bx[i,j])
+    @constraint(model, [i = 1:(I - 1), j = 1:J], abs_dxbx[i, j]>=bx[i + 1, j] - bx[i, j])
+    @constraint(model, [i = 1:(I - 1), j = 1:J], abs_dxbx[i, j]>=-bx[i + 1, j] + bx[i, j])
 
-    @constraint(model, [i=1:I, j=1:J-1], abs_dyby[i,j] >=  by[i,j+1] - by[i,j])
-    @constraint(model, [i=1:I, j=1:J-1], abs_dyby[i,j] >= -by[i,j+1] + by[i,j])
+    @constraint(model, [i = 1:I, j = 1:(J - 1)], abs_dyby[i, j]>=by[i, j + 1] - by[i, j])
+    @constraint(model, [i = 1:I, j = 1:(J - 1)], abs_dyby[i, j]>=-by[i, j + 1] + by[i, j])
 
-    @constraint(model, [i=1:I, j=1:J-1], abs_dybx[i,j] >=  bx[i,j+1] - bx[i,j])
-    @constraint(model, [i=1:I, j=1:J-1], abs_dybx[i,j] >= -bx[i,j+1] + bx[i,j])
+    @constraint(model, [i = 1:I, j = 1:(J - 1)], abs_dybx[i, j]>=bx[i, j + 1] - bx[i, j])
+    @constraint(model, [i = 1:I, j = 1:(J - 1)], abs_dybx[i, j]>=-bx[i, j + 1] + bx[i, j])
 
-    @constraint(model, [i=1:I-1, j=1:J], abs_dxby[i,j] >=  by[i+1,j] - by[i,j])
-    @constraint(model, [i=1:I-1, j=1:J], abs_dxby[i,j] >= -by[i+1,j] + by[i,j])
+    @constraint(model, [i = 1:(I - 1), j = 1:J], abs_dxby[i, j]>=by[i + 1, j] - by[i, j])
+    @constraint(model, [i = 1:(I - 1), j = 1:J], abs_dxby[i, j]>=-by[i + 1, j] + by[i, j])
 
     # Monotonicity / no new extrema constraints
-    @constraint(model, [i=1:I, j=1:J], bx[i,j] >= 0)
-    @constraint(model, [i=1:I, j=1:J], by[i,j] >= 0)
+    @constraint(model, [i = 1:I, j = 1:J], bx[i, j]>=0)
+    @constraint(model, [i = 1:I, j = 1:J], by[i, j]>=0)
 
     # Objective function is the first-order total variation (TV) of gradients
     # Additional regularization can be added with `lambda > 0`
-    @objective(model, Min, sum(abs_dxbx) + sum(abs_dyby)
-                         + sum(abs_dybx) + sum(abs_dxby)
-                         + lambda * (sum(bx) + sum(by)))
+    @objective(model, Min,
+               sum(abs_dxbx)+sum(abs_dyby)
+               +sum(abs_dybx)+sum(abs_dxby)
+               +lambda*(sum(bx) + sum(by)))
 
     # Solve optimization problem
     optimize!(model)

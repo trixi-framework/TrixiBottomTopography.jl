@@ -175,8 +175,8 @@ function spline_interpolation(lavery::LaverySpline2D, x::Number, y::Number)
     by = lavery.by
 
     # Find containing cell
-    i = max(1, min(searchsortedlast(xData, x), length(xData)-1))
-    j = max(1, min(searchsortedlast(yData, y), length(yData)-1))
+    i = max(1, min(searchsortedlast(xData, x), length(xData) - 1))
+    j = max(1, min(searchsortedlast(yData, y), length(yData) - 1))
 
     dx = xData[i + 1] - xData[i]
     dy = yData[j + 1] - yData[j]
@@ -210,7 +210,7 @@ function spline_interpolation(lavery::LaverySpline2D, x::Number, y::Number)
     return (h00(xt) * (h00(yt) * z00 + h01(yt) * z01) +
             h01(xt) * (h00(yt) * z10 + h01(yt) * z11) +
             dx * (h10(xt) * (h00(yt) * bx00 + h01(yt) * bx01) +
-                  h11(xt) * (h00(yt) * bx10 + h01(yt) * bx11)) +
+             h11(xt) * (h00(yt) * bx10 + h01(yt) * bx11)) +
             dy * (h00(xt) * (h10(yt) * by00 + h11(yt) * by01) +
-                  h01(xt) * (h10(yt) * by10 + h11(yt) * by11)))
+             h01(xt) * (h10(yt) * by10 + h11(yt) * by11)))
 end
