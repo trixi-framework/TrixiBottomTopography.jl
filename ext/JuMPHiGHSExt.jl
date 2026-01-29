@@ -415,7 +415,8 @@ References:
    Approximation of Irregular Geometric Data by Locally Calculated Univariate Cubic L1 Spline Fits
    [DOI: 10.1007/s40745-014-0002-z](https://doi.org/10.1007/s40745-014-0002-z)
 """
-function TrixiBottomTopography.spline_interpolation(lavery_spline::LaverySpline2D, x::Number,
+function TrixiBottomTopography.spline_interpolation(lavery_spline::LaverySpline2D,
+                                                    x::Number,
                                                     y::Number)
     xData = lavery_spline.x
     yData = lavery_spline.y
