@@ -11,6 +11,9 @@ module TrixiBottomTopography
 using LinearAlgebra: norm, diagm, qr, Tridiagonal, SymTridiagonal
 using SparseArrays: sparse, spzeros
 using StaticArrays: SVector, @SVector, SMatrix, @SMatrix
+using JuMP: Model, VariableRef, direct_model, @variable, @objective, @constraint, optimize!,
+            termination_status, OPTIMAL, value, set_silent, optimizer_with_attributes
+using HiGHS
 
 # Include one dimensional B-spline interpolation
 include("1D/spline_utils_1D.jl")
@@ -27,8 +30,8 @@ include("auxiliary/convert.jl")
 include("auxiliary/default_example.jl")
 
 # Export the functions which are used for B-spline interpolation
-export LinearBSpline, CubicBSpline
-export BilinearBSpline, BicubicBSpline
+export LinearBSpline, CubicBSpline, LaverySpline1D
+export BilinearBSpline, BicubicBSpline, LaverySpline2D
 export spline_interpolation
 
 # Export the functions which are used DGM data conversion

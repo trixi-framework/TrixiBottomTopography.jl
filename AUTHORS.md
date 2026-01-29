@@ -18,7 +18,10 @@ The following people contributed major additions or modifications to TrixiBottom
 are listed in alphabetical order:
 
 * Maximilian D. Bertrand
+* Logan Eriksson
+* Oscar Jemsson
 * Joshua Lampert
+* Vincent Marks
 * Hendrik Ranocha
 * Michael Schlottke-Lakemper
 * Andrew Winters
