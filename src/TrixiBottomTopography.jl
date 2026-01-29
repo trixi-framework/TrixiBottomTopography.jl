@@ -11,9 +11,6 @@ module TrixiBottomTopography
 using LinearAlgebra: norm, diagm, qr, Tridiagonal, SymTridiagonal
 using SparseArrays: sparse, spzeros
 using StaticArrays: SVector, @SVector, SMatrix, @SMatrix
-using JuMP: Model, VariableRef, direct_model, @variable, @objective, @constraint, optimize!,
-            termination_status, OPTIMAL, value, set_silent, optimizer_with_attributes
-using HiGHS
 
 # Include one dimensional B-spline interpolation
 include("1D/spline_utils_1D.jl")
@@ -30,8 +27,8 @@ include("auxiliary/convert.jl")
 include("auxiliary/default_example.jl")
 
 # Export the functions which are used for B-spline interpolation
-export LinearBSpline, CubicBSpline, LaverySpline1D
-export BilinearBSpline, BicubicBSpline, LaverySpline2D
+export LinearBSpline, CubicBSpline
+export BilinearBSpline, BicubicBSpline
 export spline_interpolation
 
 # Export the functions which are used DGM data conversion
@@ -52,4 +49,14 @@ function RBFInterpolation end
 function RBFInterpolation1D end
 function RBFInterpolation2D end
 export RBFInterpolation, RBFInterpolation1D, RBFInterpolation2D
+
+# Note, types and empty routines for Lavery spline interpolation are included and exported.
+# They are extended in `ext/JuMPExt.jl` where their implementations are found.
+abstract type AbstractLaverySpline end
+function spline_interpolation(::AbstractLaverySpline, args...)
+    throw(MethodError(spline_interpolation, (args...,)))
+end
+function LaverySpline1D end
+function LaverySpline2D end
+export LaverySpline1D, LaverySpline2D
 end

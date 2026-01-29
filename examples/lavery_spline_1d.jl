@@ -5,6 +5,8 @@
 
 # Include packages
 using TrixiBottomTopography
+using JuMP
+using HiGHS
 
 # Load in data from one of the examples from Eriksson and Jemsson thesis
 # https://liu.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf
