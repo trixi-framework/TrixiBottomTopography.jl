@@ -23,3 +23,9 @@ TrixiBottomTopography.RBFInterpolation
 TrixiBottomTopography.RBFInterpolation1D
 TrixiBottomTopography.RBFInterpolation2D
 ```
+
+## JuMPHiGHS.jl extension
+```@docs
+TrixiBottomTopography.LaverySpline1D
+TrixiBottomTopography.LaverySpline2D
+```

@@ -1,6 +1,6 @@
 # Package extension for adding JuMP modeling language and HiGHS optimization features
 # for Lavery spline interpolation to TrixiBottomTopography.jl
-module JuMPExt
+module JuMPHiGHSExt
 
 using JuMP: Model, VariableRef, direct_model, @variable, @objective, @constraint,
             optimize!, value, set_silent, set_attribute
@@ -26,7 +26,7 @@ mutable struct LaverySpline1DModel
 end
 
 # Constructor
-function build_lavery_spline_1d_model(len::Int, weight::Float64, integral_steps::Int)
+function LaverySpline1DModel(len::Int, weight::Float64, integral_steps::Int)
     sumDomain = 1:(len - 1)
     bDomain = 1:len
 
@@ -68,9 +68,7 @@ function build_lavery_spline_1d_model(len::Int, weight::Float64, integral_steps:
     @constraint(model, [i in bDomain], abs_b[i]>=b[i])
     @constraint(model, [i in bDomain], abs_b[i]>=-b[i])
 
-    return LaverySpline1DModel(model,
-                               b, abs_b, abs_E,
-                               deltaZ)
+    return LaverySpline1DModel(model, b, abs_b, abs_E, deltaZ)
 end
 
 """
@@ -143,7 +141,7 @@ function TrixiBottomTopography.LaverySpline1D(xData::AbstractVector, zData::Abst
     len = length(xData)
 
     # Build the JuMP model once to save time
-    spline_model = build_lavery_spline_1d_model(len, weight, integral_steps)
+    spline_model = LaverySpline1DModel(len, weight, integral_steps)
 
     for i in 1:(len - 1)
         hi = xData[i + 1] - xData[i]
@@ -266,7 +264,7 @@ The input values are:
 - `zData`: Matrix of z-coordinates (function values) at the data points
 - `lambda`: Additional regularization parameter for smoothness (default: 0.0)
 
-Creates a total variation (TV) bicubic spline.
+Creates a total variation (TV) denoising bicubic spline.
 The spline is written as a tensor product of cubic Hermite basis functions.
 The coefficients for the spline are computed from an optimization problem with
 constraints to ensure no new extrema and shape preservation.
