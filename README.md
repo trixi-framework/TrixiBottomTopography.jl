@@ -38,6 +38,7 @@ This package contains the following main functionalities:
 - Setting up a B-spline interpolation structure in one and two dimensions which contains all the relevant information to define a B-spline interpolation function with additional specifications
 - Using the B-spline structure to set up a B-spline interpolation function
 - Setting up a radial basis function interpolation based on scattered data leveraging [KernelInterpolation.jl](https://github.com/JoshuaLampert/KernelInterpolation.jl)
+- Setting up a shape preserving cubic spline structure (Lavery spline) for interpolation that avoids generating new extrema.
 
 A detailed description of the functionalities can be found in the [documentation](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/) to this package.
 
