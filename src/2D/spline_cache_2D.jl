@@ -647,12 +647,12 @@ function LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix; lambda::Flo
 
     model = Model(optimizer_with_attributes(HiGHS.Optimizer,
                                             "solver" => "simplex",
-                                            "presolve" => "on"))
+                                            "presolve" => "off"))
     set_silent(model)
 
-    # Setup the variables
-    @variable(model, bx[1:I, 1:J])
-    @variable(model, by[1:I, 1:J])
+    # Setup the variables that enforce monotonicity via bounds
+    @variable(model, bx[1:I, 1:J]>=0)
+    @variable(model, by[1:I, 1:J]>=0)
 
     @variable(model, abs_dxbx[1:(I - 1), 1:J]>=0)
     @variable(model, abs_dyby[1:I, 1:(J - 1)]>=0)
@@ -671,10 +671,6 @@ function LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix; lambda::Flo
 
     @constraint(model, [i = 1:(I - 1), j = 1:J], abs_dxby[i, j]>=by[i + 1, j] - by[i, j])
     @constraint(model, [i = 1:(I - 1), j = 1:J], abs_dxby[i, j]>=-by[i + 1, j] + by[i, j])
-
-    # Monotonicity / no new extrema constraints
-    @constraint(model, [i = 1:I, j = 1:J], bx[i, j]>=0)
-    @constraint(model, [i = 1:I, j = 1:J], by[i, j]>=0)
 
     # Objective function is the first-order total variation (TV) of gradients
     # Additional regularization can be added with `lambda > 0`
