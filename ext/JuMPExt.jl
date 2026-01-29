@@ -109,7 +109,11 @@ The input values are:
 First the data is sorted via [`sort_data`](@ref) to guarantee that the `x` values
 are in ascending order.
 
-The Lavery spline is computed by solving an optimization problem.
+The Lavery spline coefficients are computed by solving an optimization problem.
+The objective function in the optimization procedure is the second derivative of the spline.
+to control the local curvature (point-wise).
+Additional positivity constraints are placed on the coefficients to ensure no new extrema
+are created by the resulting spline.
 
 The optimization problem is formulated as a linear program and solved using HiGHS.jl.
 
