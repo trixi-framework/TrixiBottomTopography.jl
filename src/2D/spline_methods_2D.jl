@@ -144,133 +144,73 @@ end
 @doc raw"""
     spline_interpolation(lavery_spline::LaverySpline2D, x::Number, y::Number)
 
-Evaluates the Bicubic Lavery spline at a single point `(x,y)`.
-The spline on a rectangular patch is written in terms of four (triangular) Sibson elements.
-Function form of the spline changes depending on which Sibson element contains the point `(x,y)`.
-See Section 2.5 of the provided reference for details.
+Evaluates a total variation (TV) based spline at a single point `(x,y)`.
+The TV spline behaves as a bicubic Lavery spline in that no new extrema are generated
+and shape is preserved.
+The coefficients are computed through an optimization procedure, see [`LaverySpline2D`](@ref).
+The spline is formulated as a tensor product of cubic Hermite splines with basis functions
+in each direction
+```math
+\begin{aligned}
+   h_{00}(t) &= 2 t^3 - 3 t^2 + 1\\
+   h_{10}(t) &= t^3 - 2 t^2 + t\\
+   h_{01}(t) &= -2 t^3 + 3 t^2\\
+   h_{11}(t) &= t^3 - t^2\\
+\end{aligned}
+```
 
-Reference:
-- Logan Eriksson and Oscar Jemsson (2024)
-   Uni- and bivariate interpolation of multiscale data using cubic L1 splines.
-   [DiVA1918338](https://www.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf)
+References:
+- Lu Yu, Qingwei Jin, John E. Lavery, and Shu-Cherng Fang (2010)
+   Univariate Cubic L1 Interpolating Splines: Spline Functional, Window Size and Analysis-based Algorithm.
+   [DOI: 10.3390/a3030311](https://doi.org/10.3390/a3030311)
+- Ziteng Wang, John Lavery & Shu-Cherng Fang (2014)
+   Approximation of Irregular Geometric Data by Locally Calculated Univariate Cubic L1 Spline Fits
+   [DOI: 10.1007/s40745-014-0002-z](https://doi.org/10.1007/s40745-014-0002-z)
 """
-function spline_interpolation(lavery_spline::LaverySpline2D, x::Number, y::Number)
-    xData = lavery_spline.x
-    yData = lavery_spline.y
-    zData = lavery_spline.z
-    bx = lavery_spline.bx
-    by = lavery_spline.by
+function spline_interpolation(lavery::LaverySpline2D, x::Number, y::Number)
+    xData = lavery.x
+    yData = lavery.y
+    z = lavery.z
+    bx = lavery.bx
+    by = lavery.by
 
-    # Find the patch containing (x, y)
-    i = max(1, min(searchsortedlast(xData, x), length(xData) - 1))
-    j = max(1, min(searchsortedlast(yData, y), length(yData) - 1))
+    # Find containing cell
+    i = max(1, min(searchsortedlast(xData, x), length(xData)-1))
+    j = max(1, min(searchsortedlast(yData, y), length(yData)-1))
 
-    # Width of patch
-    dx_i = xData[i + 1] - xData[i]
-    dy_j = yData[j + 1] - yData[j]
+    dx = xData[i + 1] - xData[i]
+    dy = yData[j + 1] - yData[j]
 
-    # Local coordinate within patch
-    xTilde = (x - xData[i]) / dx_i # Transforms x in [x_i,x_i+1] to xTilde in [0,1]
-    yTilde = (y - yData[j]) / dy_j # Transforms y in [y_i,y_i+1] to yTilde in [0,1]
+    xt = (x - xData[i]) / dx
+    yt = (y - yData[j]) / dy
 
-    z_val = 0
-    slope = dy_j / dx_i
+    # cubic Hermite spline basis functions
+    h00(t) = 1 + t^2 * (-3 + 2 * t)
+    h10(t) = t + t^2 * (-2 + t)
+    h01(t) = t^2 * (3 - 2 * t)
+    h11(t) = t^2 * (-1 + t)
 
-    # Depending in which Sibson element the `(x,y)` point is present the variables may change roles.
-    if (y <= yData[j] + (x - xData[i]) * slope && y <= yData[j+1] - (x - xData[i]) * slope)
-        # Sibson element 1 (default)
-        xt = xTilde
-        yt = yTilde
-        dx = dx_i
-        dy = dy_j
-        z_ij = zData[i, j]
-        zx_ij = bx[i, j]
-        zy_ij = by[i, j]
-        z_ip1j = zData[i + 1, j]
-        zx_ip1j = bx[i + 1, j]
-        zy_ip1j = by[i + 1, j]
-        z_ijp1 = zData[i, j + 1]
-        zx_ijp1 = bx[i, j + 1]
-        zy_ijp1 = by[i, j + 1]
-        z_ip1jp1 = zData[i + 1, j + 1]
-        zx_ip1jp1 = bx[i + 1, j + 1]
-        zy_ip1jp1 = by[i + 1, j + 1]
-    elseif (y <= yData[j] + (x - xData[i]) * slope && y >= yData[j+1] - (x - xData[i]) * slope)
-        # Sibson element 2; Eq. (2.27)
-        xt = yTilde
-        yt = 1 - xTilde
-        dx = dy_j
-        dy = dx_i
-        z_ij = zData[i + 1, j]
-        zx_ij = by[i + 1, j]
-        zy_ij = -bx[i + 1, j]
-        z_ip1j = zData[i + 1, j + 1]
-        zx_ip1j = by[i + 1, j + 1]
-        zy_ip1j = -bx[i + 1, j + 1]
-        z_ijp1 = zData[i, j]
-        zx_ijp1 = by[i, j]
-        zy_ijp1 = -bx[i, j]
-        z_ip1jp1 = zData[i, j + 1]
-        zx_ip1jp1 = by[i, j + 1]
-        zy_ip1jp1 = -bx[i, j + 1]
-    elseif (y >= yData[j] + (x - xData[i]) * slope && y >= yData[j+1] - (x - xData[i]) * slope)
-        # Sibson element 3; Eq. (2.28)
-        xt = 1 - xTilde
-        yt = 1 - yTilde
-        dx = dx_i
-        dy = dy_j
-        z_ij = zData[i + 1, j + 1]
-        zx_ij = -bx[i + 1, j + 1]
-        zy_ij = -by[i + 1, j + 1]
-        z_ip1j = zData[i, j + 1]
-        zx_ip1j = -bx[i, j + 1]
-        zy_ip1j = -by[i, j + 1]
-        z_ijp1 = zData[i + 1, j]
-        zx_ijp1 = -bx[i + 1, j]
-        zy_ijp1 = -by[i + 1, j]
-        z_ip1jp1 = zData[i, j]
-        zx_ip1jp1 = -bx[i, j]
-        zy_ip1jp1 = -by[i, j]
-    elseif (y >= yData[j] + (x - xData[i]) * slope && y <= yData[j+1] - (x - xData[i]) * slope)
-        # Sibson element 4; Eq. (2.29)
-        xt = 1 - yTilde
-        yt = xTilde
-        dx = dy_j
-        dy = dx_i
-        z_ij = zData[i, j + 1]
-        zx_ij = -by[i, j + 1]
-        zy_ij = bx[i, j + 1]
-        z_ip1j = zData[i, j]
-        zx_ip1j = -by[i, j]
-        zy_ip1j = bx[i, j]
-        z_ijp1 = zData[i + 1, j + 1]
-        zx_ijp1 = -by[i + 1, j + 1]
-        zy_ijp1 = bx[i + 1, j + 1]
-        z_ip1jp1 = zData[i + 1, j]
-        zx_ip1jp1 = -by[i + 1, j]
-        zy_ip1jp1 = bx[i + 1, j]
-    end
+    # Corner values of the current cell
+    z00 = z[i, j]
+    z10 = z[i + 1, j]
+    z01 = z[i, j + 1]
+    z11 = z[i + 1, j + 1]
 
-    # Evaluation of the spline on Sibson element 1.
-    # The original expression is Eq. (2.26) in Eriksson and Jemsson, the version below
-    # has been factored via Horner's rule for faster computation.
+    bx00 = bx[i, j]
+    bx10 = bx[i + 1, j]
+    bx01 = bx[i, j + 1]
+    bx11 = bx[i + 1, j + 1]
 
-    # Precompute powers that can be reused
-    xt2 = xt * xt
-    yt2 = yt * yt
-    xtyt2 = xt * yt2
-    z_val = ((xt * (xt * (2 * xt - 3) + 3 * yt2) + 1 + yt2 * (yt - 3)) * z_ij
-            + dx * (xt * (xt * (xt - 2) + 1 + 0.5 * yt2) - 0.5 * yt2) * zx_ij
-            + dy * (yt * (yt * (0.5 * yt + xt - 1.5) + (1 - xt))) * zy_ij
-            + (xt2 * (3 - 2 * xt) + yt2 * (yt - 3 * xt)) * z_ip1j
-            + dx * (xt2 * (xt - 1) + 0.5 * xtyt2) * zx_ip1j
-            + dy * (yt * (xt + yt * (0.5 * yt - xt - 0.5))) * zy_ip1j
-            + yt2 * (3 - yt - 3 * xt) * z_ijp1
-            + dx * 0.5 * yt2 * (1 - xt) * zx_ijp1
-            + dy * yt2 * (xt + 0.5 * yt - 1) * zy_ijp1
-            + yt2 * (3 * xt - yt) * z_ip1jp1
-            + dx * (-0.5 * xtyt2) * zx_ip1jp1
-            + dy * yt2 * (0.5*yt - xt) * zy_ip1jp1)
+    by00 = by[i, j]
+    by10 = by[i + 1, j]
+    by01 = by[i, j + 1]
+    by11 = by[i + 1, j + 1]
 
-    return z_val
+    # Tensor product cubic Hermite interpolation
+    return (h00(xt) * (h00(yt) * z00 + h01(yt) * z01) +
+            h01(xt) * (h00(yt) * z10 + h01(yt) * z11) +
+            dx * (h10(xt) * (h00(yt) * bx00 + h01(yt) * bx01) +
+                  h11(xt) * (h00(yt) * bx10 + h01(yt) * bx11)) +
+            dy * (h00(xt) * (h10(yt) * by00 + h11(yt) * by01) +
+                  h01(xt) * (h10(yt) * by10 + h11(yt) * by11)))
 end

@@ -563,7 +563,7 @@ end
 
 # Lavery Spline structure
 """
-    LaverySpline2D(x, y, z, bx, by, lambda, N)
+    LaverySpline2D(x, y, z, bx, by, lambda)
 
 Two dimensional Lavery spline structure.
 
@@ -573,40 +573,45 @@ The attributes are:
 - `z`: Matrix of data values in the z-direction
 - `bx`: Matrix of slope coefficients at each knot point
 - `by`: Matrix of slope coefficients at each knot point
-- `lambda`: Regularization weight for the slope coefficients (default: 1.0)
-- `N`: Number of integration steps for computation (default: 5)
-
+- `lambda`: Additional regularization weight
 """
-mutable struct LaverySpline2D
-    x::Vector
-    y::Vector
-    z::Array
-    bx::Array
-    by::Array
+struct LaverySpline2D
+    x::Vector{Float64}
+    y::Vector{Float64}
+    z::Matrix{Float64}
+    bx::Matrix{Float64}
+    by::Matrix{Float64}
     lambda::Float64
-    N::Int
 end
 
-# Fill structure
 @doc raw"""
     LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix;
-                   lambda::Float64 = 1.0,
-                   N::Int = 5)
+                   lambda::Float64 = 0.0)
 
 This function calculates the inputs for the structure [`LaverySpline2D`](@ref).
 The input values are:
 - `xData`: Vector of x-coordinates of the data points (knots)
 - `yData`: Vector of y-coordinates of the data points (knots)
 - `zData`: Matrix of z-coordinates (function values) at the data points
-- `lambda`: Regularization parameter for smoothness (default: 1.0)
-- `N`: Number of discrete points for integration (default: 5)
+- `lambda`: Additional regularization parameter for smoothness (default: 0.0)
 
-First the data is sorted via [`sort_data`](@ref) to guarantee that the `x`, `y`, and `z`
+Creates a total variation (TV) bicubic spline.
+The spline is written as a tensor product of cubic Hermite basis functions.
+The coefficients for the spline are computed from an optimization problem with
+constraints to ensure no new extrema and shape preservation.
+
+The original formulation from Lavery uses an objective function in terms of the second derivatives
+to control curvature of the resulting spline pointwise.
+This strategy requires geometric subdivision via Sibson elements and is numerically expensive.
+This implementation, instead, uses sign constraints on the gradients together with a TV penalty
+and a convex optimization procedure to determine the coefficients and maintain shape preservation globally.
+In essence, this is a discrete convex relaxation of the original formulation of Lavery that is tight under monotonicity.
+
+The data is sorted via [`sort_data`](@ref) to guarantee that the `x`, `y`, and `z`
 values are in ascending order.
 
-The Lavery spline is computed by solving an optimization problem.
-
-The optimization problem is formulated as a linear program and solved using HiGHS.jl.
+The optimization problem is formulated as a linear program and solved using
+the simplex method available in HiGHS.jl.
 
 References:
 - John E. Lavery (2001),
@@ -615,249 +620,87 @@ References:
 - Logan Eriksson and Oscar Jemsson (2024)
    Uni- and bivariate interpolation of multiscale data using cubic L1 splines.
    [DiVA1918338](https://www.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf)
+- Frans Kuijt and Ruud van Damme (2001)
+   A linear approach to shape preserving spline approximation
+   [DOI: 10.1023/A:1016660513725](https://doi.org/10.1023/A:1016660513725)
+- Lu Yu, Qingwei Jin, John E. Lavery, and Shu-Cherng Fang (2010)
+   Univariate Cubic L1 Interpolating Splines: Spline Functional, Window Size and Analysis-based Algorithm.
+   [DOI: 10.3390/a3030311](https://doi.org/10.3390/a3030311)
+- Ziteng Wang, John Lavery & Shu-Cherng Fang (2014)
+   Approximation of Irregular Geometric Data by Locally Calculated Univariate Cubic L1 Spline Fits
+   [DOI: 10.1007/s40745-014-0002-z](https://doi.org/10.1007/s40745-014-0002-z)
 """
-function LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix;
-                        lambda::Float64 = 1.0,
-                        N::Int = 5)
+function LaverySpline2D(xData::Vector, yData::Vector, zData::Matrix; lambda::Float64 = 0.0)
+
     I = length(xData)
     J = length(yData)
 
-    if (size(zData, 1) != I || size(zData, 2) != J)
-        throw(DimensionMismatch("The dimensions of z do not coincide with x and y."))
+    if size(zData, 2) != I || size(zData, 1) != J
+        error("Dimension mismatch between x, y, z")
     end
 
     xData, yData, zData = sort_data(xData, yData, zData)
 
-    model = direct_model(
-        optimizer_with_attributes(
-            HiGHS.Optimizer,
-            "presolve" => "on",
-            "solver"   => "ipm",
-        )
-    )
+    # As with the `BicubicBSpline` the data is passed in the ordering
+    # zData[j, i] where j = 1, ..., J and i = 1, ..., I
+    # So we transpose into the format needed by the implementation below
+    zData = Matrix(transpose(zData))
+
+    model = Model(optimizer_with_attributes(HiGHS.Optimizer,
+                                            "solver" => "simplex",
+                                            "presolve" => "on",))
     set_silent(model)
 
-    deltaX = [xData[i + 1] - xData[i] for i in 1:I-1]   # x-step length
-    deltaY = [yData[j + 1] - yData[j] for j in 1:J-1]   # y-step length
+    # Setup the variables
+    @variable(model, bx[1:I, 1:J])
+    @variable(model, by[1:I, 1:J])
 
-    # Convenience values for inverse of the grid spacing
-    inv_dx = 1 ./ deltaX
-    inv_dy = 1 ./ deltaY
+    @variable(model, abs_dxbx[1:I-1, 1:J] >= 0)
+    @variable(model, abs_dyby[1:I, 1:J-1] >= 0)
+    @variable(model, abs_dybx[1:I, 1:J-1] >= 0)
+    @variable(model, abs_dxby[1:I-1, 1:J] >= 0)
 
-    # N is the number of integration points in each sub-piece
-    domain = collect(range(0, 1, step = 1 / (2 * N)))
+    # Absolute value constraints on the gradients
+    @constraint(model, [i=1:I-1, j=1:J], abs_dxbx[i,j] >=  bx[i+1,j] - bx[i,j])
+    @constraint(model, [i=1:I-1, j=1:J], abs_dxbx[i,j] >= -bx[i+1,j] + bx[i,j])
 
-    @variable(model, bx[1:I, 1:J]) # dzdx(x_i,y_i)
-    @variable(model, by[1:I, 1:J]) # dzdy(x_i,y_i)
+    @constraint(model, [i=1:I, j=1:J-1], abs_dyby[i,j] >=  by[i,j+1] - by[i,j])
+    @constraint(model, [i=1:I, j=1:J-1], abs_dyby[i,j] >= -by[i,j+1] + by[i,j])
 
-    # Compute all the second derivatives in each of the patches
-    d2zdx2_1 = [inv_dx[i]^2 * ((-6 + 12 * xTilde) * zData[i, j]
-                + deltaX[i] * (-4 + 6 * xTilde) * bx[i, j]
-                + (6 - 12 * xTilde) * zData[i + 1, j]
-                + deltaX[i] * (-2 + 6 * xTilde) * bx[i + 1, j])
-                for i in 1:I-1, j in 1:J-1, xTilde in domain]
+    @constraint(model, [i=1:I, j=1:J-1], abs_dybx[i,j] >=  bx[i,j+1] - bx[i,j])
+    @constraint(model, [i=1:I, j=1:J-1], abs_dybx[i,j] >= -bx[i,j+1] + bx[i,j])
 
-    d2zdxdy_1= [inv_dx[i] * inv_dy[j] * (
-                6 * yTilde * ((zData[i, j] + zData[i + 1, j + 1]) - (zData[i + 1, j] + zData[i, j + 1]))
-                +deltaX[i] * yTilde * ((bx[i, j] + bx[i + 1, j]) - (bx[i, j + 1] + bx[i + 1, j + 1]))
-                +deltaY[j] * ((by[i + 1, j] - by[i, j]) +
-                2 * yTilde * ( (by[i, j] + by[i, j + 1]) - (by[i + 1, j] + by[i + 1, j + 1]))))
-                for i in 1:I-1, j in 1:J-1, yTilde in domain]
+    @constraint(model, [i=1:I-1, j=1:J], abs_dxby[i,j] >=  by[i+1,j] - by[i,j])
+    @constraint(model, [i=1:I-1, j=1:J], abs_dxby[i,j] >= -by[i+1,j] + by[i,j])
 
-    d2zdy2_1 = [inv_dy[j]^2 * ((-6 + 6 * xTilde + 6 * yTilde) * zData[i, j]
-                + deltaX[i] * (-1 + xTilde) * bx[i, j]
-                + deltaY[j] * (-3 + 2 * xTilde + 3 * yTilde) * by[i, j]
-                + (-6 * xTilde + 6 * yTilde) * zData[i + 1, j]
-                + deltaX[i] * xTilde * bx[i + 1, j]
-                + deltaY[j] * (-1 - 2 * xTilde + 3 * yTilde) * by[i + 1, j]
-                + (6 - 6 * xTilde - 6 * yTilde) * zData[i, j + 1]
-                + deltaX[i] * (1 - xTilde) * bx[i, j + 1]
-                + deltaY[j] * (-2 + 2 * xTilde + 3 * yTilde) * by[i, j + 1]
-                + (6 * xTilde - 6 * yTilde) * zData[i + 1, j + 1]
-                + deltaX[i] * (-xTilde) * bx[i + 1, j + 1]
-                + deltaY[j] * (-2 * xTilde + 3 * yTilde) * by[i + 1, j + 1])
-                for i in 1:I-1, j in 1:J-1, xTilde in domain, yTilde in domain]
+    # Monotonicity / no new extrema constraints
+    @constraint(model, [i=1:I, j=1:J], bx[i,j] >= 0)
+    @constraint(model, [i=1:I, j=1:J], by[i,j] >= 0)
 
-    d2zdx2_2 = [inv_dy[j]^2 * ((-6 + 12 * yTilde) * zData[i + 1, j]
-                + deltaY[j] * (-4 + 6 * yTilde) * by[i + 1, j]
-                + (6 - 12 * yTilde) * zData[i + 1, j + 1]
-                + deltaY[j] * (-2 + 6 * yTilde) * by[i + 1, j + 1])
-                for i in 1:I-1, j in 1:J-1, yTilde in domain]
+    # Objective function is the first-order total variation (TV) of gradients
+    # Additional regularization can be added with `lambda > 0`
+    @objective(model, Min, sum(abs_dxbx) + sum(abs_dyby)
+                         + sum(abs_dybx) + sum(abs_dxby)
+                         + lambda * (sum(bx) + sum(by)))
 
-    d2zdxdy_2 = [inv_dy[j] * inv_dx[i] * (
-                6 * (1 - xTilde) * ((zData[i + 1, j] + zData[i, j + 1]) - (zData[i + 1, j + 1] + zData[i, j]))
-                + deltaY[j] * (1 - xTilde) * ((by[i + 1, j] + by[i + 1, j + 1]) - (by[i, j] + by[i, j + 1]) )
-                + deltaX[i] * ((-bx[i + 1, j + 1] + bx[i + 1, j]) +
-                2 * (1 - xTilde) * ((bx[i + 1, j] + bx[i, j]) - (-bx[i + 1, j + 1] - bx[i, j + 1]))))
-                for i in 1:I-1, j in 1:J-1, xTilde in domain]
-
-    d2zdy2_2 = [inv_dx[i]^2 * ((-6 + 6 * yTilde + 6 * (1 - xTilde)) * zData[i + 1, j]
-                + deltaY[j] * (-1 + yTilde) * by[i + 1, j]
-                + deltaX[i] * (-3 + 2 * yTilde + 3 * (1 - xTilde)) * (-bx[i + 1, j])
-                + (-6 * yTilde + 6 * (1 - xTilde)) * zData[i + 1, j + 1]
-                + deltaY[j] * yTilde * by[i + 1, j + 1]
-                + deltaX[i] * (-1 - 2 * yTilde + 3 * (1 - xTilde)) * (-bx[i + 1, j + 1])
-                + (6 - 6 * yTilde - 6 * (1 - xTilde)) * zData[i, j]
-                + deltaY[j] * (1 - yTilde) * by[i, j]
-                + deltaX[i] * (-2 + 2 * yTilde + 3 * (1 - xTilde)) * (-bx[i,j])
-                + (6 * yTilde - 6 * (1 - xTilde)) * zData[i, j + 1]
-                + deltaY[j] * (-yTilde) * by[i, j + 1]
-                + deltaX[i] * (-2 * yTilde + 3 * (1 - xTilde)) * (-bx[i, j + 1]))
-                for i in 1:I-1, j in 1:J-1, xTilde in domain, yTilde in domain]
-
-    d2zdx2_3 = [inv_dx[i]^2 * ((-6 + 12 * (1 - xTilde)) * zData[i + 1, j + 1]
-                + deltaX[i] * (-4 + 6 * (1 - xTilde)) * bx[i + 1, j + 1]
-                + (6 - 12 * (1 - xTilde)) * zData[i, j + 1]
-                + deltaX[i] * (-2 + 6 * (1 - xTilde)) * bx[i, j + 1])
-                for i in 1:I-1, j in 1:J-1, xTilde in domain]
-
-    d2zdxdy_3 = [inv_dx[i] * inv_dy[j] * (
-                6 * (1 - yTilde) * ((zData[i + 1, j + 1] + zData[i, j]) - (zData[i, j + 1] + zData[i + 1, j]))
-                + deltaX[i] * (1 - yTilde) * ((bx[i + 1, j + 1] + bx[i, j + 1]) - (bx[i + 1, j] + bx[i, j]))
-                + deltaY[j] * ((by[i, j + 1] - by[i + 1, j + 1]) +
-                2 * (1 - yTilde) * ((by[i + 1, j + 1] + by[i + 1, j]) - (by[i, j + 1] + by[i, j]))))
-                for i in 1:I-1, j in 1:J-1, yTilde in domain]
-
-    d2zdy2_3 = [inv_dy[j]^2 * ((-6 + 6 * (1 - xTilde) + 6 * (1 - yTilde)) * zData[i + 1, j + 1]
-                + deltaX[i] * (-1 + (1 - xTilde)) * bx[i + 1, j + 1]
-                + deltaY[j] * (-3 + 2 * (1 - xTilde) + 3 * (1 - yTilde)) * by[i + 1, j + 1]
-                + (-6 * (1 - xTilde) + 6 * (1 - yTilde)) * zData[i, j + 1]
-                + deltaX[i] * (1 - xTilde) * bx[i, j + 1]
-                + deltaY[j] * (-1 - 2 * (1 - xTilde) + 3 * (1 - yTilde)) * by[i, j + 1]
-                + (6 - 6 * (1 - xTilde) - 6 * (1 - yTilde)) * zData[i + 1, j]
-                + deltaX[i] * (1 - (1 - xTilde )) * bx[i + 1, j]
-                + deltaY[j] * (-2 + 2 * (1 - xTilde) + 3 * (1 - yTilde)) * by[i + 1, j]
-                + (6 * (1 - xTilde) - 6 * (1 - yTilde)) * zData[i, j]
-                + deltaX[i] * (-(1 - xTilde)) * bx[i, j]
-                + deltaY[j] * (-2 * (1 - xTilde) + 3 * (1 - yTilde)) * by[i, j])
-                for i in 1:I-1, j in 1:J-1, xTilde in domain, yTilde in domain]
-
-    d2zdx2_4 = [inv_dy[j]^2 * ((-6 + 12 * (1 - yTilde)) * zData[i, j + 1]
-                + deltaY[j] * (-4 + 6 * (1 - yTilde)) * (-bx[i, j + 1])
-                + (6 - 12 * (1 - yTilde)) * zData[i, j]
-                + deltaY[j] * (-2 + 6 * (1 - yTilde)) * (-bx[i,j]))
-                for i in 1:I-1, j in 1:J-1, yTilde in domain]
-
-    d2zdxdy_4 = [inv_dx[i] * inv_dy[j] * (
-                6 * xTilde * ((zData[i, j + 1] + zData[i + 1, j]) - (zData[i, j] + zData[i + 1, j + 1]))
-                + deltaY[j] * xTilde * ((-bx[i, j + 1] - bx[i, j]) - (-bx[i + 1, j + 1] - bx[i + 1, j]))
-                + deltaX[i] * ((by[i, j] - by[i, j + 1])
-                + 2 * xTilde * ((by[i, j + 1] + by[i + 1, j + 1]) - (by[i, j] + by[i + 1, j]))))
-                for i in 1:I-1, j in 1:J-1, xTilde in domain]
-
-    d2zdy2_4 = [inv_dx[i]^2 * ((-6 + 6 * (1 - yTilde) + 6 * xTilde) * zData[i, j + 1]
-                + deltaY[j] * (-1 + (1 - yTilde)) * (-bx[i, j + 1])
-                + deltaX[i] * (-3 + 2 * (1 - yTilde) + 3 * xTilde) * by[i, j + 1]
-                + (-6 * (1 - yTilde) + 6 * xTilde) * zData[i, j]
-                + deltaY[j] * (1 - yTilde) * (-bx[i, j])
-                + deltaX[i] * (-1 -2 * (1 - yTilde) + 3 * xTilde) * by[i, j]
-                + (6 - 6 * (1 - yTilde) - 6 * xTilde) * zData[i + 1, j + 1]
-                + deltaY[j] * (1 - (1 - yTilde)) * (-bx[i + 1, j + 1])
-                + deltaX[i] * (-2 + 2 * (1 - yTilde) + 3 * yTilde) * by[i + 1, j + 1]
-                + (6 * (1 - yTilde) - 6 * xTilde) * zData[i + 1, j]
-                + deltaY[j] * (-(1 - yTilde)) * (-bx[i + 1, j])
-                + deltaX[i] * (-2 * (1 - yTilde) + 3 * xTilde) * by[i + 1,j])
-                for i in 1:I-1, j in 1:J-1, xTilde in domain, yTilde in domain]
-
-    # Define the variables
-    @variable(model, abs_d2zdx2_1[1:I-1, 1:J-1, 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdxdy_1[1:I-1, 1:J-1, 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdy2_1[1:I-1, 1:J-1, 1:(2*N), 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdx2_2[1:I-1, 1:J-1, 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdxdy_2[1:I-1, 1:J-1, 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdy2_2[1:I-1, 1:J-1, 1:(2*N), 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdx2_3[1:I-1, 1:J-1, 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdxdy_3[1:I-1, 1:J-1, 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdy2_3[1:I-1, 1:J-1, 1:(2*N), 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdx2_4[1:I-1, 1:J-1, 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdxdy_4[1:I-1, 1:J-1, 1:(2*N)] >= 0)
-    @variable(model, abs_d2zdy2_4[1:I-1, 1:J-1, 1:(2*N), 1:(2*N)] >= 0)
-    @variable(model, abs_bx[1:I, 1:J] >= 0)
-    @variable(model, abs_by[1:I, 1:J] >= 0)
-
-    # Objective function
-
-    # The sample size in each small square is 4*N^2 and lambda is a small number
-    inv_N2 = 1 / (N^2)
-    @objective(model, Min, sum(sum(inv_N2 * (
-            sum(sum(abs_d2zdx2_1[i, j, k] + 2 * abs_d2zdxdy_1[i, j, l] + abs_d2zdy2_1[i, j, k, l]
-                  + abs_d2zdx2_2[i, j, l] + 2 * abs_d2zdxdy_2[i, j, k] + abs_d2zdy2_2[i, j, k, l]
-                  + abs_d2zdx2_3[i, j, k] + 2 * abs_d2zdxdy_3[i, j, l] + abs_d2zdy2_3[i, j, k, l]
-                  + abs_d2zdx2_4[i, j, l] + 2 * abs_d2zdxdy_4[i, j, k] + abs_d2zdy2_4[i, j, k, l]
-                for l in 1:k) for k in 1:N)
-          + sum(sum(abs_d2zdx2_1[i, j, k] + 2 * abs_d2zdxdy_1[i, j, l] + abs_d2zdy2_1[i, j, k, l]
-                  + abs_d2zdx2_2[i, j, l] + 2 * abs_d2zdxdy_2[i, j, k] + abs_d2zdy2_2[i, j, k, l]
-                  + abs_d2zdx2_3[i, j, k] + 2 * abs_d2zdxdy_3[i, j, l] + abs_d2zdy2_3[i, j, k, l]
-                  + abs_d2zdx2_4[i, j, l] + 2 * abs_d2zdxdy_4[i, j, k] + abs_d2zdy2_4[i, j, k, l]
-                for l in N:2*N-k) for k in N+1:2*N)
-          ) for j in 1:J-1) for i in 1:I-1)
-          + lambda * sum(sum(abs_bx[i, j] + abs_by[i, j] for i in 1:I) for j in 1:J))
-
-    # Constraints in first piece
-    @constraint(model, pos_d2zdx2_1[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdx2_1[i, j, k] >=  d2zdx2_1[i, j, k])
-    @constraint(model, neg_d2zdx2_1[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdx2_1[i, j, k] >= -d2zdx2_1[i, j, k])
-
-    @constraint(model, pos_d2zdxdy_1[i in 1:I-1, j in 1:J-1, l in 1:(2*N)], abs_d2zdxdy_1[i, j, l] >=  d2zdxdy_1[i, j, l])
-    @constraint(model, neg_d2zdxdy_1[i in 1:I-1, j in 1:J-1, l in 1:(2*N)], abs_d2zdxdy_1[i, j, l] >= -d2zdxdy_1[i, j, l])
-
-    @constraint(model, pos_d2zdy2_1[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_1[i, j, k, l] >=  d2zdy2_1[i, j, k, l])
-    @constraint(model, neg_d2zdy2_1[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_1[i, j, k, l] >= -d2zdy2_1[i, j, k, l])
-
-    # Constraints in second piece
-    @constraint(model, pos_d2zdx2_2[i in 1:I-1, j in 1:J-1, l in 1:(2*N)], abs_d2zdx2_2[i, j, l] >=  d2zdx2_2[i, j, l])
-    @constraint(model, neg_d2zdx2_2[i in 1:I-1, j in 1:J-1, l in 1:(2*N)], abs_d2zdx2_2[i, j, l] >= -d2zdx2_2[i, j, l])
-
-    @constraint(model, pos_d2zdxdy_2[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdxdy_2[i, j, k] >=  d2zdxdy_2[i, j, k])
-    @constraint(model, neg_d2zdxdy_2[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdxdy_2[i, j, k] >= -d2zdxdy_2[i, j, k])
-
-    @constraint(model, pos_d2zdy2_2[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_2[i, j, k, l] >=  d2zdy2_2[i, j, k, l])
-    @constraint(model, neg_d2zdy2_2[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_2[i, j, k, l] >= -d2zdy2_2[i, j, k, l])
-
-    # Constraints in third piece
-    @constraint(model, pos_d2zdx2_3[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdx2_3[i, j, k] >=  d2zdx2_3[i, j, k])
-    @constraint(model, neg_d2zdx2_3[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdx2_3[i, j, k] >= -d2zdx2_3[i, j, k])
-
-    @constraint(model, pos_d2zdxdy_3[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdxdy_3[i, j, k] >=  d2zdxdy_3[i, j, k])
-    @constraint(model, neg_d2zdxdy_3[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdxdy_3[i, j, k] >= -d2zdxdy_3[i, j, k])
-
-    @constraint(model, pos_d2zdy2_3[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_3[i, j, k, l] >=  d2zdy2_3[i, j, k, l])
-    @constraint(model, neg_d2zdy2_3[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_3[i, j, k, l] >= -d2zdy2_3[i, j, k, l])
-
-    # Constraints in fourth piece
-    @constraint(model, pos_d2zdx2_4[i in 1:I-1, j in 1:J-1, l in 1:(2*N)], abs_d2zdx2_4[i, j, l] >=  d2zdx2_4[i, j, l])
-    @constraint(model, neg_d2zdx2_4[i in 1:I-1, j in 1:J-1, l in 1:(2*N)], abs_d2zdx2_4[i, j, l] >= -d2zdx2_4[i, j, l])
-
-    @constraint(model, pos_d2zdxdy_4[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdxdy_4[i, j, k] >=  d2zdxdy_4[i, j, k])
-    @constraint(model, neg_d2zdxdy_4[i in 1:I-1, j in 1:J-1, k in 1:(2*N)], abs_d2zdxdy_4[i, j, k] >= -d2zdxdy_4[i, j, k])
-
-    @constraint(model, pos_d2zdy2_4[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_4[i, j, k, l] >=  d2zdy2_4[i, j, k, l])
-    @constraint(model, neg_d2zdy2_4[i in 1:I-1, j in 1:J-1, k in 1:(2*N), l in 1:(2*N)], abs_d2zdy2_4[i, j, k, l] >= -d2zdy2_4[i, j, k, l])
-
-    # Remaining constraints on the coefficients
-    @constraint(model, pos_bx[i in 1:I, j in 1:J], abs_bx[i, j] >=  bx[i, j])
-    @constraint(model, neg_bx[i in 1:I, j in 1:J], abs_bx[i, j] >= -bx[i, j])
-
-    @constraint(model, pos_by[i in 1:I, j in 1:J], abs_by[i, j] >=  by[i, j])
-    @constraint(model, neg_by[i in 1:I, j in 1:J], abs_by[i, j] >= -by[i, j])
-
-    # Solve the optimization problem
+    # Solve optimization problem
     optimize!(model)
 
-    bx = Array(value.(bx))
-    by = Array(value.(by))
+    # Extract solution
+    bxv = value.(bx)
+    byv = value.(by)
 
-    return LaverySpline2D(xData, yData, zData, bx, by, lambda, N)
+    return LaverySpline2D(xData, yData, zData, bxv, byv, lambda)
 end
 
 # Read from file
 """
-    LaverySpline2D(path::String; lambda::Float64 = 1.0, N::Int = 5)
+    LaverySpline2D(path::String; lambda::Float64 = 0.0)
 
 A function which reads in the `x`, `y` and `z` values for [`LaverySpline2D`](@ref) from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
-- `lambda`: Regularization parameter for smoothness (default: 1.0)
-- `N`: Number of discrete points for integration (default: 5)
+- `lambda`: Regularization parameter for smoothness (default: 0.0)
 
 The .txt file has to have the following structure to be interpreted by this function:
 - First line: comment `# Number of x values`
@@ -875,7 +718,5 @@ The .txt file has to have the following structure to be interpreted by this func
 function LaverySpline2D(path::String; kwargs...)
     x, y, z = parse_txt_2D(path)
 
-    # The Lavery spline constructor expects the `z` data in a slightly different order
-    z = Matrix(transpose(z))
     LaverySpline2D(x, y, z; kwargs...)
 end

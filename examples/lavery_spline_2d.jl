@@ -22,7 +22,7 @@ z_knots = [1 1 1 0 0 4 4 4 4 1;
            0 0 0 0 0 0 0 0 0 0]
 
 # Lavery spline that does not generate new extrema
-spline_struct = LaverySpline2D(x_knots, y_knots, z_knots; lambda = 5.0)
+spline_struct = LaverySpline2D(x_knots, y_knots, z_knots)
 # Define Lavery spline interpolation function
 spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
@@ -37,7 +37,7 @@ if isdefined(Main, :Makie)
     z_int_pts = evaluate_two_dimensional_interpolant(spline_func, x_int_pts, y_int_pts)
 
     plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
-                                             x_knots, y_knots, z_knots';
+                                             x_knots, y_knots, z_knots;
                                              xlabel = "x",
                                              ylabel = "y",
                                              zlabel = "z")
