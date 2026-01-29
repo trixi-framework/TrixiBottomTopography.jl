@@ -133,7 +133,7 @@ function TrixiBottomTopography.LaverySpline1D(xData::AbstractVector, zData::Abst
     end
 
     if length(xData) < 2
-        throw(ArgumentError("To perform Lavery spline interpolation, we need an vector
+        throw(ArgumentError("To perform Lavery spline interpolation, we need a vector
                              that contains at least 2 values."))
     end
 
@@ -417,13 +417,13 @@ References:
    Approximation of Irregular Geometric Data by Locally Calculated Univariate Cubic L1 Spline Fits
    [DOI: 10.1007/s40745-014-0002-z](https://doi.org/10.1007/s40745-014-0002-z)
 """
-function TrixiBottomTopography.spline_interpolation(lavery::LaverySpline2D, x::Number,
+function TrixiBottomTopography.spline_interpolation(lavery_spline::LaverySpline2D, x::Number,
                                                     y::Number)
-    xData = lavery.x
-    yData = lavery.y
-    z = lavery.z
-    bx = lavery.bx
-    by = lavery.by
+    xData = lavery_spline.x
+    yData = lavery_spline.y
+    z = lavery_spline.z
+    bx = lavery_spline.bx
+    by = lavery_spline.by
 
     # Find containing cell
     i = max(1, min(searchsortedlast(xData, x), length(xData) - 1))
