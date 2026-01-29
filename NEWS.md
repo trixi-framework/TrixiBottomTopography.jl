@@ -9,6 +9,7 @@ for human readability.
 
 #### Added
 
+- Added shape preserving splines and interpolation using [JuMP.jl](https://github.com/jump-dev/JuMP.jl) and [HiGHS.jl](https://github.com/jump-dev/HiGHS.jl) [#83]
 - Added scattered radial basis function interpolation using [KernelInterpolation.jl](https://github.com/JoshuaLampert/KernelInterpolation.jl) [#73]
 - Implementation of visualization routines `plot_topography` and `plot_topography_with_interpolation_knots`
 
