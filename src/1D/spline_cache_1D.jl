@@ -341,30 +341,26 @@ end
 
 # Constructor
 function build_lavery_spline_model(len::Int, weight::Float64, integral_steps::Int)
-    sumDomain = 1:len - 1
-    bDomain   = 1:len
+    sumDomain = 1:(len - 1)
+    bDomain = 1:len
 
     # integration grid
     integralDomain = collect(range(-0.5, 0.5; length = integral_steps))
 
     # precompute t-dependent scalars
     aa = -1 .+ 6 .* integralDomain
-    bb =  1 .+ 6 .* integralDomain
+    bb = 1 .+ 6 .* integralDomain
     cc = 12 .* integralDomain
 
-    model = direct_model(
-        optimizer_with_attributes(
-            HiGHS.Optimizer,
-            "presolve" => "on",
-            "solver"   => "ipm",
-        )
-    )
+    model = direct_model(optimizer_with_attributes(HiGHS.Optimizer,
+                                                   "presolve" => "on",
+                                                   "solver" => "ipm"))
     set_silent(model)
 
     # variables
     @variable(model, b[bDomain])
-    @variable(model, abs_b[bDomain] >= 0)
-    @variable(model, abs_E[i in sumDomain, k in 1:integral_steps] >= 0)
+    @variable(model, abs_b[bDomain]>=0)
+    @variable(model, abs_E[i in sumDomain, k in 1:integral_steps]>=0)
 
     # placeholder for data
     deltaZ = zeros(len - 1)
@@ -372,21 +368,18 @@ function build_lavery_spline_model(len::Int, weight::Float64, integral_steps::In
     inv_steps = 1 / integral_steps
 
     @objective(model, Min,
-        sum(inv_steps * abs_E[i, k] for i in sumDomain, k in 1:integral_steps) +
-        sum(weight * abs_b[i] for i in bDomain)
-    )
+               sum(inv_steps * abs_E[i, k] for i in sumDomain, k in 1:integral_steps)+
+               sum(weight * abs_b[i] for i in bDomain))
 
     # constraints
     @constraint(model, [i in sumDomain, k in 1:integral_steps],
-        abs_E[i, k] >= aa[k] * b[i] + bb[k] * b[i + 1] - cc[k] * deltaZ[i]
-    )
+                abs_E[i, k]>=aa[k] * b[i] + bb[k] * b[i + 1] - cc[k] * deltaZ[i])
 
     @constraint(model, [i in sumDomain, k in 1:integral_steps],
-        abs_E[i, k] >= -aa[k] * b[i] - bb[k] * b[i + 1] + cc[k] * deltaZ[i]
-    )
+                abs_E[i, k]>=-aa[k] * b[i] - bb[k] * b[i + 1] + cc[k] * deltaZ[i])
 
-    @constraint(model, [i in bDomain], abs_b[i] >=  b[i])
-    @constraint(model, [i in bDomain], abs_b[i] >= -b[i])
+    @constraint(model, [i in bDomain], abs_b[i]>=b[i])
+    @constraint(model, [i in bDomain], abs_b[i]>=-b[i])
 
     return LaverySplineModel(model,
                              b, abs_b, abs_E,
@@ -446,7 +439,6 @@ References:
 function LaverySpline1D(xData::Vector, zData::Vector;
                         weight::Float64 = 1e-4,
                         integral_steps::Int = 10)
-
     if length(xData) != length(zData)
         throw(DimensionMismatch("Vectors xData and zData have to contain the same number of values"))
     end
@@ -464,7 +456,7 @@ function LaverySpline1D(xData::Vector, zData::Vector;
     # Build the JuMP model once to save time
     spline_model = build_lavery_spline_model(len, weight, integral_steps)
 
-    for i in 1:len-1
+    for i in 1:(len - 1)
         hi = xData[i + 1] - xData[i]
         spline_model.deltaZ[i] = (zData[i + 1] - zData[i]) / hi
     end

@@ -138,15 +138,16 @@ function spline_interpolation(lavery_spline::LaverySpline1D, x::Number)
 
     # Helper functions for this patch
     h_i = xData[i + 1] - xData[i]
-    deltaZ_i = (zData[i + 1] - zData[i]) / h_i
+    dz_i = (zData[i + 1] - zData[i]) / h_i
 
     # Local coordinate within patch
-    xi = x - xData[i]
+    x_i = x - xData[i]
 
     # Evaluate cubic polynomial (written with Horner's rule)
-    z_val = zData[i] + xi * (b[i] +
-            xi * ((-(2 * b[i] + b[i + 1]) + 3 * deltaZ_i) / h_i +
-            (b[i] + b[i + 1] - 2 * deltaZ_i) * xi / h_i^2))
+    z_val = (zData[i] +
+             x_i * (b[i] +
+              x_i * ((-(2 * b[i] + b[i + 1]) + 3 * dz_i) / h_i +
+               (b[i] + b[i + 1] - 2 * dz_i) * x_i / h_i^2)))
 
     return z_val
 end
