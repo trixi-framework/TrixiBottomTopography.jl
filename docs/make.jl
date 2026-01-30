@@ -5,6 +5,8 @@ using Changelog: Changelog
 # To load the extensions
 import CairoMakie
 import KernelInterpolation
+import JuMP
+import HiGHS
 
 # Copy list of authors to not need to synchronize it manually.
 # Since the authors header exists twice we create a unique identifier for the docs section.
