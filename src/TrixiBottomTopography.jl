@@ -65,7 +65,7 @@ The attributes are:
 - `weight`: Regularization weight for the slope coefficients (default: 1e-4)
 - `integral_steps`: Number of integration steps for computation (default: 10)
 """
-mutable struct LaverySpline1D{T<:Real}
+mutable struct LaverySpline1D{T <: Real}
     x::Vector{T}
     y::Vector{T}
     b::Vector{T}
@@ -85,7 +85,7 @@ The attributes are:
 - `by`: Matrix of slope coefficients at each knot point
 - `lambda`: Additional regularization weight
 """
-struct LaverySpline2D{T<:Real}
+struct LaverySpline2D{T <: Real}
     x::Vector{T}
     y::Vector{T}
     z::Matrix{T}

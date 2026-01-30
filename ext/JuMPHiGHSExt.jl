@@ -15,7 +15,7 @@ import TrixiBottomTopography: LaverySpline1D, LaverySpline2D, spline_interpolati
 ##########################################
 
 # Helper container so that the JuMP model only needs constructed once
-mutable struct LaverySpline1DModel{T<:Real}
+mutable struct LaverySpline1DModel{T <: Real}
     model::Model
     b::Vector{VariableRef}
     abs_b::Vector{VariableRef}
@@ -24,16 +24,17 @@ mutable struct LaverySpline1DModel{T<:Real}
 end
 
 # Constructor
-function LaverySpline1DModel(len::Int, lambda::T, integral_steps::Int) where {T<:Real}
+function LaverySpline1DModel(len::Int, lambda::T, integral_steps::Int) where {T <: Real}
     sumDomain = 1:(len - 1)
     bDomain = 1:len
 
     # integration grid
-    integralDomain = collect(range(convert(T, -0.5), convert(T, 0.5); length = integral_steps))
+    integralDomain = collect(range(convert(T, -0.5), convert(T, 0.5);
+                                   length = integral_steps))
 
     # precompute t-dependent scalars
     # that are the tridiagonal matrix entries for a spline
-    aa = convert(T,-1) .+ convert(T, 6) .* integralDomain
+    aa = convert(T, -1) .+ convert(T, 6) .* integralDomain
     bb = convert(T, 1) .+ convert(T, 6) .* integralDomain
     cc = convert(T, 12) .* integralDomain
 
@@ -99,7 +100,8 @@ References:
    Uni- and bivariate interpolation of multiscale data using cubic L1 splines.
    [DiVA1918338](https://www.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf)
 """
-function LaverySpline1D(x::Vector{T}, y::Vector{T}; lambda::T = convert(T, 1e-4), integral_steps::Int = 10) where {T<:Real}
+function LaverySpline1D(x::Vector{T}, y::Vector{T}; lambda::T = convert(T, 1e-4),
+                        integral_steps::Int = 10) where {T <: Real}
     if length(x) != length(y)
         throw(DimensionMismatch("Vectors x and y have to contain the same number of values"))
     end
@@ -250,7 +252,8 @@ References:
    Approximation of Irregular Geometric Data by Locally Calculated Univariate Cubic L1 Spline Fits
    [DOI: 10.1007/s40745-014-0002-z](https://doi.org/10.1007/s40745-014-0002-z)
 """
-function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T}; lambda::T = convert(T, 0)) where {T<:Real}
+function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
+                        lambda::T = convert(T, 0)) where {T <: Real}
     n = length(x)
     m = length(y)
 
