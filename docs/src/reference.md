@@ -26,6 +26,10 @@ TrixiBottomTopography.RBFInterpolation2D
 
 ## JuMPHiGHS.jl extension
 ```@docs
-TrixiBottomTopography.LaverySpline1D
-TrixiBottomTopography.LaverySpline2D
+TrixiBottomTopography.LaverySpline1D(::Vector, ::Vector)
+TrixiBottomTopography.LaverySpline1D(::String)
+TrixiBottomTopography.LaverySpline2D(::Vector, ::Vector, ::Matrix)
+TrixiBottomTopography.LaverySpline2D(::String)
+TrixiBottomTopography.spline_interpolation(::LaverySpline1D, ::Number)
+TrixiBottomTopography.spline_interpolation(::LaverySpline2D, ::Number, ::Number)
 ```

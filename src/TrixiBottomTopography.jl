@@ -52,8 +52,48 @@ export RBFInterpolation, RBFInterpolation1D, RBFInterpolation2D
 
 # Note, types and empty routines for Lavery spline interpolation are included and exported.
 # They are extended in `ext/JuMPExt.jl` where their implementations are found.
-abstract type AbstractLaverySpline end
-function spline_interpolation(::AbstractLaverySpline, args...)
+# abstract type AbstractLaverySpline end
+"""
+    LaverySpline1D
+
+One dimensional Lavery spline storage.
+
+The attributes are:
+- `x`: Vector of data points in x-direction (knot points)
+- `y`: Vector of data values in y-direction
+- `b`: Vector of slope coefficients at each knot point
+- `weight`: Regularization weight for the slope coefficients (default: 1e-4)
+- `integral_steps`: Number of integration steps for computation (default: 10)
+"""
+mutable struct LaverySpline1D{x_type, y_type, b_type}
+    x::x_type
+    y::y_type
+    b::b_type
+    weight::Float64
+    integral_steps::Int
+end
+"""
+    LaverySpline2D
+
+Two dimensional Lavery spline storage.
+
+The attributes are:
+- `x`: Vector of data points in x-direction (knot points)
+- `y`: Vector of data points in x-direction (knot points)
+- `z`: Matrix of data values in the z-direction
+- `bx`: Matrix of slope coefficients at each knot point
+- `by`: Matrix of slope coefficients at each knot point
+- `lambda`: Additional regularization weight
+"""
+struct LaverySpline2D
+    x::AbstractVector{Float64}
+    y::AbstractVector{Float64}
+    z::AbstractMatrix{Float64}
+    bx::AbstractMatrix{Float64}
+    by::AbstractMatrix{Float64}
+    lambda::Float64
+end
+function spline_interpolation(::Union{LaverySpline1D, LaverySpline2D}, args...)
     throw(MethodError(spline_interpolation, (args...,)))
 end
 function LaverySpline1D end
