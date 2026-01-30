@@ -72,13 +72,13 @@ function LaverySpline1DModel(len::Int, lambda::T, integral_steps::Int) where {T 
 end
 
 """
-    LaverySpline1D(x::Vector, y::Vector; lambda::Real = 1e-4, integral_steps::Int = 10)
+    LaverySpline1D(x::Vector, y::Vector; lambda::Real = 0.0, integral_steps::Int = 10)
 
 This function calculates the inputs for the structure [`LaverySpline1D`](@ref LaverySpline1D).
 The input values are:
 - `x`: Vector of x-coordinates of the data points (knots)
 - `y`: Vector of y-coordinates (function values) at the data points
-- `lambda`: Regularization parameter for smoothness (default: 1e-4)
+- `lambda`: Additional regularization parameter for smoothness (default: 0.0)
 - `integral_steps`: Number of discrete points for integration (default: 10)
 
 First the data is sorted via [`sort_data`](@ref TrixiBottomTopography.sort_data)
@@ -100,7 +100,7 @@ References:
    Uni- and bivariate interpolation of multiscale data using cubic L1 splines.
    [DiVA1918338](https://www.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf)
 """
-function LaverySpline1D(x::Vector{T}, y::Vector{T}; lambda::T = convert(T, 1e-4),
+function LaverySpline1D(x::Vector{T}, y::Vector{T}; lambda::T = convert(T, 0.0),
                         integral_steps::Int = 10) where {T <: Real}
     if length(x) != length(y)
         throw(DimensionMismatch("Vectors x and y have to contain the same number of values"))
@@ -137,13 +137,13 @@ function LaverySpline1D(x::Vector{T}, y::Vector{T}; lambda::T = convert(T, 1e-4)
 end
 
 """
-    LaverySpline1D(path::String; lambda::Real = 1e-4, integral_steps::Int = 10)
+    LaverySpline1D(path::String; lambda::Real = 0.0, integral_steps::Int = 10)
 
 A function that reads in the `x` and `y` values for [`LaverySpline1D`](@ref LaverySpline1D)
 from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
-- `lambda`: Regularization parameter for smoothness (default: 1e-4)
+- `lambda`: Additional regularization parameter for smoothness (default: 0.0)
 - `integral_steps`: Number of discrete points for integration (default: 10)
 
 The .txt file has to have the following structure to be interpreted by this function:
