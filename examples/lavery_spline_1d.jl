@@ -10,10 +10,10 @@ using HiGHS
 
 # Load in data from one of the examples from Eriksson and Jemsson thesis
 # https://liu.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf
-xData = Vector(0:29)
-yData = [0, 0, 0, 0, 0, 4, 2, 4, 3, 2,
-    1, 0, 9, 9, 9, 0, 0, 0, 6, 7,
-    5, 6, 7, 8, 0, 0, 0, 0, 0, 0]
+xData = Vector(0.0:29.0)
+yData = [0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 2.0, 4.0, 3.0, 2.0,
+    1.0, 0.0, 9.0, 9.0, 9.0, 0.0, 0.0, 0.0, 6.0, 7.0,
+    5.0, 6.0, 7.0, 8.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 # Lavery spline that does not generate new extrema
 spline_struct = LaverySpline1D(xData, yData)

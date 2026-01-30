@@ -15,26 +15,27 @@ import TrixiBottomTopography: LaverySpline1D, LaverySpline2D, spline_interpolati
 ##########################################
 
 # Helper container so that the JuMP model only needs constructed once
-mutable struct LaverySpline1DModel
+mutable struct LaverySpline1DModel{T<:Real}
     model::Model
     b::Vector{VariableRef}
     abs_b::Vector{VariableRef}
     abs_E::Matrix{VariableRef}
-    delta_y::Vector{Float64} # data-dependent coefficients
+    delta_y::Vector{T} # data-dependent coefficients
 end
 
 # Constructor
-function LaverySpline1DModel(len::Int, weight::Float64, integral_steps::Int)
+function LaverySpline1DModel(len::Int, lambda::T, integral_steps::Int) where {T<:Real}
     sumDomain = 1:(len - 1)
     bDomain = 1:len
 
     # integration grid
-    integralDomain = collect(range(-0.5, 0.5; length = integral_steps))
+    integralDomain = collect(range(convert(T, -0.5), convert(T, 0.5); length = integral_steps))
 
     # precompute t-dependent scalars
-    aa = -1 .+ 6 .* integralDomain
-    bb = 1 .+ 6 .* integralDomain
-    cc = 12 .* integralDomain
+    # that are the tridiagonal matrix entries for a spline
+    aa = convert(T,-1) .+ convert(T, 6) .* integralDomain
+    bb = convert(T, 1) .+ convert(T, 6) .* integralDomain
+    cc = convert(T, 12) .* integralDomain
 
     # Setup the model and solver choice
     model = direct_model(HiGHS.Optimizer())
@@ -48,13 +49,13 @@ function LaverySpline1DModel(len::Int, weight::Float64, integral_steps::Int)
     @variable(model, abs_E[i in sumDomain, k in 1:integral_steps]>=0)
 
     # placeholder for data
-    delta_y = zeros(len - 1)
+    delta_y = zeros(T, len - 1)
 
-    inv_steps = 1 / integral_steps
+    inv_steps = convert(T, 1) / integral_steps
 
     @objective(model, Min,
                sum(inv_steps * abs_E[i, k] for i in sumDomain, k in 1:integral_steps)+
-               sum(weight * abs_b[i] for i in bDomain))
+               sum(lambda * abs_b[i] for i in bDomain))
 
     # constraints
     @constraint(model, [i in sumDomain, k in 1:integral_steps],
@@ -66,18 +67,17 @@ function LaverySpline1DModel(len::Int, weight::Float64, integral_steps::Int)
     @constraint(model, [i in bDomain], abs_b[i]>=b[i])
     @constraint(model, [i in bDomain], abs_b[i]>=-b[i])
 
-    return LaverySpline1DModel(model, b, abs_b, abs_E, delta_y)
+    return LaverySpline1DModel{T}(model, b, abs_b, abs_E, delta_y)
 end
 
 """
-    LaverySpline1D(x::Vector, y::Vector; weight::Float64 = 1e-4,
-                   integral_steps::Int = 10)
+    LaverySpline1D(x::Vector, y::Vector; lambda::Real = 1e-4, integral_steps::Int = 10)
 
 This function calculates the inputs for the structure [`LaverySpline1D`](@ref LaverySpline1D).
 The input values are:
 - `x`: Vector of x-coordinates of the data points (knots)
 - `y`: Vector of y-coordinates (function values) at the data points
-- `weight`: Regularization parameter for smoothness (default: 1e-4)
+- `lambda`: Regularization parameter for smoothness (default: 1e-4)
 - `integral_steps`: Number of discrete points for integration (default: 10)
 
 First the data is sorted via [`sort_data`](@ref TrixiBottomTopography.sort_data)
@@ -99,7 +99,7 @@ References:
    Uni- and bivariate interpolation of multiscale data using cubic L1 splines.
    [DiVA1918338](https://www.diva-portal.org/smash/get/diva2:1918338/FULLTEXT01.pdf)
 """
-function LaverySpline1D(x::Vector, y::Vector; weight::Float64 = 1e-4, integral_steps::Int = 10)
+function LaverySpline1D(x::Vector{T}, y::Vector{T}; lambda::T = convert(T, 1e-4), integral_steps::Int = 10) where {T<:Real}
     if length(x) != length(y)
         throw(DimensionMismatch("Vectors x and y have to contain the same number of values"))
     end
@@ -115,7 +115,7 @@ function LaverySpline1D(x::Vector, y::Vector; weight::Float64 = 1e-4, integral_s
     len = length(x)
 
     # Build the JuMP model once to save time
-    spline_model = LaverySpline1DModel(len, weight, integral_steps)
+    spline_model = LaverySpline1DModel(len, lambda, integral_steps)
 
     for i in 1:(len - 1)
         hi = x[i + 1] - x[i]
@@ -131,17 +131,17 @@ function LaverySpline1D(x::Vector, y::Vector; weight::Float64 = 1e-4, integral_s
         b_values[i] = value(spline_model.b[i])
     end
 
-    LaverySpline1D(x, y, b_values, weight, integral_steps)
+    LaverySpline1D(x, y, b_values, lambda, integral_steps)
 end
 
 """
-    LaverySpline1D(path::String; weight::Float64 = 1e-4, integral_steps::Int = 10)
+    LaverySpline1D(path::String; lambda::Real = 1e-4, integral_steps::Int = 10)
 
 A function that reads in the `x` and `y` values for [`LaverySpline1D`](@ref LaverySpline1D)
 from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
-- `weight`: Regularization parameter for smoothness (default: 1e-4)
+- `lambda`: Regularization parameter for smoothness (default: 1e-4)
 - `integral_steps`: Number of discrete points for integration (default: 10)
 
 The .txt file has to have the following structure to be interpreted by this function:
@@ -205,7 +205,7 @@ end
 ##########################################
 
 """
-    LaverySpline2D(x::Vector, y::Vector, z::Matrix; lambda::Float64 = 0.0)
+    LaverySpline2D(x::Vector, y::Vector, z::Matrix; lambda::Real = 0.0)
 
 This function calculates the inputs for the structure [`LaverySpline2D`](@ref LaverySpline2D).
 The input values are:
@@ -250,7 +250,7 @@ References:
    Approximation of Irregular Geometric Data by Locally Calculated Univariate Cubic L1 Spline Fits
    [DOI: 10.1007/s40745-014-0002-z](https://doi.org/10.1007/s40745-014-0002-z)
 """
-function LaverySpline2D(x::Vector, y::Vector, z::Matrix; lambda::Float64 = 0.0)
+function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T}; lambda::T = convert(T, 0)) where {T<:Real}
     n = length(x)
     m = length(y)
 
@@ -263,7 +263,7 @@ function LaverySpline2D(x::Vector, y::Vector, z::Matrix; lambda::Float64 = 0.0)
     # As with the `BicubicBSpline` the data is passed in the ordering
     # z[j, i] where j = 1, ..., m and i = 1, ..., n
     # So we transpose into the format needed by the implementation below
-    z = transpose(z)
+    z = Matrix{T}(transpose(z))
 
     # Setup the model and solver choice
     model = direct_model(HiGHS.Optimizer())
@@ -311,7 +311,7 @@ function LaverySpline2D(x::Vector, y::Vector, z::Matrix; lambda::Float64 = 0.0)
 end
 
 """
-    LaverySpline2D(path::String; lambda::Float64 = 0.0)
+    LaverySpline2D(path::String; lambda::Real = 0.0)
 
 A function which reads in the `x`, `y` and `z` values for [`LaverySpline2D`](@ref LaverySpline2D)
 from a .txt file.
@@ -365,9 +365,7 @@ References:
    Approximation of Irregular Geometric Data by Locally Calculated Univariate Cubic L1 Spline Fits
    [DOI: 10.1007/s40745-014-0002-z](https://doi.org/10.1007/s40745-014-0002-z)
 """
-function spline_interpolation(lavery_spline::LaverySpline2D,
-                                                    x::Number,
-                                                    y::Number)
+function spline_interpolation(lavery_spline::LaverySpline2D, x::Number, y::Number)
     xData = lavery_spline.x
     yData = lavery_spline.y
     z = lavery_spline.z

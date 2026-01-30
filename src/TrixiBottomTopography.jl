@@ -65,11 +65,11 @@ The attributes are:
 - `weight`: Regularization weight for the slope coefficients (default: 1e-4)
 - `integral_steps`: Number of integration steps for computation (default: 10)
 """
-mutable struct LaverySpline1D{x_type, y_type, b_type}
-    x::x_type
-    y::y_type
-    b::b_type
-    weight::Float64
+mutable struct LaverySpline1D{T<:Real}
+    x::Vector{T}
+    y::Vector{T}
+    b::Vector{T}
+    weight::T
     integral_steps::Int
 end
 """
@@ -85,13 +85,13 @@ The attributes are:
 - `by`: Matrix of slope coefficients at each knot point
 - `lambda`: Additional regularization weight
 """
-struct LaverySpline2D
-    x::AbstractVector{Float64}
-    y::AbstractVector{Float64}
-    z::AbstractMatrix{Float64}
-    bx::AbstractMatrix{Float64}
-    by::AbstractMatrix{Float64}
-    lambda::Float64
+struct LaverySpline2D{T<:Real}
+    x::Vector{T}
+    y::Vector{T}
+    z::Matrix{T}
+    bx::Matrix{T}
+    by::Matrix{T}
+    lambda::T
 end
 function spline_interpolation(::Union{LaverySpline1D, LaverySpline2D}, args...)
     throw(MethodError(spline_interpolation, (args...,)))
