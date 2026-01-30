@@ -74,7 +74,7 @@ end
 """
     LaverySpline1D(x::Vector, y::Vector; lambda::Real = 1e-4, integral_steps::Int = 10)
 
-This function calculates the inputs for the structure [`LaverySpline1D`](@ref LaverySpline1D).
+This function calculates the inputs for the structure [`LaverySpline1D`](@ref).
 The input values are:
 - `x`: Vector of x-coordinates of the data points (knots)
 - `y`: Vector of y-coordinates (function values) at the data points
@@ -139,7 +139,7 @@ end
 """
     LaverySpline1D(path::String; lambda::Real = 1e-4, integral_steps::Int = 10)
 
-A function that reads in the `x` and `y` values for [`LaverySpline1D`](@ref LaverySpline1D)
+A function that reads in the `x` and `y` values for [`LaverySpline1D`](@ref)
 from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
@@ -316,7 +316,7 @@ end
 """
     LaverySpline2D(path::String; lambda::Real = 0.0)
 
-A function which reads in the `x`, `y` and `z` values for [`LaverySpline2D`](@ref LaverySpline2D)
+A function which reads in the `x`, `y` and `z` values for [`LaverySpline2D`](@ref)
 from a .txt file.
 The input values are:
 - `path`: String of a path of the specific .txt file
@@ -348,7 +348,7 @@ Evaluates a total variation (TV) based spline at a single point `(x, y)`.
 The TV regularized spline behaves as a bicubic Lavery spline in that no new extrema are generated
 and shape is preserved.
 The coefficients are computed through an optimization procedure,
-see [`LaverySpline2D`](@ref LaverySpline2D).
+see [`LaverySpline2D`](@ref).
 The spline is formulated as a tensor product of cubic Hermite splines with basis functions
 in each direction
 ```math
