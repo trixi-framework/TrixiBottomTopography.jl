@@ -92,7 +92,7 @@ mutable struct LaverySpline1D{x_type, z_type, b_type} <: AbstractLaverySpline
     integral_steps::Int
 end
 
-@doc raw"""
+"""
     LaverySpline1D(xData::AbstractVector, zData::AbstractVector;
                    weight::Float64 = 1e-4,
                    integral_steps::Int = 10)
@@ -186,7 +186,7 @@ function TrixiBottomTopography.LaverySpline1D(path::String; kwargs...)
     TrixiBottomTopography.LaverySpline1D(x, z; kwargs...)
 end
 
-@doc raw"""
+"""
     spline_interpolation(lavery_spline::LaverySpline1D, x::Number)
 
 Evaluate the one dimensional Lavery spline at a single point `x`.
@@ -252,7 +252,7 @@ struct LaverySpline2D <: AbstractLaverySpline
     lambda::Float64
 end
 
-@doc raw"""
+"""
     LaverySpline2D(xData::AbstractVector, yData::AbstractVector,
                    zData::AbstractMatrix;
                    lambda::Float64 = 0.0)
@@ -389,7 +389,7 @@ function TrixiBottomTopography.LaverySpline2D(path::String; kwargs...)
     TrixiBottomTopography.LaverySpline2D(x, y, z; kwargs...)
 end
 
-@doc raw"""
+"""
     spline_interpolation(lavery_spline::LaverySpline2D, x::Number, y::Number)
 
 Evaluates a total variation (TV) based spline at a single point `(x,y)`.
