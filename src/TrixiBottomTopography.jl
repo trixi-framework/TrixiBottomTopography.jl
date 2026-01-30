@@ -52,7 +52,6 @@ export RBFInterpolation, RBFInterpolation1D, RBFInterpolation2D
 
 # Note, types and empty routines for Lavery spline interpolation are included and exported.
 # They are extended in `ext/JuMPExt.jl` where their implementations are found.
-# abstract type AbstractLaverySpline end
 """
     LaverySpline1D
 
