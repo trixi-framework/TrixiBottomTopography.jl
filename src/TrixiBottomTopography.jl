@@ -49,4 +49,53 @@ function RBFInterpolation end
 function RBFInterpolation1D end
 function RBFInterpolation2D end
 export RBFInterpolation, RBFInterpolation1D, RBFInterpolation2D
+
+# Note, types and empty routines for Lavery spline interpolation are included and exported.
+# They are extended in `ext/JuMPExt.jl` where their implementations are found.
+"""
+    LaverySpline1D
+
+One dimensional Lavery spline storage.
+
+The attributes are:
+- `x`: Vector of data points in x-direction (knot points)
+- `y`: Vector of data values in y-direction
+- `b`: Vector of slope coefficients at each knot point
+- `lambda`: Regularization parameter for the slope coefficients
+- `integral_steps`: Number of integration steps for computation
+"""
+mutable struct LaverySpline1D{T <: Real}
+    x::Vector{T}
+    y::Vector{T}
+    b::Vector{T}
+    weight::T
+    integral_steps::Int
+end
+"""
+    LaverySpline2D
+
+Two dimensional Lavery spline storage.
+
+The attributes are:
+- `x`: Vector of data points in x-direction (knot points)
+- `y`: Vector of data points in x-direction (knot points)
+- `z`: Matrix of data values in the z-direction
+- `bx`: Matrix of slope coefficients at each knot point
+- `by`: Matrix of slope coefficients at each knot point
+- `lambda`: Regularization parameter for the slope coefficients
+"""
+struct LaverySpline2D{T <: Real}
+    x::Vector{T}
+    y::Vector{T}
+    z::Matrix{T}
+    bx::Matrix{T}
+    by::Matrix{T}
+    lambda::T
+end
+function spline_interpolation(::Union{LaverySpline1D, LaverySpline2D}, args...)
+    throw(MethodError(spline_interpolation, (args...,)))
+end
+function LaverySpline1D end
+function LaverySpline2D end
+export LaverySpline1D, LaverySpline2D
 end

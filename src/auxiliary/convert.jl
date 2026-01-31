@@ -3,8 +3,8 @@
 """
     convert_dgm_1d(path_read::String, path_write::String; excerpt = 1, direction = "x", section = 1)
 
-Function to convert [DGM](https://www.opengeodata.nrw.de/produkte/geobasis/hm/dgm1_xyz/dgm1_xyz/)
-data files into one dimensional readable files.
+Function to convert DGM data files from [Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw)
+into one dimensional readable files.
 
 Inputs:
 - `path_read`: String of the path of the DGM data which should be converted
@@ -117,8 +117,8 @@ end
 """
     convert_dgm_2d(path_read::String, path_write::String; excerpt = 1)
 
-Function to convert [DGM](https://www.opengeodata.nrw.de/produkte/geobasis/hm/dgm1_xyz/dgm1_xyz/)
-data files into two dimensional readable files.
+Function to convert DGM data files from [Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw)
+into two dimensional readable files.
 
 Inputs:
 - `path_read`: String of the path of the DGM data which should be converted

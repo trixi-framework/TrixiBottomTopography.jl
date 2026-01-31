@@ -5,6 +5,8 @@ using Changelog: Changelog
 # To load the extensions
 import CairoMakie
 import KernelInterpolation
+import JuMP
+import HiGHS
 
 # Copy list of authors to not need to synchronize it manually.
 # Since the authors header exists twice we create a unique identifier for the docs section.
@@ -94,7 +96,8 @@ rm(joinpath(@__DIR__, "src", "changelog_tmp.md"))
 makedocs(;
          modules = [TrixiBottomTopography,
              Base.get_extension(TrixiBottomTopography, :MakieExt),
-             Base.get_extension(TrixiBottomTopography, :KernelInterpolationExt)],
+             Base.get_extension(TrixiBottomTopography, :KernelInterpolationExt),
+             Base.get_extension(TrixiBottomTopography, :JuMPHiGHSExt)],
          authors = "Andrew R. Winters <andrew.ross.winters@liu.se>, Michael Schlottke-Lakemper <michael@sloede.com>",
          sitename = "TrixiBottomTopography.jl",
          format = Documenter.HTML(;

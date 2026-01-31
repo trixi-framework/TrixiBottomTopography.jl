@@ -34,7 +34,7 @@ function evaluate_two_dimensional_interpolant(spline, x, y)
     m = length(y)
 
     # Create empty solution matrix
-    z = zeros(n, m)
+    z = zeros(m, n)
 
     # Evaluate spline function at given x, y values
     for i in 1:n, j in 1:m

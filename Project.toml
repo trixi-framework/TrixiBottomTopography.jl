@@ -10,15 +10,20 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [weakdeps]
+HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 KernelInterpolation = "95686e15-3c94-4443-8f08-76d06d509f7b"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 
 [extensions]
+JuMPHiGHSExt = ["JuMP", "HiGHS"]
 KernelInterpolationExt = "KernelInterpolation"
 MakieExt = "Makie"
 
 [compat]
 Downloads = "1.6"
+HiGHS = "1.0"
+JuMP = "1.0"
 KernelInterpolation = "0.3.5"
 LinearAlgebra = "1"
 Makie = "0.21, 0.22, 0.24"
