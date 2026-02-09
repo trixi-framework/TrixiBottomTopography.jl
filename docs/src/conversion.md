@@ -27,7 +27,7 @@ They provide a [geographical data set](https://www.opengeodata.nrw.de/produkte/g
 This data set contains patches of $1\,km^2$ where each patch has the elevation data for $1,000,000$ data points equally distributed as a grid with a grid size of $1\,m$.
 
 The geographic LiDAR data from the [geographical data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/) is provided in the lossless compressed data format `.laz`.
-This raw data requires preprocessing into a usable `.xyz` format for TrixiBottomTopography.
+This raw data requires preprocessing into a usable `.xyz` format for [TrixiBottomTopography.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl).
 Two good options to convert this data are:
 1) Use the Julia packages [LazIO.jl](https://github.com/evetion/LazIO.jl)
 and [LasIO.jl](https://github.com/visr/LasIO.jl) to unpack the data and process it, respectively.
