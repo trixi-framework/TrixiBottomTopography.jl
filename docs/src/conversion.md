@@ -25,7 +25,22 @@ In the [examples folder](https://github.com/trixi-framework/TrixiBottomTopograph
 [Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw).
 They provide a [geographical data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/) of the German state of North Rhine-Westphalia called **DGM**.
 This data set contains patches of $1\,km^2$ where each patch has the elevation data for $1,000,000$ data points equally distributed as a grid with a grid size of $1\,m$.
-As an example, the data can be given as `.xyz` files:
+
+The geographic LiDAR data from the [geographical data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/) is provided in the lossless compressed data format `.laz`.
+This raw data requires preprocessing into a usable `.xyz` format for [TrixiBottomTopography.jl](https://github.com/trixi-framework/TrixiBottomTopography.jl).
+Two good options to convert this data are:
+1) Use the Julia packages [LazIO.jl](https://github.com/evetion/LazIO.jl)
+and [LasIO.jl](https://github.com/visr/LasIO.jl) to unpack the data and process it, respectively.
+2) Use the [Point Data Abstraction Library (PDAL)](https://pdal.org/) which can be installed
+via the terminal or homebrew. Then one can convert the LiDAR data from `.laz` to `.xyz` with the command
+```shell
+pdal translate file_name.laz output_file_name.xyz \
+  --writers.text.order="X,Y,Z" \
+  --writers.text.keep_unspecified=false \
+  --writers.text.delimiter=" "
+```
+
+As an example, the data from Geobasis NRW can be given as `.xyz` files:
 ```
 357000.00 5646999.00 47.40
 357001.00 5646999.00 47.43
