@@ -12,10 +12,10 @@ spline_func(x::Float64) = spline_interpolation(spline_struct, x)</code></pre><pr
 equations = ShallowWaterEquations1D(gravity = 1.0, H0 = 55.0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ ShallowWaterEquations1D                                                                          │
 │ ═══════════════════════                                                                          │
-│ #variables: ………………………………………………… 3                                                                │
-│ │ variable 1: …………………………………………… h                                                                │
-│ │ variable 2: …………………………………………… h_v                                                              │
-│ │ variable 3: …………………………………………… b                                                                │
+│ #variables: ……………………………………………………………… 3                                                           │
+│ │ variable 1: ………………………………………………………… h                                                           │
+│ │ variable 2: ………………………………………………………… h_v                                                         │
+│ │ variable 3: ………………………………………………………… b                                                           │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>Here the constant gravititational acceleration has been chosen to be <span>$1.0$</span>, and the background total water height <span>$H_0$</span> has been set to <span>$55.0$</span>.</p><p>Next, the initial condition for the dam break problem can be defined. At time <span>$t=0$</span>, a part of the water height in the center of the domain with a diameter of <span>$100$</span> is set to <span>$60.0$</span> while the rest of the domain stays at the background water height <span>$55.0$</span>. Additionally, we can see that the bottom topography <code>b</code> is defined by the B-spline interpolation function <code>spline_func</code> and is set in the initial condition.</p><pre><code class="language-julia hljs"># Defining initial condition for the dam break problem
 function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
 
@@ -33,7 +33,7 @@ end</code></pre><pre class="documenter-example-output"><code class="nohighlight 
 initial_condition = initial_condition_dam_break
 
 # Setting the boundary to be a reflective wall
-boundary_condition = boundary_condition_slip_wall</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">boundary_condition_slip_wall (generic function with 20 methods)</code></pre><p>The upcoming code parts will <strong>not</strong> be covered in full detail. To get a more profound understanding of the routines, please see the <a href="https://trixi-framework.github.io/TrixiDocumentation/stable/">Trixi.jl documentation</a> as well as the <a href="https://trixi-framework.github.io/TrixiShallowWater.jl/stable/">TrixiShallowWater documentation</a>.</p><p>The following code snippet sets up the discontinuous Galerkin spectral element method (DGSEM). In this solver type, we can specify which flux functions for the surface and volume fluxes will be taken, as well as the polynomial degree (<code>polydeg</code>) of the polynomials used in the approximation space.</p><pre><code class="language-julia hljs">###############################################################################
+boundary_condition = boundary_condition_slip_wall</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">boundary_condition_slip_wall (generic function with 25 methods)</code></pre><p>The upcoming code parts will <strong>not</strong> be covered in full detail. To get a more profound understanding of the routines, please see the <a href="https://trixi-framework.github.io/TrixiDocumentation/stable/">Trixi.jl documentation</a> as well as the <a href="https://trixi-framework.github.io/TrixiShallowWater.jl/stable/">TrixiShallowWater documentation</a>.</p><p>The following code snippet sets up the discontinuous Galerkin spectral element method (DGSEM). In this solver type, we can specify which flux functions for the surface and volume fluxes will be taken, as well as the polynomial degree (<code>polydeg</code>) of the polynomials used in the approximation space.</p><pre><code class="language-julia hljs">###############################################################################
 # Get the DG approximation space
 
 volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
@@ -41,12 +41,12 @@ solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm
                volume_integral=VolumeIntegralFluxDifferencing(volume_flux))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ DG{Float64}                                                                                      │
 │ ═══════════                                                                                      │
-│ basis: ……………………………………………………………… LobattoLegendreBasis{Float64}(polydeg=3)                         │
-│ mortar: …………………………………………………………… LobattoLegendreMortarL2{Float64}(polydeg=3)                      │
-│ surface integral: ………………………………… SurfaceIntegralWeakForm                                          │
-│ │ surface flux: ……………………………………… (FluxHLL(min_max_speed_davis), T…nonconservative_fjordholm_etal) │
-│ volume integral: …………………………………… VolumeIntegralFluxDifferencing                                   │
-│ │ volume flux: ………………………………………… (Trixi.flux_wintermeyer_etal, Tr…nconservative_wintermeyer_etal) │
+│ basis: …………………………………………………………………………… LobattoLegendreBasis{Float64}(polydeg=3)                    │
+│ mortar: ………………………………………………………………………… LobattoLegendreMortarL2{Float64}(polydeg=3)                 │
+│ surface integral: ……………………………………………… SurfaceIntegralWeakForm                                     │
+│ │ surface flux: …………………………………………………… (FluxHLL(min_max_speed_davis)…nconservative_fjordholm_etal) │
+│ volume integral: ………………………………………………… VolumeIntegralFluxDifferencing                              │
+│ │ volume flux: ……………………………………………………… (Trixi.flux_wintermeyer_etal,…onservative_wintermeyer_etal) │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>After the solver comes the specification of the mesh in the approximation. In this case, a <a href="https://trixi-framework.github.io/TrixiDocumentation/stable/meshes/tree_mesh/"><code>TreeMesh</code></a> is chosen, which is a Cartesian mesh. Here the domain borders must be defined, as well as the number of initial elements (<span>$2$</span> to the power of <code>initial_refinement_level</code>). Also, we have to indicate if the domain is periodic. In this example, boundary conditions were defined. Thus the periodicity is set to <code>false</code>.</p><p>Once the underlying mesh is constructed, a semidiscretization object can be created by calling <code>SemiDiscretizationHyperbolic</code>. This collects all the building blocks needed to set up the semidiscretization:</p><ul><li>The underlying mesh.</li><li>The set of equations.</li><li>The initial condition.</li><li>The solver (in this case DGSEM).</li><li>The boundary conditions.</li></ul><pre><code class="language-julia hljs">###############################################################################
 # Get the TreeMesh and setup a periodic mesh
 
@@ -62,16 +62,16 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
                                     boundary_conditions = boundary_condition)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ SemidiscretizationHyperbolic                                                                     │
 │ ════════════════════════════                                                                     │
-│ #spatial dimensions: ………………………… 1                                                                │
-│ mesh: ………………………………………………………………… TreeMesh{1, Trixi.SerialTree{1, Float64}} with length 15         │
-│ equations: …………………………………………………… ShallowWaterEquations1D                                          │
-│ initial condition: ……………………………… initial_condition_dam_break                                      │
-│ boundary conditions: ………………………… 2                                                                │
-│ │ negative x: …………………………………………… boundary_condition_slip_wall                                     │
-│ │ positive x: …………………………………………… boundary_condition_slip_wall                                     │
-│ source terms: …………………………………………… nothing                                                          │
-│ solver: …………………………………………………………… DG                                                               │
-│ total #DOFs per field: …………………… 32                                                               │
+│ #spatial dimensions: ……………………………………… 1                                                           │
+│ mesh: ……………………………………………………………………………… TreeMesh{1, Trixi.SerialTree{1, Float64}} with length 15    │
+│ equations: ………………………………………………………………… ShallowWaterEquations1D                                     │
+│ initial condition: …………………………………………… initial_condition_dam_break                                 │
+│ boundary conditions: ……………………………………… 2                                                           │
+│ │ negative x: ………………………………………………………… boundary_condition_slip_wall                                │
+│ │ positive x: ………………………………………………………… boundary_condition_slip_wall                                │
+│ source terms: ………………………………………………………… nothing                                                     │
+│ solver: ………………………………………………………………………… DG                                                          │
+│ total #DOFs per field: ………………………………… 32                                                          │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>An ordinary differential equations object is set up using a specified time range, <code>tspan</code>, and the semidiscretization object, <code>semi</code>.</p><pre><code class="language-julia hljs">###############################################################################
 # ODE solvers
 
@@ -144,12 +144,12 @@ solver = DGSEM(polydeg=3, surface_flux=(flux_fjordholm_etal, flux_nonconservativ
                volume_integral=VolumeIntegralFluxDifferencing(volume_flux))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ DG{Float64}                                                                                      │
 │ ═══════════                                                                                      │
-│ basis: ……………………………………………………………… LobattoLegendreBasis{Float64}(polydeg=3)                         │
-│ mortar: …………………………………………………………… LobattoLegendreMortarL2{Float64}(polydeg=3)                      │
-│ surface integral: ………………………………… SurfaceIntegralWeakForm                                          │
-│ │ surface flux: ……………………………………… (Trixi.flux_fjordholm_etal, Trix…nonconservative_fjordholm_etal) │
-│ volume integral: …………………………………… VolumeIntegralFluxDifferencing                                   │
-│ │ volume flux: ………………………………………… (Trixi.flux_wintermeyer_etal, Tr…nconservative_wintermeyer_etal) │
+│ basis: …………………………………………………………………………… LobattoLegendreBasis{Float64}(polydeg=3)                    │
+│ mortar: ………………………………………………………………………… LobattoLegendreMortarL2{Float64}(polydeg=3)                 │
+│ surface integral: ……………………………………………… SurfaceIntegralWeakForm                                     │
+│ │ surface flux: …………………………………………………… (Trixi.flux_fjordholm_etal, T…nconservative_fjordholm_etal) │
+│ volume integral: ………………………………………………… VolumeIntegralFluxDifferencing                              │
+│ │ volume flux: ……………………………………………………… (Trixi.flux_wintermeyer_etal,…onservative_wintermeyer_etal) │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>Now the mesh has to be specified. As above, we use a Cartesian box mesh created as a <code>TreeMesh</code> in Trixi.jl. Because we have defined boundary conditions defined, we set the <code>periodicity</code> to be <code>false</code>.</p><pre><code class="language-julia hljs">###############################################################################
 # Get the TreeMesh and setup a periodic mesh
 
@@ -161,29 +161,29 @@ mesh = TreeMesh(coordinates_min, coordinates_max,
                 periodicity = false)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ TreeMesh{2, Trixi.SerialTree{2, Float64}}                                                        │
 │ ═════════════════════════════════════════                                                        │
-│ center: …………………………………………………………… [357480.0, 5.646519e6]                                           │
-│ length: …………………………………………………………… 960.0                                                            │
-│ periodicity: ……………………………………………… (false, false)                                                   │
-│ current #cells: ……………………………………… 85                                                               │
-│ #leaf-cells: ……………………………………………… 64                                                               │
-│ maximum #cells: ……………………………………… 10000                                                            │
+│ center: ………………………………………………………………………… [357480.0, 5.646519e6]                                      │
+│ length: ………………………………………………………………………… 960.0                                                       │
+│ periodicity: …………………………………………………………… (false, false)                                              │
+│ current #cells: …………………………………………………… 85                                                          │
+│ #leaf-cells: …………………………………………………………… 64                                                          │
+│ maximum #cells: …………………………………………………… 10000                                                       │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>When calling the semidiscretization object again, <code>boundary_conditions</code> does not have to be specified.</p><pre><code class="language-julia hljs"># create the semi discretization object
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
                                     boundary_conditions = boundary_condition)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ SemidiscretizationHyperbolic                                                                     │
 │ ════════════════════════════                                                                     │
-│ #spatial dimensions: ………………………… 2                                                                │
-│ mesh: ………………………………………………………………… TreeMesh{2, Trixi.SerialTree{2, Float64}} with length 85         │
-│ equations: …………………………………………………… ShallowWaterEquations2D                                          │
-│ initial condition: ……………………………… initial_condition_wave                                           │
-│ boundary conditions: ………………………… 4                                                                │
-│ │ negative x: …………………………………………… boundary_condition_slip_wall                                     │
-│ │ positive x: …………………………………………… boundary_condition_slip_wall                                     │
-│ │ negative y: …………………………………………… boundary_condition_slip_wall                                     │
-│ │ positive y: …………………………………………… boundary_condition_slip_wall                                     │
-│ source terms: …………………………………………… nothing                                                          │
-│ solver: …………………………………………………………… DG                                                               │
-│ total #DOFs per field: …………………… 1024                                                             │
+│ #spatial dimensions: ……………………………………… 2                                                           │
+│ mesh: ……………………………………………………………………………… TreeMesh{2, Trixi.SerialTree{2, Float64}} with length 85    │
+│ equations: ………………………………………………………………… ShallowWaterEquations2D                                     │
+│ initial condition: …………………………………………… initial_condition_wave                                      │
+│ boundary conditions: ……………………………………… 4                                                           │
+│ │ negative x: ………………………………………………………… boundary_condition_slip_wall                                │
+│ │ positive x: ………………………………………………………… boundary_condition_slip_wall                                │
+│ │ negative y: ………………………………………………………… boundary_condition_slip_wall                                │
+│ │ positive y: ………………………………………………………… boundary_condition_slip_wall                                │
+│ source terms: ………………………………………………………… nothing                                                     │
+│ solver: ………………………………………………………………………… DG                                                          │
+│ total #DOFs per field: ………………………………… 1024                                                        │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>The solution of the PDE and the animation is analogous to the one dimensional case except that we chose <code>PlotData2D</code> to create the plotting object instead of <code>PlotData1D</code> as we are in the two dimensional case now.</p><p>As in the 1D example, we use the plotting backend CairoMakie.jl. To create an animation we use the <code>record</code> structure to save plots over every time step of the simulation and append them together into an animation. Inside the loop, the <code>PlotData2D</code> functionality from Trixi.jl is called to create a plotting object. Afterwards, this plotting object is visualized using the <code>wireframe</code> command to visualize the 2D water height evolution and <code>surface</code> to visualize bicubic B-spline approximation of the bottom topography. Two <code>Observable</code> quantities are created, one to increment the number of plots and another for the time at which each solution occurs. The the resulting animation is given below.</p><pre><code class="language-julia hljs">###############################################################################
 # ODE solvers, callbacks etc.
 
@@ -224,4 +224,4 @@ zlims!(ax, 35, 70)
 record(f, &quot;animation_2d.gif&quot;, 1:length(pd_list)) do tt
   j[] = tt
   time[] = sol.t[tt]
-end</code></pre><p><img src="../animation_2d.gif" alt="simTrixi2D"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../function/">« B-spline function</a><a class="docs-footer-nextpage" href="../development/">Development »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 9 February 2026 12:32">Monday 9 February 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre><p><img src="../animation_2d.gif" alt="simTrixi2D"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../function/">« B-spline function</a><a class="docs-footer-nextpage" href="../development/">Development »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Sunday 1 March 2026 19:29">Sunday 1 March 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
