@@ -57,7 +57,7 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - run: julia -e 'using InteractiveUtils; versioninfo(verbose=true)'
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v3
       - uses: julia-actions/julia-buildpkg@v1
         env:
           PYTHON: ""
@@ -89,7 +89,7 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - run: julia -e 'using InteractiveUtils; versioninfo(verbose=true)'
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v3
       - uses: julia-actions/julia-buildpkg@v1
       - name: Run tests with coverage
         uses: julia-actions/julia-runtest@v1
@@ -102,7 +102,7 @@ jobs:
         with:
           directories: src
       - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           files: lcov.info
         env:
