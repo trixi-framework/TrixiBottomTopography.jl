@@ -1,10 +1,10 @@
-# Package extension for adding JuMP modeling language and HiGHS optimization features
+# Package extension for adding MathOptInterface modeling language and HiGHS optimization features
 # for Lavery spline interpolation to TrixiBottomTopography.jl
-module JuMPHiGHSExt
+module MathOptInterfaceHiGHSExt
 
-using JuMP: Model, VariableRef, direct_model, @variable, @objective, @constraint,
-            optimize!, value, set_silent, set_attribute
 using HiGHS
+
+import MathOptInterface as MOI
 
 using TrixiBottomTopography
 
@@ -14,19 +14,9 @@ import TrixiBottomTopography: LaverySpline1D, LaverySpline2D, spline_interpolati
 # One dimensional Lavery spline routines #
 ##########################################
 
-# Helper container so that the JuMP model only needs constructed once
-mutable struct LaverySpline1DModel{T <: Real}
-    model::Model
-    b::Vector{VariableRef}
-    abs_b::Vector{VariableRef}
-    abs_E::Matrix{VariableRef}
-    delta_y::Vector{T} # data-dependent coefficients
-end
-
 # Constructor
-function LaverySpline1DModel(len::Int, lambda::T, integral_steps::Int) where {T <: Real}
-    sumDomain = 1:(len - 1)
-    bDomain = 1:len
+function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
+                             integral_steps::Int) where {T <: Real}
 
     # integration grid
     integralDomain = collect(range(convert(T, -0.5), convert(T, 0.5);
@@ -38,37 +28,104 @@ function LaverySpline1DModel(len::Int, lambda::T, integral_steps::Int) where {T 
     bb = convert(T, 1) .+ convert(T, 6) .* integralDomain
     cc = convert(T, 12) .* integralDomain
 
+    n_sum = len - 1
+    n_b = len
+    n_abs_b = len
+    n_abs_E = n_sum * integral_steps
+    n_vars = n_b + n_abs_b + n_abs_E
+
+    # Offsets
+    b_off = 0
+    abs_b_off = n_b
+    abs_E_off = n_b + n_abs_b
+
+    @inline b_idx(i) = b_off + i
+    @inline abs_b_idx(i) = abs_b_off + i
+    @inline abs_E_idx(i, k) = abs_E_off + (i - 1) * integral_steps + k
+
     # Setup the model and solver choice
-    model = direct_model(HiGHS.Optimizer())
-    set_attribute(model, "solver", "simplex")
-    set_attribute(model, "presolve", "off")
-    set_silent(model)
+    model = HiGHS.Optimizer()
+    MOI.set(model, MOI.Silent(), true)
+    MOI.set(model, MOI.RawOptimizerAttribute("solver"), "simplex")
+    MOI.set(model, MOI.RawOptimizerAttribute("presolve"), "off")
 
     # variables
-    @variable(model, b[bDomain])
-    @variable(model, abs_b[bDomain]>=0)
-    @variable(model, abs_E[i in sumDomain, k in 1:integral_steps]>=0)
+    vars = MOI.add_variables(model, n_vars)
 
-    # placeholder for data
-    delta_y = zeros(T, len - 1)
+    # abs_b >= 0; b unconstrained, abs_E >= 0
+    lb_zero = MOI.GreaterThan(zero(T))
+    for i in 1:n_abs_b
+        MOI.add_constraint(model, vars[abs_b_idx(i)], lb_zero)
+    end
 
+    for i in 1:n_sum, k in 1:integral_steps
+        MOI.add_constraint(model, vars[abs_E_idx(i, k)], lb_zero)
+    end
+
+    # objective: min sum_{i,k} inv_steps * abs_E[i, k] + lambda * sum_i abs_b[i]
     inv_steps = convert(T, 1) / integral_steps
+    obj_terms = Vector{MOI.ScalarAffineTerm{T}}(undef, n_vars)
+    for i in 1:n_b
+        obj_terms[b_idx(i)] = MOI.ScalarAffineTerm{T}(zero(T), vars[b_idx(i)])
+        obj_terms[abs_b_idx(i)] = MOI.ScalarAffineTerm{T}(lambda, vars[abs_b_idx(i)])
+    end
 
-    @objective(model, Min,
-               sum(inv_steps * abs_E[i, k] for i in sumDomain, k in 1:integral_steps)+
-               sum(lambda * abs_b[i] for i in bDomain))
+    for i in 1:n_sum, k in 1:integral_steps
+        obj_terms[abs_E_idx(i, k)] = MOI.ScalarAffineTerm{T}(inv_steps,
+                                                             vars[abs_E_idx(i, k)])
+    end
+
+    MOI.set(model,
+            MOI.ObjectiveFunction{MOI.ScalarAffineFunction{T}}(),
+            MOI.ScalarAffineFunction{T}(obj_terms, zero(T)))
+    MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
 
     # constraints
-    @constraint(model, [i in sumDomain, k in 1:integral_steps],
-                abs_E[i, k]>=aa[k] * b[i] + bb[k] * b[i + 1] - cc[k] * delta_y[i])
+    # abs_E[i,k] constraints
+    buf3 = Vector{MOI.ScalarAffineTerm{T}}(undef, 3)
+    for i in 1:n_sum, k in 1:integral_steps
+        s = vars[abs_E_idx(i, k)]
+        bi = vars[b_idx(i)]
+        bi1 = vars[b_idx(i + 1)]
 
-    @constraint(model, [i in sumDomain, k in 1:integral_steps],
-                abs_E[i, k]>=-aa[k] * b[i] - bb[k] * b[i + 1] + cc[k] * delta_y[i])
+        # abs_E[i,k] - aa[k] * b[i] - bb[k] * b[i + 1] + cc[k] * delta_y[i] >= 0
 
-    @constraint(model, [i in bDomain], abs_b[i]>=b[i])
-    @constraint(model, [i in bDomain], abs_b[i]>=-b[i])
+        buf3[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf3[2] = MOI.ScalarAffineTerm{T}(-aa[k], bi)
+        buf3[3] = MOI.ScalarAffineTerm{T}(-bb[k], bi1)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf3), zero(T)),
+                           MOI.GreaterThan(-cc[k] * delta_y[i]))
 
-    return LaverySpline1DModel{T}(model, b, abs_b, abs_E, delta_y)
+        # abs_E[i,k] + aa[k] * b[i] + bb[k] * b[i + 1] - cc[k] * delta_y[i] >= 0
+        buf3[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf3[2] = MOI.ScalarAffineTerm{T}(aa[k], bi)
+        buf3[3] = MOI.ScalarAffineTerm{T}(bb[k], bi1)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf3), zero(T)),
+                           MOI.GreaterThan(cc[k] * delta_y[i]))
+    end
+
+    # abs_b[i] constraints
+    buf2 = Vector{MOI.ScalarAffineTerm{T}}(undef, 2)
+    for i in 1:n_b
+        s = vars[abs_b_idx(i)]
+        bi = vars[b_idx(i)]
+
+        # abs_b[i] - b[i] >= 0
+        buf2[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf2[2] = MOI.ScalarAffineTerm{T}(-one(T), bi)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf2), zero(T)),
+                           MOI.GreaterThan(zero(T)))
+
+        # abs_b[i] + b[i] >= 0
+        buf2[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf2[2] = MOI.ScalarAffineTerm{T}(one(T), bi)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf2), zero(T)),
+                           MOI.GreaterThan(zero(T)))
+    end
+
+    MOI.optimize!(model)
+
+    return model, vars
 end
 
 """
@@ -115,22 +172,19 @@ function LaverySpline1D(x::Vector{T}, y::Vector{T}; lambda::T = convert(T, 0.0),
     x, y = TrixiBottomTopography.sort_data(collect(x), collect(y))
 
     len = length(x)
+    n_sum = len - 1
 
-    # Build the JuMP model once to save time
-    spline_model = LaverySpline1DModel(len, lambda, integral_steps)
-
-    for i in 1:(len - 1)
+    delta_y = Vector{T}(undef, n_sum)
+    for i in 1:n_sum
         hi = x[i + 1] - x[i]
-        spline_model.delta_y[i] = (y[i + 1] - y[i]) / hi
+        delta_y[i] = (y[i + 1] - y[i]) / hi
     end
 
-    # Solve optimization problem
-    optimize!(spline_model.model)
+    model, vars = LaverySpline1DModel(len, delta_y, lambda, integral_steps)
 
-    # Extract solution
-    b_values = Vector{Float64}(undef, len)
+    b_values = Vector{T}(undef, len)
     for i in 1:len
-        b_values[i] = value(spline_model.b[i])
+        b_values[i] = MOI.get(model, MOI.VariablePrimal(), vars[i])
     end
 
     LaverySpline1D(x, y, b_values, lambda, integral_steps)
@@ -268,47 +322,138 @@ function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
     # So we transpose into the format needed by the implementation below
     z = Matrix{T}(transpose(z))
 
+    # offsets
+    bx_off = 0
+    by_off = n * m
+    dxbx_off = 2 * n * m
+    dyby_off = dxbx_off + (n - 1) * m
+    dybx_off = dyby_off + n * (m - 1)
+    dxby_off = dybx_off + n * (m - 1)
+    n_vars = dxby_off + (n - 1) * m
+
+    @inline bx_idx(i, j) = bx_off + (i - 1) * m + j
+    @inline by_idx(i, j) = by_off + (i - 1) * m + j
+    @inline dxbx_idx(i, j) = dxbx_off + (i - 1) * m + j
+    @inline dyby_idx(i, j) = dyby_off + (i - 1) * (m - 1) + j
+    @inline dybx_idx(i, j) = dybx_off + (i - 1) * (m - 1) + j
+    @inline dxby_idx(i, j) = dxby_off + (i - 1) * m + j
+
     # Setup the model and solver choice
-    model = direct_model(HiGHS.Optimizer())
-    set_attribute(model, "solver", "simplex")
-    set_attribute(model, "presolve", "off")
-    set_silent(model)
+    model = HiGHS.Optimizer()
+    MOI.set(model, MOI.Silent(), true)
+    MOI.set(model, MOI.RawOptimizerAttribute("solver"), "simplex")
+    MOI.set(model, MOI.RawOptimizerAttribute("presolve"), "off")
 
-    # Setup the variables that enforce monotonicity via bounds
-    @variable(model, bx[1:n, 1:m]>=0)
-    @variable(model, by[1:n, 1:m]>=0)
+    # Add variables
+    vars = MOI.add_variables(model, n_vars)
 
-    @variable(model, abs_dxbx[1:(n - 1), 1:m]>=0)
-    @variable(model, abs_dyby[1:n, 1:(m - 1)]>=0)
-    @variable(model, abs_dybx[1:n, 1:(m - 1)]>=0)
-    @variable(model, abs_dxby[1:(n - 1), 1:m]>=0)
+    lb_zero = MOI.GreaterThan(zero(T))
+    for v in vars
+        MOI.add_constraint(model, v, lb_zero)
+    end
 
-    # Absolute value constraints on the gradients
-    @constraint(model, [i = 1:(n - 1), j = 1:m], abs_dxbx[i, j]>=bx[i + 1, j] - bx[i, j])
-    @constraint(model, [i = 1:(n - 1), j = 1:m], abs_dxbx[i, j]>=-bx[i + 1, j] + bx[i, j])
+    # Coefficients 
+    obj_terms = Vector{MOI.ScalarAffineTerm{T}}(undef, n_vars)
 
-    @constraint(model, [i = 1:n, j = 1:(m - 1)], abs_dyby[i, j]>=by[i, j + 1] - by[i, j])
-    @constraint(model, [i = 1:n, j = 1:(m - 1)], abs_dyby[i, j]>=-by[i, j + 1] + by[i, j])
+    for k in 1:n_vars
+        c = if k <= 2 * n * m
+            lambda            # bx or by block
+        else
+            one(T)            # dxbx, dyby, dyxbx, dxyby blocks
+        end
+        obj_terms[k] = MOI.ScalarAffineTerm{T}(c, vars[k])
+    end
 
-    @constraint(model, [i = 1:n, j = 1:(m - 1)], abs_dybx[i, j]>=bx[i, j + 1] - bx[i, j])
-    @constraint(model, [i = 1:n, j = 1:(m - 1)], abs_dybx[i, j]>=-bx[i, j + 1] + bx[i, j])
-
-    @constraint(model, [i = 1:(n - 1), j = 1:m], abs_dxby[i, j]>=by[i + 1, j] - by[i, j])
-    @constraint(model, [i = 1:(n - 1), j = 1:m], abs_dxby[i, j]>=-by[i + 1, j] + by[i, j])
-
-    # Objective function is the first-order total variation (TV) of gradients
+    # First-order total variation (TV) of gradients
     # Additional regularization can be added with `lambda > 0`
-    @objective(model, Min,
-               sum(abs_dxbx)+sum(abs_dyby)
-               +sum(abs_dybx)+sum(abs_dxby)
-               +lambda*(sum(bx) + sum(by)))
+    MOI.set(model,
+            MOI.ObjectiveFunction{MOI.ScalarAffineFunction{T}}(),
+            MOI.ScalarAffineFunction{T}(obj_terms, zero(T)))
+    MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
 
-    # Solve optimization problem
-    optimize!(model)
+    # Constraints
+    nnz_per_con = 3
+    buf = Vector{MOI.ScalarAffineTerm{T}}(undef, nnz_per_con)
+    rhs = MOI.GreaterThan(zero(T))
+
+    # abs_dxbx: s_{i,j} ≥ ± (bx[i+1,j] - bx[i,j]) for i = 1:n-1, j = 1:m
+    for i in 1:(n - 1), j in 1:m
+        s = vars[dxbx_idx(i, j)]
+        bp = vars[bx_idx(i + 1, j)]
+        bm = vars[bx_idx(i, j)]
+        # s - bp + bm ≥ 0
+        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf[2] = MOI.ScalarAffineTerm{T}(-one(T), bp)
+        buf[3] = MOI.ScalarAffineTerm{T}(one(T), bm)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+        # s + bp - bm ≥ 0
+        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf[2] = MOI.ScalarAffineTerm{T}(one(T), bp)
+        buf[3] = MOI.ScalarAffineTerm{T}(-one(T), bm)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+    end
+
+    # abs_dyby: s_{i,j} ≥ ± (by[i,j+1] - by[i,j]) for i = 1:n, j = 1:m-1
+    for i in 1:n, j in 1:(m - 1)
+        s = vars[dyby_idx(i, j)]
+        bp = vars[by_idx(i, j + 1)]
+        bm = vars[by_idx(i, j)]
+        # s - bp + bm ≥ 0
+        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf[2] = MOI.ScalarAffineTerm{T}(-one(T), bp)
+        buf[3] = MOI.ScalarAffineTerm{T}(one(T), bm)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+        # s + bp - bm ≥ 0
+        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf[2] = MOI.ScalarAffineTerm{T}(one(T), bp)
+        buf[3] = MOI.ScalarAffineTerm{T}(-one(T), bm)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+    end
+
+    # abs_dybx: s_{i,j} ≥ ± (bx[i,j+1] - bx[i,j]) for i = 1:n, j = 1:m-1
+    for i in 1:n, j in 1:(m - 1)
+        s = vars[dybx_idx(i, j)]
+        bp = vars[bx_idx(i, j + 1)]
+        bm = vars[bx_idx(i, j)]
+        # s - bp + bm ≥ 0
+        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf[2] = MOI.ScalarAffineTerm{T}(-one(T), bp)
+        buf[3] = MOI.ScalarAffineTerm{T}(one(T), bm)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+        # s + bp - bm ≥ 0
+        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf[2] = MOI.ScalarAffineTerm{T}(one(T), bp)
+        buf[3] = MOI.ScalarAffineTerm{T}(-one(T), bm)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+    end
+
+    # abs_dxby: s_{i,j} ≥ ± (by[i+1,j] - by[i,j]) for i = 1:n-1, j = 1:m
+    for i in 1:(n - 1), j in 1:m
+        s = vars[dxby_idx(i, j)]
+        bp = vars[by_idx(i + 1, j)]
+        bm = vars[by_idx(i, j)]
+        # s - bp + bm ≥ 0
+        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf[2] = MOI.ScalarAffineTerm{T}(-one(T), bp)
+        buf[3] = MOI.ScalarAffineTerm{T}(one(T), bm)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+        # s + bp - bm ≥ 0
+        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
+        buf[2] = MOI.ScalarAffineTerm{T}(one(T), bp)
+        buf[3] = MOI.ScalarAffineTerm{T}(-one(T), bm)
+        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+    end
+
+    # Solve
+    MOI.optimize!(model)
 
     # Extract solution
-    bxv = value.(bx)
-    byv = value.(by)
+    bxv = Matrix{T}(undef, n, m)
+    byv = Matrix{T}(undef, n, m)
+    for i in 1:n, j in 1:m
+        bxv[i, j] = MOI.get(model, MOI.VariablePrimal(), vars[bx_idx(i, j)])
+        byv[i, j] = MOI.get(model, MOI.VariablePrimal(), vars[by_idx(i, j)])
+    end
 
     return LaverySpline2D(x, y, z, bxv, byv, lambda)
 end
