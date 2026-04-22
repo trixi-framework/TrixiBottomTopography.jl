@@ -5,7 +5,7 @@ using Changelog: Changelog
 # To load the extensions
 import CairoMakie
 import KernelInterpolation
-import JuMP
+import MathOptInterface
 import HiGHS
 
 # Copy list of authors to not need to synchronize it manually.
