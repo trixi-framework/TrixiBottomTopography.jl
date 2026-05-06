@@ -9,12 +9,13 @@ for human readability.
 
 #### Added
 
-- Added shape preserving splines and interpolation using [JuMP.jl](https://github.com/jump-dev/JuMP.jl) and [HiGHS.jl](https://github.com/jump-dev/HiGHS.jl) [#83]
+- Added shape preserving splines and interpolation using [MathOptInterface.jl](https://github.com/jump-dev/MathOptInterface.jl) and [HiGHS.jl](https://github.com/jump-dev/HiGHS.jl) [#83, #93]
 - Added scattered radial basis function interpolation using [KernelInterpolation.jl](https://github.com/JoshuaLampert/KernelInterpolation.jl) [#73]
 - Implementation of visualization routines `plot_topography` and `plot_topography_with_interpolation_knots`
 
 #### Changed
 
+- Replaced [JuMP.jl](https://github.com/jump-dev/JuMP.jl) with [MathOptInterface.jl](https://github.com/jump-dev/MathOptInterface.jl) for Lavery splines to reduce allocations [#93]
 - The required Julia version is updated to v1.10.
 - Visualization routines rely on Makie.jl instead of PyPlot.jl [#52]
 

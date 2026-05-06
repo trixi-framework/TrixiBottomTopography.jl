@@ -5,7 +5,7 @@ using Changelog: Changelog
 # To load the extensions
 import CairoMakie
 import KernelInterpolation
-import JuMP
+import MathOptInterface
 import HiGHS
 
 # Copy list of authors to not need to synchronize it manually.
@@ -97,7 +97,7 @@ makedocs(;
          modules = [TrixiBottomTopography,
              Base.get_extension(TrixiBottomTopography, :MakieExt),
              Base.get_extension(TrixiBottomTopography, :KernelInterpolationExt),
-             Base.get_extension(TrixiBottomTopography, :JuMPHiGHSExt)],
+             Base.get_extension(TrixiBottomTopography, :MathOptInterfaceHiGHSExt)],
          authors = "Andrew R. Winters <andrew.ross.winters@liu.se>, Michael Schlottke-Lakemper <michael@sloede.com>",
          sitename = "TrixiBottomTopography.jl",
          format = Documenter.HTML(;
