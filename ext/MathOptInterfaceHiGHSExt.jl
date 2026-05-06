@@ -78,10 +78,13 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
     MOI.set(model,
             MOI.ObjectiveFunction{MOI.ScalarAffineFunction{T}}(),
             MOI.ScalarAffineFunction{T}(obj_terms, zero(T)))
+    # Indicate that the objective function should be minimized
     MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
 
     # constraints
-    # abs_E[i,k] constraints
+    # Build constraints from abs(aa[k] * b[i] + bb[k] * b[i + 1] - cc[k] * delta_y[i])
+    # which are nonlinear. Convert into linear constraints by considering each side
+    # of the inequality separately.
     buf3 = Vector{MOI.ScalarAffineTerm{T}}(undef, 3)
     for i in 1:n_sum, k in 1:integral_steps
         s = vars[abs_E_idx(i, k)]
@@ -104,7 +107,7 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
                            MOI.GreaterThan(cc[k] * delta_y[i]))
     end
 
-    # abs_b[i] constraints
+    # Then come the remaining constraints on the sign of `abs_b[i]`
     buf2 = Vector{MOI.ScalarAffineTerm{T}}(undef, 2)
     for i in 1:n_b
         s = vars[abs_b_idx(i)]
@@ -356,11 +359,8 @@ function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
     obj_terms = Vector{MOI.ScalarAffineTerm{T}}(undef, n_vars)
 
     for k in 1:n_vars
-        c = if k <= 2 * n * m
-            lambda            # bx or by block
-        else
-            one(T)            # dxbx, dyby, dyxbx, dxyby blocks
-        end
+        # Assign `lambda` to bx or by block; `one(T)` to dxbx, dyby, dyxbx, dxyby blocks
+        c = k <= 2 * n * m ? lambda : one(T)
         obj_terms[k] = MOI.ScalarAffineTerm{T}(c, vars[k])
     end
 
