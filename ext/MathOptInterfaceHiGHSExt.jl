@@ -49,18 +49,15 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
     MOI.set(model, MOI.RawOptimizerAttribute("solver"), "simplex")
     MOI.set(model, MOI.RawOptimizerAttribute("presolve"), "off")
 
-    # variables
-    vars = MOI.add_variables(model, n_vars)
-
-    # abs_b >= 0; b unconstrained, abs_E >= 0
-    lb_zero = MOI.GreaterThan(zero(T))
-    for i in 1:n_abs_b
-        MOI.add_constraint(model, vars[abs_b_idx(i)], lb_zero)
-    end
-
-    for i in 1:n_sum, k in 1:integral_steps
-        MOI.add_constraint(model, vars[abs_E_idx(i, k)], lb_zero)
-    end
+    # b: free variables; abs_b and abs_E: non-negative
+    b_vars = MOI.add_variables(model, n_b)
+    abs_b_vars, _ = MOI.add_constrained_variables(model,
+                                                   [MOI.GreaterThan(zero(T))
+                                                    for _ in 1:n_abs_b])
+    abs_E_vars, _ = MOI.add_constrained_variables(model,
+                                                   [MOI.GreaterThan(zero(T))
+                                                    for _ in 1:n_abs_E])
+    vars = vcat(b_vars, abs_b_vars, abs_E_vars)
 
     # objective: min sum_{i,k} inv_steps * abs_E[i, k] + lambda * sum_i abs_b[i]
     inv_steps = convert(T, 1) / integral_steps
@@ -69,7 +66,6 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
         obj_terms[b_idx(i)] = MOI.ScalarAffineTerm{T}(zero(T), vars[b_idx(i)])
         obj_terms[abs_b_idx(i)] = MOI.ScalarAffineTerm{T}(lambda, vars[abs_b_idx(i)])
     end
-
     for i in 1:n_sum, k in 1:integral_steps
         obj_terms[abs_E_idx(i, k)] = MOI.ScalarAffineTerm{T}(inv_steps,
                                                              vars[abs_E_idx(i, k)])
@@ -78,53 +74,75 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
     MOI.set(model,
             MOI.ObjectiveFunction{MOI.ScalarAffineFunction{T}}(),
             MOI.ScalarAffineFunction{T}(obj_terms, zero(T)))
-    # Indicate that the objective function should be minimized
     MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
 
-    # constraints
-    # Build constraints from abs(aa[k] * b[i] + bb[k] * b[i + 1] - cc[k] * delta_y[i])
-    # which are nonlinear. Convert into linear constraints by considering each side
-    # of the inequality separately.
-    buf3 = Vector{MOI.ScalarAffineTerm{T}}(undef, 3)
+    # Build all constraints
+    # - 2 * n_sum * integral_steps rows (3 non-zeros each) for the E constraints
+    # - 2 * n_b rows (2 non-zeros each) for the abs_b sign constraints
+    n_E_rows = 2 * n_sum * integral_steps
+    n_b_rows = 2 * n_b
+    n_rows = n_E_rows + n_b_rows
+    nnz = 3 * n_E_rows + 2 * n_b_rows
+
+    row_lower  = Vector{T}(undef, n_rows)
+    row_upper  = fill(T(Inf), n_rows)
+    row_starts = Vector{Cint}(undef, n_rows)
+    col_indices = Vector{Cint}(undef, nnz)
+    values      = Vector{T}(undef, nnz)
+
+    r = 0
+    nz = 0
+
+    # abs(aa[k]*b[i] + bb[k]*b[i+1] - cc[k]*delta_y[i]) 
     for i in 1:n_sum, k in 1:integral_steps
-        s = vars[abs_E_idx(i, k)]
-        bi = vars[b_idx(i)]
-        bi1 = vars[b_idx(i + 1)]
+        rhs = cc[k] * delta_y[i]
+        sidx  = abs_E_idx(i, k)
+        biidx = b_idx(i)
+        bi1idx = b_idx(i + 1)
 
-        # abs_E[i,k] - aa[k] * b[i] - bb[k] * b[i + 1] + cc[k] * delta_y[i] >= 0
+        # abs_E[i,k] - aa[k]*b[i] - bb[k]*b[i+1] >= -rhs
+        row_lower[r + 1] = -rhs
+        row_starts[r + 1] = Cint(nz)
+        col_indices[nz + 1] = Cint(sidx - 1)
+        col_indices[nz + 2] = Cint(biidx - 1)
+        col_indices[nz + 3] = Cint(bi1idx - 1)
+        values[nz + 1] =  one(T); values[nz + 2] = -aa[k]; values[nz + 3] = -bb[k]
+        r += 1; nz += 3
 
-        buf3[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf3[2] = MOI.ScalarAffineTerm{T}(-aa[k], bi)
-        buf3[3] = MOI.ScalarAffineTerm{T}(-bb[k], bi1)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf3), zero(T)),
-                           MOI.GreaterThan(-cc[k] * delta_y[i]))
-
-        # abs_E[i,k] + aa[k] * b[i] + bb[k] * b[i + 1] - cc[k] * delta_y[i] >= 0
-        buf3[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf3[2] = MOI.ScalarAffineTerm{T}(aa[k], bi)
-        buf3[3] = MOI.ScalarAffineTerm{T}(bb[k], bi1)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf3), zero(T)),
-                           MOI.GreaterThan(cc[k] * delta_y[i]))
+        # abs_E[i,k] + aa[k]*b[i] + bb[k]*b[i+1] >= rhs
+        row_lower[r + 1] = rhs
+        row_starts[r + 1] = Cint(nz)
+        col_indices[nz + 1] = Cint(sidx - 1)
+        col_indices[nz + 2] = Cint(biidx - 1)
+        col_indices[nz + 3] = Cint(bi1idx - 1)
+        values[nz + 1] =  one(T); values[nz + 2] =  aa[k]; values[nz + 3] =  bb[k]
+        r += 1; nz += 3
     end
 
-    # Then come the remaining constraints on the sign of `abs_b[i]`
-    buf2 = Vector{MOI.ScalarAffineTerm{T}}(undef, 2)
+    # abs_b[i] >= ±b[i]
     for i in 1:n_b
-        s = vars[abs_b_idx(i)]
-        bi = vars[b_idx(i)]
+        sidx  = abs_b_idx(i)
+        biidx = b_idx(i)
 
         # abs_b[i] - b[i] >= 0
-        buf2[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf2[2] = MOI.ScalarAffineTerm{T}(-one(T), bi)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf2), zero(T)),
-                           MOI.GreaterThan(zero(T)))
+        row_lower[r + 1] = zero(T)
+        row_starts[r + 1] = Cint(nz)
+        col_indices[nz + 1] = Cint(sidx - 1)
+        col_indices[nz + 2] = Cint(biidx - 1)
+        values[nz + 1] =  one(T); values[nz + 2] = -one(T)
+        r += 1; nz += 2
 
         # abs_b[i] + b[i] >= 0
-        buf2[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf2[2] = MOI.ScalarAffineTerm{T}(one(T), bi)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf2), zero(T)),
-                           MOI.GreaterThan(zero(T)))
+        row_lower[r + 1] = zero(T)
+        row_starts[r + 1] = Cint(nz)
+        col_indices[nz + 1] = Cint(sidx - 1)
+        col_indices[nz + 2] = Cint(biidx - 1)
+        values[nz + 1] =  one(T); values[nz + 2] =  one(T)
+        r += 1; nz += 2
     end
+
+    HiGHS.Highs_addRows(model.inner, Cint(n_rows), row_lower, row_upper,
+                        Cint(nnz), row_starts, col_indices, values)
 
     MOI.optimize!(model)
 
