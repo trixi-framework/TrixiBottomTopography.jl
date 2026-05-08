@@ -347,19 +347,12 @@ function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
     MOI.set(model, MOI.RawOptimizerAttribute("solver"), "simplex")
     MOI.set(model, MOI.RawOptimizerAttribute("presolve"), "off")
 
-    # Add variables
-    vars = MOI.add_variables(model, n_vars)
+    # Add variables (all variables non-negative)
+    vars, _ = MOI.add_constrained_variables(model, [MOI.GreaterThan(zero(T)) for _ in 1:n_vars])
 
-    lb_zero = MOI.GreaterThan(zero(T))
-    for v in vars
-        MOI.add_constraint(model, v, lb_zero)
-    end
-
-    # Coefficients 
+    # Objective
     obj_terms = Vector{MOI.ScalarAffineTerm{T}}(undef, n_vars)
-
     for k in 1:n_vars
-        # Assign `lambda` to bx or by block; `one(T)` to dxbx, dyby, dyxbx, dxyby blocks
         c = k <= 2 * n * m ? lambda : one(T)
         obj_terms[k] = MOI.ScalarAffineTerm{T}(c, vars[k])
     end
@@ -371,78 +364,53 @@ function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
             MOI.ScalarAffineFunction{T}(obj_terms, zero(T)))
     MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
 
-    # Constraints
-    nnz_per_con = 3
-    buf = Vector{MOI.ScalarAffineTerm{T}}(undef, nnz_per_con)
-    rhs = MOI.GreaterThan(zero(T))
+    # Build all TV constraints
+    n_rows = 2 * ((n - 1) * m + n * (m - 1) + n * (m - 1) + (n - 1) * m)
+    nnz = 3 * n_rows
 
-    # abs_dxbx: s_{i,j} ≥ ± (bx[i+1,j] - bx[i,j]) for i = 1:n-1, j = 1:m
+    row_lower  = zeros(T, n_rows)
+    row_upper  = fill(T(Inf), n_rows)
+    row_starts = Vector{Cint}(undef, n_rows)
+    col_indices = Vector{Cint}(undef, nnz)
+    values      = Vector{T}(undef, nnz)
+
+    r = 0
+    nz = 0
+
+    @inline function fill_pair!(sidx, bpidx, bmidx)
+        row_starts[r + 1] = Cint(nz)
+        col_indices[nz + 1] = Cint(sidx - 1)
+        col_indices[nz + 2] = Cint(bpidx - 1)
+        col_indices[nz + 3] = Cint(bmidx - 1)
+        values[nz + 1] =  one(T)
+        values[nz + 2] = -one(T)
+        values[nz + 3] =  one(T)
+        r += 1; nz += 3
+        row_starts[r + 1] = Cint(nz)
+        col_indices[nz + 1] = Cint(sidx - 1)
+        col_indices[nz + 2] = Cint(bpidx - 1)
+        col_indices[nz + 3] = Cint(bmidx - 1)
+        values[nz + 1] =  one(T)
+        values[nz + 2] =  one(T)
+        values[nz + 3] = -one(T)
+        r += 1; nz += 3
+    end
+
     for i in 1:(n - 1), j in 1:m
-        s = vars[dxbx_idx(i, j)]
-        bp = vars[bx_idx(i + 1, j)]
-        bm = vars[bx_idx(i, j)]
-        # s - bp + bm ≥ 0
-        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf[2] = MOI.ScalarAffineTerm{T}(-one(T), bp)
-        buf[3] = MOI.ScalarAffineTerm{T}(one(T), bm)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
-        # s + bp - bm ≥ 0
-        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf[2] = MOI.ScalarAffineTerm{T}(one(T), bp)
-        buf[3] = MOI.ScalarAffineTerm{T}(-one(T), bm)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+        fill_pair!(dxbx_idx(i, j), bx_idx(i + 1, j), bx_idx(i, j))
     end
-
-    # abs_dyby: s_{i,j} ≥ ± (by[i,j+1] - by[i,j]) for i = 1:n, j = 1:m-1
     for i in 1:n, j in 1:(m - 1)
-        s = vars[dyby_idx(i, j)]
-        bp = vars[by_idx(i, j + 1)]
-        bm = vars[by_idx(i, j)]
-        # s - bp + bm ≥ 0
-        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf[2] = MOI.ScalarAffineTerm{T}(-one(T), bp)
-        buf[3] = MOI.ScalarAffineTerm{T}(one(T), bm)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
-        # s + bp - bm ≥ 0
-        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf[2] = MOI.ScalarAffineTerm{T}(one(T), bp)
-        buf[3] = MOI.ScalarAffineTerm{T}(-one(T), bm)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+        fill_pair!(dyby_idx(i, j), by_idx(i, j + 1), by_idx(i, j))
     end
-
-    # abs_dybx: s_{i,j} ≥ ± (bx[i,j+1] - bx[i,j]) for i = 1:n, j = 1:m-1
     for i in 1:n, j in 1:(m - 1)
-        s = vars[dybx_idx(i, j)]
-        bp = vars[bx_idx(i, j + 1)]
-        bm = vars[bx_idx(i, j)]
-        # s - bp + bm ≥ 0
-        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf[2] = MOI.ScalarAffineTerm{T}(-one(T), bp)
-        buf[3] = MOI.ScalarAffineTerm{T}(one(T), bm)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
-        # s + bp - bm ≥ 0
-        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf[2] = MOI.ScalarAffineTerm{T}(one(T), bp)
-        buf[3] = MOI.ScalarAffineTerm{T}(-one(T), bm)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+        fill_pair!(dybx_idx(i, j), bx_idx(i, j + 1), bx_idx(i, j))
     end
-
-    # abs_dxby: s_{i,j} ≥ ± (by[i+1,j] - by[i,j]) for i = 1:n-1, j = 1:m
     for i in 1:(n - 1), j in 1:m
-        s = vars[dxby_idx(i, j)]
-        bp = vars[by_idx(i + 1, j)]
-        bm = vars[by_idx(i, j)]
-        # s - bp + bm ≥ 0
-        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf[2] = MOI.ScalarAffineTerm{T}(-one(T), bp)
-        buf[3] = MOI.ScalarAffineTerm{T}(one(T), bm)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
-        # s + bp - bm ≥ 0
-        buf[1] = MOI.ScalarAffineTerm{T}(one(T), s)
-        buf[2] = MOI.ScalarAffineTerm{T}(one(T), bp)
-        buf[3] = MOI.ScalarAffineTerm{T}(-one(T), bm)
-        MOI.add_constraint(model, MOI.ScalarAffineFunction{T}(copy(buf), zero(T)), rhs)
+        fill_pair!(dxby_idx(i, j), by_idx(i + 1, j), by_idx(i, j))
     end
+
+    HiGHS.Highs_addRows(model.inner, Cint(n_rows), row_lower, row_upper,
+                        Cint(nnz), row_starts, col_indices, values)
 
     # Solve
     MOI.optimize!(model)
