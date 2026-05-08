@@ -24,7 +24,7 @@ TrixiBottomTopography.RBFInterpolation1D
 TrixiBottomTopography.RBFInterpolation2D
 ```
 
-## MathOptInterfaceHiGHS.jl extension
+## JuMPHiGHS.jl extension
 ```@docs
 TrixiBottomTopography.LaverySpline1D(::Vector{T}, ::Vector{T}) where {T<:Real}
 TrixiBottomTopography.LaverySpline1D(::String)
