@@ -2,7 +2,7 @@ module TestLaverySpline1D
 
 using Test
 using TrixiBottomTopography
-using JuMP
+using MathOptInterface
 using HiGHS
 
 @testset "Lavery spline 1D interpolation" begin

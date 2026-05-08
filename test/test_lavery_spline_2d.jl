@@ -1,8 +1,8 @@
-module TestLaverySpline1D
+module TestLaverySpline2D
 
 using Test
 using TrixiBottomTopography
-using JuMP
+using MathOptInterface
 using HiGHS
 
 @testset "Lavery spline 2D interpolation" begin

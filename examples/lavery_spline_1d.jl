@@ -5,7 +5,7 @@
 
 # Include packages
 using TrixiBottomTopography
-using JuMP
+using MathOptInterface
 using HiGHS
 
 # Load in data from one of the examples from Eriksson and Jemsson thesis
