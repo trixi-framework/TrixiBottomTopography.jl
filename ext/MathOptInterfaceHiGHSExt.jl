@@ -52,11 +52,11 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
     # b: free variables; abs_b and abs_E: non-negative
     b_vars = MOI.add_variables(model, n_b)
     abs_b_vars, _ = MOI.add_constrained_variables(model,
-                                                   [MOI.GreaterThan(zero(T))
-                                                    for _ in 1:n_abs_b])
+                                                  [MOI.GreaterThan(zero(T))
+                                                   for _ in 1:n_abs_b])
     abs_E_vars, _ = MOI.add_constrained_variables(model,
-                                                   [MOI.GreaterThan(zero(T))
-                                                    for _ in 1:n_abs_E])
+                                                  [MOI.GreaterThan(zero(T))
+                                                   for _ in 1:n_abs_E])
     vars = vcat(b_vars, abs_b_vars, abs_E_vars)
 
     # objective: min sum_{i,k} inv_steps * abs_E[i, k] + lambda * sum_i abs_b[i]
@@ -84,11 +84,11 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
     n_rows = n_E_rows + n_b_rows
     nnz = 3 * n_E_rows + 2 * n_b_rows
 
-    row_lower  = Vector{T}(undef, n_rows)
-    row_upper  = fill(T(Inf), n_rows)
+    row_lower = Vector{T}(undef, n_rows)
+    row_upper = fill(T(Inf), n_rows)
     row_starts = Vector{Cint}(undef, n_rows)
     col_indices = Vector{Cint}(undef, nnz)
-    values      = Vector{T}(undef, nnz)
+    values = Vector{T}(undef, nnz)
 
     r = 0
     nz = 0
@@ -96,7 +96,7 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
     # abs(aa[k]*b[i] + bb[k]*b[i+1] - cc[k]*delta_y[i]) 
     for i in 1:n_sum, k in 1:integral_steps
         rhs = cc[k] * delta_y[i]
-        sidx  = abs_E_idx(i, k)
+        sidx = abs_E_idx(i, k)
         biidx = b_idx(i)
         bi1idx = b_idx(i + 1)
 
@@ -106,8 +106,11 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
         col_indices[nz + 1] = Cint(sidx - 1)
         col_indices[nz + 2] = Cint(biidx - 1)
         col_indices[nz + 3] = Cint(bi1idx - 1)
-        values[nz + 1] =  one(T); values[nz + 2] = -aa[k]; values[nz + 3] = -bb[k]
-        r += 1; nz += 3
+        values[nz + 1] = one(T)
+        values[nz + 2] = -aa[k]
+        values[nz + 3] = -bb[k]
+        r += 1
+        nz += 3
 
         # abs_E[i,k] + aa[k]*b[i] + bb[k]*b[i+1] >= rhs
         row_lower[r + 1] = rhs
@@ -115,13 +118,16 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
         col_indices[nz + 1] = Cint(sidx - 1)
         col_indices[nz + 2] = Cint(biidx - 1)
         col_indices[nz + 3] = Cint(bi1idx - 1)
-        values[nz + 1] =  one(T); values[nz + 2] =  aa[k]; values[nz + 3] =  bb[k]
-        r += 1; nz += 3
+        values[nz + 1] = one(T)
+        values[nz + 2] = aa[k]
+        values[nz + 3] = bb[k]
+        r += 1
+        nz += 3
     end
 
     # abs_b[i] >= ±b[i]
     for i in 1:n_b
-        sidx  = abs_b_idx(i)
+        sidx = abs_b_idx(i)
         biidx = b_idx(i)
 
         # abs_b[i] - b[i] >= 0
@@ -129,16 +135,20 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
         row_starts[r + 1] = Cint(nz)
         col_indices[nz + 1] = Cint(sidx - 1)
         col_indices[nz + 2] = Cint(biidx - 1)
-        values[nz + 1] =  one(T); values[nz + 2] = -one(T)
-        r += 1; nz += 2
+        values[nz + 1] = one(T)
+        values[nz + 2] = -one(T)
+        r += 1
+        nz += 2
 
         # abs_b[i] + b[i] >= 0
         row_lower[r + 1] = zero(T)
         row_starts[r + 1] = Cint(nz)
         col_indices[nz + 1] = Cint(sidx - 1)
         col_indices[nz + 2] = Cint(biidx - 1)
-        values[nz + 1] =  one(T); values[nz + 2] =  one(T)
-        r += 1; nz += 2
+        values[nz + 1] = one(T)
+        values[nz + 2] = one(T)
+        r += 1
+        nz += 2
     end
 
     HiGHS.Highs_addRows(model.inner, Cint(n_rows), row_lower, row_upper,
@@ -366,7 +376,8 @@ function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
     MOI.set(model, MOI.RawOptimizerAttribute("presolve"), "off")
 
     # Add variables (all variables non-negative)
-    vars, _ = MOI.add_constrained_variables(model, [MOI.GreaterThan(zero(T)) for _ in 1:n_vars])
+    vars, _ = MOI.add_constrained_variables(model,
+                                            [MOI.GreaterThan(zero(T)) for _ in 1:n_vars])
 
     # Objective
     obj_terms = Vector{MOI.ScalarAffineTerm{T}}(undef, n_vars)
@@ -386,11 +397,11 @@ function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
     n_rows = 2 * ((n - 1) * m + n * (m - 1) + n * (m - 1) + (n - 1) * m)
     nnz = 3 * n_rows
 
-    row_lower  = zeros(T, n_rows)
-    row_upper  = fill(T(Inf), n_rows)
+    row_lower = zeros(T, n_rows)
+    row_upper = fill(T(Inf), n_rows)
     row_starts = Vector{Cint}(undef, n_rows)
     col_indices = Vector{Cint}(undef, nnz)
-    values      = Vector{T}(undef, nnz)
+    values = Vector{T}(undef, nnz)
 
     r = 0
     nz = 0
@@ -400,18 +411,20 @@ function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
         col_indices[nz + 1] = Cint(sidx - 1)
         col_indices[nz + 2] = Cint(bpidx - 1)
         col_indices[nz + 3] = Cint(bmidx - 1)
-        values[nz + 1] =  one(T)
+        values[nz + 1] = one(T)
         values[nz + 2] = -one(T)
-        values[nz + 3] =  one(T)
-        r += 1; nz += 3
+        values[nz + 3] = one(T)
+        r += 1
+        nz += 3
         row_starts[r + 1] = Cint(nz)
         col_indices[nz + 1] = Cint(sidx - 1)
         col_indices[nz + 2] = Cint(bpidx - 1)
         col_indices[nz + 3] = Cint(bmidx - 1)
-        values[nz + 1] =  one(T)
-        values[nz + 2] =  one(T)
+        values[nz + 1] = one(T)
+        values[nz + 2] = one(T)
         values[nz + 3] = -one(T)
-        r += 1; nz += 3
+        r += 1
+        nz += 3
     end
 
     for i in 1:(n - 1), j in 1:m
