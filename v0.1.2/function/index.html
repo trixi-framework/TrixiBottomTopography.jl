@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>B-spline function · TrixiBottomTopography.jl</title><meta name="title" content="B-spline function · TrixiBottomTopography.jl"/><meta property="og:title" content="B-spline function · TrixiBottomTopography.jl"/><meta property="twitter:title" content="B-spline function · TrixiBottomTopography.jl"/><meta name="description" content="Documentation for TrixiBottomTopography.jl."/><meta property="og:description" content="Documentation for TrixiBottomTopography.jl."/><meta property="twitter:description" content="Documentation for TrixiBottomTopography.jl."/><meta property="og:url" content="https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/function/"/><meta property="twitter:url" content="https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/function/"/><link rel="canonical" href="https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/function/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">TrixiBottomTopography.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><span class="tocitem">Overview</span><ul><li><a class="tocitem" href="../conversion/">Data conversion</a></li><li><a class="tocitem" href="../structure/">B-spline structure</a></li><li class="is-active"><a class="tocitem" href>B-spline function</a><ul class="internal"><li><a class="tocitem" href="#One-dimensional-case"><span>One dimensional case</span></a></li><li><a class="tocitem" href="#Two-dimensional-case"><span>Two dimensional case</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../trixi_jl_examples/">Trixi.jl examples</a></li><li><span class="tocitem">Advanced topics &amp; developers</span><ul><li><a class="tocitem" href="../development/">Development</a></li><li><a class="tocitem" href="../styleguide/">Style guide</a></li><li><a class="tocitem" href="../testing/">Testing</a></li></ul></li><li><a class="tocitem" href="../changelog/">Changelog</a></li><li><a class="tocitem" href="../authors/">Authors</a></li><li><a class="tocitem" href="../contributing/">Contributing</a></li><li><a class="tocitem" href="../code_of_conduct/">Code of Conduct</a></li><li><a class="tocitem" href="../license/">License</a></li><li><a class="tocitem" href="../reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Overview</a></li><li class="is-active"><a href>B-spline function</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>B-spline function</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/trixi-framework/TrixiBottomTopography.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/docs/src/function.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="B-spline-interpolation-function"><a class="docs-heading-anchor" href="#B-spline-interpolation-function">B-spline interpolation function</a><a id="B-spline-interpolation-function-1"></a><a class="docs-heading-anchor-permalink" href="#B-spline-interpolation-function" title="Permalink"></a></h1><p>If the B-spline structure is defined, it can be used to define the B-spline interpolation function. In this chapter, we will continue with the examples from the <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/">B-spline structure</a> section for the one and two dimensional case.</p><h2 id="One-dimensional-case"><a class="docs-heading-anchor" href="#One-dimensional-case">One dimensional case</a><a id="One-dimensional-case-1"></a><a class="docs-heading-anchor-permalink" href="#One-dimensional-case" title="Permalink"></a></h2><p>In the <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/">B-spline structure</a> section, we began with the example file <a href="https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/rhine_data_cubic-nak.jl">rhine_data_cubic-nak.jl</a> from the <a href="https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples">examples folder</a> where we already defined the B-spline structure for the cubic B-spline interpolation with not-a-knot end condition and smoothing.</p><pre><code class="language-julia hljs"># Include packages
+using TrixiBottomTopography
+using CairoMakie
+
+# Define data path
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, &quot;examples&quot;, &quot;data&quot;, &quot;rhine_data_1d_20_x.txt&quot;)
+
+# Define B-spline structure
+spline_struct = CubicBSpline(data; end_condition = &quot;not-a-knot&quot;, smoothing_factor = 999)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">CubicBSpline{Vector{Float64}, Float64, Vector{Float64}, StaticArraysCore.SMatrix{4, 4, Int64, 16}}([357000.0, 357020.0, 357040.0, 357060.0, 357080.0, 357100.0, 357120.0, 357140.0, 357160.0, 357180.0  …  357800.0, 357820.0, 357840.0, 357860.0, 357880.0, 357900.0, 357920.0, 357940.0, 357960.0, 357980.0], 20.0, [46.91426684256018, 47.397904854124576, 46.99689666444544, 46.50889411070535, 46.73154903008692, 46.862924837363984, 46.74903591362994, 46.40702226591983, 46.31904390610859, 46.654018220049146  …  39.07284424693978, 39.1231081223708, 39.13738000648763, 39.136760208084766, 39.10325245367299, 39.08822484618267, 39.09410545889054, 39.1030246596446, 39.08484073202447, 39.009411959609665], [-1 3 -3 1; 3 -6 3 0; -3 0 3 0; 1 4 1 0])</code></pre><p>To define the B-spline interpolation function for a variable <code>x</code>, we use the <code>spline_interpolation</code> function. For the one dimensional case, this function is implemented as <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{LinearBSpline,%20Any}"><code>spline_interpolation(linear_struct, x)</code></a> and <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{CubicBSpline,%20Any}"><code>spline_interpolation(cubic_struct, x)</code></a>.</p><pre><code class="language-julia hljs"># Define B-spline interpolation function
+spline_func(x) = spline_interpolation(spline_struct, x)</code></pre><p>This defines the cubic B-spline interpolation function with not-a-knot end condition and smoothing with respect to variable <code>x</code> from the previously created <code>spline_struct</code>. If we want to visualize the interpolation function with 100 interpolation points, we define the following:</p><pre><code class="language-julia hljs"># Define interpolation points
+n = 200
+x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">200-element Vector{Float64}:
+ 357000.0
+ 357004.92462311557
+ 357009.84924623114
+ 357014.77386934677
+ 357019.6984924623
+ 357024.6231155779
+ 357029.5477386934
+ 357034.47236180905
+ 357039.3969849247
+ 357044.3216080402
+      ⋮
+ 357940.6030150754
+ 357945.52763819095
+ 357950.4522613065
+ 357955.3768844221
+ 357960.3015075377
+ 357965.2261306533
+ 357970.15075376886
+ 357975.07537688443
+ 357980.0</code></pre><p>and evaluate to obtain the corresponding <code>y</code> values by:</p><pre><code class="language-julia hljs"># Get interpolated values
+y_int_pts = spline_func.(x_int_pts)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">200-element Vector{Float64}:
+ 47.25046382058398
+ 47.235803568569594
+ 47.179415507626665
+ 47.0932077352213
+ 46.98908834882418
+ 46.87896544589783
+ 46.774747123914494
+ 46.68834148033668
+ 46.63165661263463
+ 46.61391092263422
+  ⋮
+ 39.09483624644603
+ 39.09666708631454
+ 39.098177071127225
+ 39.09891621696852
+ 39.09843453992283
+ 39.09628205607458
+ 39.09200878150819
+ 39.08516473230809
+ 39.07529992455869</code></pre><p>Plotting the interpolated points can be done via the command below and produces a one-dimensional plot</p><pre><code class="language-julia hljs">plot_topography(x_int_pts, y_int_pts; xlabel = &quot;ETRS89 East&quot;, ylabel = &quot;DHHN2016 Height&quot;)</code></pre><img src="20c01744.png" alt="Example block output"/><p>Alternatively, one can plot the interpolated bottom topography together with the interpolation knots as follows</p><pre><code class="language-julia hljs"># Get the original interpolation knots
+x_knots = spline_struct.x
+y_knots = spline_func.(x_knots)
+
+plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, x_knots, y_knots;
+                                         xlabel = &quot;ETRS89 East&quot;, ylabel = &quot;DHHN2016 Height&quot;)</code></pre><img src="5dfc00d9.png" alt="Example block output"/><h2 id="Two-dimensional-case"><a class="docs-heading-anchor" href="#Two-dimensional-case">Two dimensional case</a><a id="Two-dimensional-case-1"></a><a class="docs-heading-anchor-permalink" href="#Two-dimensional-case" title="Permalink"></a></h2><p>In the <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/">B-spline structure</a> section, we examined the example file <a href="https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/rhine_data_bicubic-nak.jl">rhine_data_bicubic-nak.jl</a> from the <a href="https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples">examples folder</a> where we already created the B-spline structure for the bicubic B-spline interpolation with not-a-knot end condition and smoothing.</p><pre><code class="language-julia hljs"># Include packages
+using TrixiBottomTopography
+using CairoMakie
+
+# Define data path
+root_dir = pkgdir(TrixiBottomTopography)
+data = joinpath(root_dir, &quot;examples&quot;, &quot;data&quot;, &quot;rhine_data_2d_20.txt&quot;)
+
+# Define B-spline structure
+spline_struct = BicubicBSpline(data; end_condition = &quot;not-a-knot&quot;, smoothing_factor = 9999)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BicubicBSpline{Vector{Float64}, Vector{Float64}, Float64, Matrix{Float64}, StaticArraysCore.SMatrix{4, 4, Int64, 16}}([357000.0, 357020.0, 357040.0, 357060.0, 357080.0, 357100.0, 357120.0, 357140.0, 357160.0, 357180.0  …  357800.0, 357820.0, 357840.0, 357860.0, 357880.0, 357900.0, 357920.0, 357940.0, 357960.0, 357980.0], [5.646019e6, 5.646039e6, 5.646059e6, 5.646079e6, 5.646099e6, 5.646119e6, 5.646139e6, 5.646159e6, 5.646179e6, 5.646199e6  …  5.646819e6, 5.646839e6, 5.646859e6, 5.646879e6, 5.646899e6, 5.646919e6, 5.646939e6, 5.646959e6, 5.646979e6, 5.646999e6], 20.0, [46.600451320002854 47.282399695552705 … 47.09971997322787 47.10735082392629; 45.82016087061047 46.502109246160636 … 46.963741530201055 46.97137238089921; … ; 45.99186284178017 45.686484464847375 … 39.098457400873656 39.23988800954714; 46.243985904572256 45.938607527639306 … 39.06537978820518 39.206810396878865], [-1 3 -3 1; 3 -6 3 0; -3 0 3 0; 1 4 1 0])</code></pre><p>To define the B-spline interpolation function for variables <code>x</code> and <code>y</code>, we use the <code>spline_interpolation</code> function for the two dimensional case. This functionality is implemented as <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{BilinearBSpline,%20Any,%20Any}"><code>spline_interpolation(bilinear_struct, x, y)</code></a> and <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/reference/#TrixiBottomTopography.spline_interpolation-Tuple{BicubicBSpline,%20Any,%20Any}"><code>spline_interpolation(bicubic_struct, x, y)</code></a>.</p><pre><code class="language-julia hljs"># Define B-spline interpolation function
+spline_func(x,y) = spline_interpolation(spline_struct, x, y)</code></pre><p>This defines the bicubic B-spline interpolation function with not-a-knot end condition and smoothing for variables <code>x</code> and <code>y</code> due to the previously constructed <code>spline_struct</code>. If we want to visualize the bicubic interpolation function with 100 interpolation points in each spatial direction, we define:</p><pre><code class="language-julia hljs"># Define interpolation points
+n = 100
+x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], n))
+y_int_pts = Vector(LinRange(spline_struct.y[1], spline_struct.y[end], n))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">100-element Vector{Float64}:
+ 5.646019e6
+ 5.646028898989899e6
+ 5.646038797979798e6
+ 5.646048696969697e6
+ 5.646058595959596e6
+ 5.646068494949495e6
+ 5.646078393939394e6
+ 5.646088292929293e6
+ 5.646098191919192e6
+ 5.646108090909091e6
+ ⋮
+ 5.646919808080808e6
+ 5.646929707070707e6
+ 5.646939606060606e6
+ 5.646949505050505e6
+ 5.646959404040404e6
+ 5.646969303030303e6
+ 5.646979202020202e6
+ 5.646989101010101e6
+ 5.646999e6</code></pre><p>To fill a matrix <code>z_int_pts</code>, which contains the corresponding <code>z</code> values for <code>x_int_pts</code> and <code>y_int_pts</code>, we use the helper function <code>evaluate_bicubicspline_interpolant</code>.</p><pre><code class="language-julia hljs"># Get interpolated matrix
+z_int_pts = evaluate_bicubicspline_interpolant(spline_func, x_int_pts, y_int_pts)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">100×100 Matrix{Float64}:
+ 46.4652  46.0495  45.59    45.0608  …  45.5853  45.6011  45.6461  45.719
+ 46.7486  46.3415  45.8956  45.3881     45.556   45.5411  45.557   45.6029
+ 46.9957  46.6121  46.1894  45.7059     45.5651  45.5146  45.4976  45.5147
+ 47.1991  46.8501  46.4565  46.0011     45.6092  45.5245  45.4746  45.4658
+ 47.3511  47.0408  46.6819  46.2619     45.6843  45.5739  45.4969  45.468
+ 47.4475  47.1729  46.8535  46.4774  …  45.79    45.6678  45.5745  45.5312
+ 47.4999  47.2541  46.9726  46.642      45.9414  45.8197  45.717   45.6593
+ 47.5231  47.2966  47.0444  46.7527     46.1512  46.0398  45.9296  45.8516
+ 47.5254  47.3085  47.0747  46.8123     46.3974  46.3073  46.1955  46.0947
+ 47.5134  47.2972  47.0707  46.8264     46.6459  46.5899  46.4879  46.369
+  ⋮                                  ⋱                             
+ 46.9407  46.8666  46.7907  46.7222     39.06    39.0671  39.071   39.072
+ 46.8836  46.8109  46.7421  46.682      39.0394  39.049   39.0552  39.0585
+ 46.848   46.7785  46.7166  46.6635     39.019   39.031   39.0395  39.0445
+ 46.8304  46.7651  46.7088  46.6602     39.0024  39.0165  39.027   39.0328
+ 46.8323  46.7707  46.7164  46.6678  …  38.9936  39.0082  39.0196  39.0259
+ 46.854   46.7937  46.7365  46.6822     38.9969  39.0093  39.02    39.0263
+ 46.8873  46.8252  46.7617  46.6978     39.0192  39.0257  39.033   39.0377
+ 46.922   46.8547  46.7832  46.7084     39.0675  39.0638  39.0642  39.0638
+ 46.9479  46.8731  46.7926  46.7075     39.1495  39.1302  39.1184  39.1086</code></pre><p>Plotting the interpolated values gives the representation directly below the <code>plot_topography</code> command</p><pre><code class="language-julia hljs">plot_topography(x_int_pts, y_int_pts, z_int_pts;
+                xlabel=&quot;ETRS89\n East&quot;,
+                ylabel=&quot;ETRS89\n North&quot;,
+                zlabel=&quot;DHHN2016\n Height&quot;,
+                azimuth_angle = 54 * pi / 180,
+                elevation_angle = 27 * pi / 180)</code></pre><img src="7e356a75.png" alt="Example block output"/><p>Alternatively, one can plot the interpolated two-dimensional bottom topography together with the interpolation knots as follows</p><pre><code class="language-julia hljs"># Get the original interpolation knots
+x_knots = spline_struct.x
+y_knots = spline_struct.y
+z_knots = evaluate_bicubicspline_interpolant(spline_func, x_knots, y_knots)
+
+plot_topography_with_interpolation_knots(x_int_pts, y_int_pts, z_int_pts,
+                                         x_knots, y_knots, z_knots;
+                                         xlabel=&quot;ETRS89\n East&quot;,
+                                         ylabel=&quot;ETRS89\n North&quot;,
+                                         zlabel=&quot;DHHN2016\n Height&quot;,
+                                         azimuth_angle = 54 * pi / 180,
+                                         elevation_angle = 27 * pi / 180)</code></pre><img src="5a2de3fb.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../structure/">« B-spline structure</a><a class="docs-footer-nextpage" href="../trixi_jl_examples/">Trixi.jl examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.11.4 on <span class="colophon-date" title="Tuesday 20 May 2025 14:10">Tuesday 20 May 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
