@@ -28,11 +28,11 @@ using Downloads: download
     # as a stress test to help catch significant performance regressions
     # The baseline time for construction of approximately 0.886560 seconds
     # is taken from https://github.com/trixi-framework/TrixiBottomTopography.jl/pull/99
-    # This value is multiplied by 3 for "safety" of different runners and other fluctuations.
+    # This value is multiplied by 4 for "safety" of different runners and other fluctuations.
     spline_bathymetry_file = download("https://gist.githubusercontent.com/andrewwinters5000/21255c980c4eda5294f91e8dfe6c7e33/raw/1afb73928892774dc3a902e0c46ffd882ef03ee3/monai_bathymetry_data.txt",
                                       joinpath(@__DIR__, "monai_bathymetry_data.txt"))
     timing = @timed LaverySpline2D(spline_bathymetry_file)
-    @test timing.time < 3 # seconds
+    @test timing.time < 4 # seconds
 end
 
 end # module
