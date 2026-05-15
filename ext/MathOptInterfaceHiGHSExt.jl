@@ -76,7 +76,9 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
             MOI.ScalarAffineFunction{T}(obj_terms, zero(T)))
     MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
 
-    # Build all constraints
+    # All constraints are passed to HiGHS in a single batch call: 
+    # each individual MOI.add_constraint triggers a C API
+    # call that resizes HiGHS's internal data structures.
     # - 2 * n_sum * integral_steps rows (3 non-zeros each) for the E constraints
     # - 2 * n_b rows (2 non-zeros each) for the abs_b sign constraints
     n_E_rows = 2 * n_sum * integral_steps
@@ -86,6 +88,9 @@ function LaverySpline1DModel(len::Int, delta_y::Vector{T}, lambda::T,
 
     row_lower = Vector{T}(undef, n_rows)
     row_upper = fill(T(Inf), n_rows)
+    # Cint (= Int32) is required because Highs_addRows is a C API that expects
+    # int32_t index arrays (HighsInt = Cint in HiGHS.jl's generated bindings).
+    # Using Julia's default Int (Int64) would silently corrupt the data.
     row_starts = Vector{Cint}(undef, n_rows)
     col_indices = Vector{Cint}(undef, nnz)
     values = Vector{T}(undef, nnz)
@@ -393,12 +398,17 @@ function LaverySpline2D(x::Vector{T}, y::Vector{T}, z::Matrix{T};
             MOI.ScalarAffineFunction{T}(obj_terms, zero(T)))
     MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
 
-    # Build all TV constraints
+    # All constraints are passed to HiGHS in a single batch call:
+    # each individual MOI.add_constraint triggers a C API
+    # call that resizes HiGHS's internal data structures.
     n_rows = 2 * ((n - 1) * m + n * (m - 1) + n * (m - 1) + (n - 1) * m)
     nnz = 3 * n_rows
 
     row_lower = zeros(T, n_rows)
     row_upper = fill(T(Inf), n_rows)
+    # Cint (= Int32) is required because Highs_addRows is a C API that expects
+    # int32_t index arrays (HighsInt = Cint in HiGHS.jl's generated bindings).
+    # Using Julia's default Int (Int64) would silently corrupt the data.
     row_starts = Vector{Cint}(undef, n_rows)
     col_indices = Vector{Cint}(undef, nnz)
     values = Vector{T}(undef, nnz)
