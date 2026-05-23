@@ -7,11 +7,7 @@ KernelInterpolation = "95686e15-3c94-4443-8f08-76d06d509f7b"
 MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 OrdinaryDiffEqLowStorageRK = "b0944070-b475-4768-8dec-fb6eb410534d"
 Trixi = "a7f1ee26-1774-49b1-8366-f1abc58fbfcb"
-TrixiBottomTopography = "86af9953-43df-404b-8eaa-d20d82623a82"
 TrixiShallowWater = "804cb1fc-5b08-4398-a671-a789bfe091b3"
-
-[sources.TrixiBottomTopography]
-path = ".."
 
 [compat]
 CairoMakie = "0.13, 0.15"
