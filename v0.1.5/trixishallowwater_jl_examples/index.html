@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>TrixiShallowWater.jl examples · TrixiBottomTopography.jl</title><meta name="title" content="TrixiShallowWater.jl examples · TrixiBottomTopography.jl"/><meta property="og:title" content="TrixiShallowWater.jl examples · TrixiBottomTopography.jl"/><meta property="twitter:title" content="TrixiShallowWater.jl examples · TrixiBottomTopography.jl"/><meta name="description" content="Documentation for TrixiBottomTopography.jl."/><meta property="og:description" content="Documentation for TrixiBottomTopography.jl."/><meta property="twitter:description" content="Documentation for TrixiBottomTopography.jl."/><meta property="og:url" content="https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/trixishallowwater_jl_examples/"/><meta property="twitter:url" content="https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/trixishallowwater_jl_examples/"/><link rel="canonical" href="https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/trixishallowwater_jl_examples/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">TrixiBottomTopography.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><span class="tocitem">Overview</span><ul><li><a class="tocitem" href="../conversion/">Data conversion</a></li><li><a class="tocitem" href="../structure/">B-spline structure</a></li><li><a class="tocitem" href="../function/">B-spline function</a></li></ul></li><li class="is-active"><a class="tocitem" href>TrixiShallowWater.jl examples</a><ul class="internal"><li><a class="tocitem" href="#One-dimensional-dam-break"><span>One dimensional dam break</span></a></li><li><a class="tocitem" href="#Two-dimensional-dam-break"><span>Two dimensional dam break</span></a></li></ul></li><li><span class="tocitem">Advanced topics &amp; developers</span><ul><li><a class="tocitem" href="../development/">Development</a></li><li><a class="tocitem" href="../styleguide/">Style guide</a></li><li><a class="tocitem" href="../testing/">Testing</a></li></ul></li><li><a class="tocitem" href="../reference/">Reference</a></li><li><a class="tocitem" href="../changelog/">Changelog</a></li><li><a class="tocitem" href="../authors/">Authors</a></li><li><a class="tocitem" href="../contributing/">Contributing</a></li><li><a class="tocitem" href="../code_of_conduct/">Code of Conduct</a></li><li><a class="tocitem" href="../license/">License</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>TrixiShallowWater.jl examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>TrixiShallowWater.jl examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/trixi-framework/TrixiBottomTopography.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/docs/src/trixishallowwater_jl_examples.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples-with-TrixiShallowWater.jl"><a class="docs-heading-anchor" href="#Examples-with-TrixiShallowWater.jl">Examples with TrixiShallowWater.jl</a><a id="Examples-with-TrixiShallowWater.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Examples-with-TrixiShallowWater.jl" title="Permalink"></a></h1><p>As mentioned in the <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/">Home</a> section of this documentation, TrixiBottomTopography.jl was developed as a supplementary package for the numerical solver suite <a href="https://github.com/trixi-framework/TrixiShallowWater.jl">TrixiShallowWater.jl</a> to enable the user to use real world geographical data for the bottom topography function of the shallow water equations. TrixiShallowWater.jl itself is a spinoff of <a href="https://github.com/trixi-framework/Trixi.jl">Trixi.jl</a> that is specifically designed for shallow water flow applications. An example that combines TrixiBottomTopography.jl with wet/dry transitions and shock capturing to model a tsunami runup is available as a <a href="https://trixi-framework.github.io/TrixiShallowWater.jl/stable/tutorials/elixir_shallowwater_monai_tsunami/">tutorial</a> in TrixiShallowWater.jl.</p><h2 id="One-dimensional-dam-break"><a class="docs-heading-anchor" href="#One-dimensional-dam-break">One dimensional dam break</a><a id="One-dimensional-dam-break-1"></a><a class="docs-heading-anchor-permalink" href="#One-dimensional-dam-break" title="Permalink"></a></h2><p>In this section, a one dimensional example is presented which uses the functionalities of TrixiBottomTopography.jl with <a href="https://github.com/trixi-framework/TrixiShallowWater.jl">TrixiShallowWater.jl</a> to simulate a dam break problem.</p><p>The underlying example file can be found <a href="https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixishallowwater_dam_break_1D.jl">here</a>.</p><p>First, all the necessary packages must be included at the beginning of the file.</p><pre><code class="language-julia hljs"># Include packages
+using TrixiBottomTopography
+using CairoMakie
+using OrdinaryDiffEqLowStorageRK
+using Trixi
+using TrixiShallowWater</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr33"><span class="sgr1">┌ Warning: </span></span>Module OrdinaryDiffEqCoreEnzymeCoreExt with build ID ffffffff-ffff-ffff-c7d4-ce782ad068d3 is missing from the cache.
+<span class="sgr33"><span class="sgr1">│ </span></span>This may mean OrdinaryDiffEqCoreEnzymeCoreExt [ca1c724a-f4aa-55ef-b8e4-2f05449449ac] does not support precompilation but is imported by a module that does.
+<span class="sgr33"><span class="sgr1">└ </span></span><span class="sgr90">@ Base loading.jl:2018</span>
+<span class="sgr91"><span class="sgr1">┌ Error: </span></span>Error during loading of extension OrdinaryDiffEqCoreEnzymeCoreExt of OrdinaryDiffEqCore, use `Base.retry_load_extensions()` to retry.
+<span class="sgr91"><span class="sgr1">│ </span></span>  exception =
+<span class="sgr91"><span class="sgr1">│ </span></span>   1-element ExceptionStack:
+<span class="sgr91"><span class="sgr1">│ </span></span>   Declaring __precompile__(false) is not allowed in files that are being precompiled.
+<span class="sgr91"><span class="sgr1">│ </span></span>   Stacktrace:
+<span class="sgr91"><span class="sgr1">│ </span></span>     [1] <span class="sgr1">_require(</span><span class="sgr90">pkg</span>::Base.PkgId, <span class="sgr90">env</span>::Nothing<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:2022</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>     [2] <span class="sgr1">__require_prelocked(</span><span class="sgr90">uuidkey</span>::Base.PkgId, <span class="sgr90">env</span>::Nothing<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:1882</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>     [3] <span class="sgr1">#invoke_in_world#3</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">essentials.jl:926</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>     [4] <span class="sgr1">invoke_in_world</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">essentials.jl:923</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>     [5] <span class="sgr1">_require_prelocked</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">loading.jl:1873</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>     [6] <span class="sgr1">_require_prelocked</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">loading.jl:1872</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>     [7] <span class="sgr1">run_extension_callbacks(</span><span class="sgr90">extid</span>::Base.ExtensionId<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:1365</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>     [8] <span class="sgr1">run_extension_callbacks(</span><span class="sgr90">pkgid</span>::Base.PkgId<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:1400</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>     [9] <span class="sgr1">run_package_callbacks(</span><span class="sgr90">modkey</span>::Base.PkgId<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:1224</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [10] <span class="sgr1">__require_prelocked(</span><span class="sgr90">uuidkey</span>::Base.PkgId, <span class="sgr90">env</span>::String<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:1889</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [11] <span class="sgr1">#invoke_in_world#3</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">essentials.jl:926</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [12] <span class="sgr1">invoke_in_world</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">essentials.jl:923</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [13] <span class="sgr1">_require_prelocked(</span><span class="sgr90">uuidkey</span>::Base.PkgId, <span class="sgr90">env</span>::String<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:1873</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [14] <span class="sgr1">macro expansion</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">loading.jl:1860</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [15] <span class="sgr1">macro expansion</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">lock.jl:267</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [16] <span class="sgr1">__require(</span><span class="sgr90">into</span>::Module, <span class="sgr90">mod</span>::Symbol<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:1823</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [17] <span class="sgr1">#invoke_in_world#3</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">essentials.jl:926</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [18] <span class="sgr1">invoke_in_world</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">essentials.jl:923</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [19] <span class="sgr1">require(</span><span class="sgr90">into</span>::Module, <span class="sgr90">mod</span>::Symbol<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:1816</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [20] <span class="sgr1">include</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">Base.jl:495</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [21] <span class="sgr1">include_package_for_output(</span><span class="sgr90">pkg</span>::Base.PkgId, <span class="sgr90">input</span>::String, <span class="sgr90">depot_path</span>::Vector<span class="sgr90">{String}</span>, <span class="sgr90">dl_load_path</span>::Vector<span class="sgr90">{String}</span>, <span class="sgr90">load_path</span>::Vector<span class="sgr90">{String}</span>, <span class="sgr90">concrete_deps</span>::Vector<span class="sgr90">{Pair{Base.PkgId, UInt128}}</span>, <span class="sgr90">source</span>::String<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:2292</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [22] top-level scope
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90"><span class="sgr4">stdin:4</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [23] <span class="sgr1">eval</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">boot.jl:385</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [24] <span class="sgr1">include_string(</span><span class="sgr90">mapexpr</span>::typeof(identity), <span class="sgr90">mod</span>::Module, <span class="sgr90">code</span>::String, <span class="sgr90">filename</span>::String<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">loading.jl:2146</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [25] <span class="sgr1">include_string</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">./<span class="sgr4">loading.jl:2156</span> [inlined]</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [26] <span class="sgr1">exec_options(</span><span class="sgr90">opts</span>::Base.JLOptions<span class="sgr1">)</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">client.jl:321</span></span>
+<span class="sgr91"><span class="sgr1">│ </span></span>    [27] <span class="sgr1">_start()</span>
+<span class="sgr91"><span class="sgr1">│ </span></span>   <span class="sgr90">    @</span> <span class="sgr90">Base</span> <span class="sgr90">./<span class="sgr4">client.jl:557</span></span>
+<span class="sgr91"><span class="sgr1">└ </span></span><span class="sgr90">@ Base loading.jl:1371</span></code></pre><ul><li><a href="https://github.com/JuliaPlots/CairoMakie.jl">CairoMakie.jl</a> is the <a href="https://docs.makie.org/stable/">Makie.jl</a> backend responsible for visualizing the approximate solution of the dam break problem.</li><li><a href="https://docs.sciml.ai/OrdinaryDiffEq/stable/explicit/LowStorageRK/">OrdinaryDiffEqLowStorageRK.jl</a> is a sub-package of <a href="https://github.com/SciML/OrdinaryDiffEq.jl">OrdinaryDiffEq.jl</a> that must be added to load low-storage explicit Runge-Kutta methods to be used by Trixi.jl.</li></ul><p>Next, the underlying bottom topography data is downloaded from a gist.</p><pre><code class="language-julia hljs"># Download one dimensional Rhine bottom data from gist
+Rhine_data = download(&quot;https://gist.githubusercontent.com/maxbertrand1996/19c33682b99bfb1cc3116f31dd49bdb9/raw/d96499a1ffe250bc8e4cca8622779bae61543fd8/Rhine_data_1D_40_x_841.txt&quot;)</code></pre><p>The downloaded data is then used to define the B-spline interpolation function as described in <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/">B-spline structure</a> and <a href="https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/">B-spline function</a>. In this case, a cubic B-spline interpolation function with free end condition is chosen.</p><pre><code class="language-julia hljs"># B-spline interpolation of the underlying data.
+# The type of this struct is fixed as `CubicBSpline`.
+const spline_struct = CubicBSpline(Rhine_data)
+spline_func(x::Float64) = spline_interpolation(spline_struct, x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">spline_func (generic function with 1 method)</code></pre><p>Now that the B-spline interpolation function is determined, the one dimensional shallow water equations implemented in TrixiShallowWater.jl can be defined by calling:</p><pre><code class="language-julia hljs"># Defining one dimensional shallow water equations
+equations = ShallowWaterEquations1D(gravity = 1.0, H0 = 55.0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ ShallowWaterEquations1D                                                                          │
+│ ═══════════════════════                                                                          │
+│ #variables: ………………………………………………… 3                                                                │
+│ │ variable 1: …………………………………………… h                                                                │
+│ │ variable 2: …………………………………………… h_v                                                              │
+│ │ variable 3: …………………………………………… b                                                                │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>Here the constant gravititational acceleration has been chosen to be <span>$1.0$</span>, and the background total water height <span>$H_0$</span> has been set to <span>$55.0$</span>.</p><p>Next, the initial condition for the dam break problem can be defined. At time <span>$t=0$</span>, a part of the water height in the center of the domain with a diameter of <span>$100$</span> is set to <span>$60.0$</span> while the rest of the domain stays at the background water height <span>$55.0$</span>. Additionally, we can see that the bottom topography <code>b</code> is defined by the B-spline interpolation function <code>spline_func</code> and is set in the initial condition.</p><pre><code class="language-julia hljs"># Defining initial condition for the dam break problem
+function initial_condition_dam_break(x, t, equations::ShallowWaterEquations1D)
+
+  inicenter = SVector(357490.0)
+  x_norm = x[1] - inicenter[1]
+  r = abs(x_norm)
+
+  # Calculate primitive variables
+  H = r &lt; 50 ? 60.0 : 55.0
+  v = 0.0
+  b = spline_func(x[1])
+
+  return prim2cons(SVector(H, v, b), equations)
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">initial_condition_dam_break (generic function with 1 method)</code></pre><p>After the initial condition, we can set the boundary conditions. In this case, a reflective wall condition is chosen, which is already implemented in TrixiShallowWater.jl for the one dimensional shallow water equations.</p><pre><code class="language-julia hljs"># Setting initial condition
+initial_condition = initial_condition_dam_break
+
+# Setting the boundary to be a reflective wall
+boundary_condition = boundary_condition_slip_wall</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">boundary_condition_slip_wall (generic function with 20 methods)</code></pre><p>The upcoming code parts will <strong>not</strong> be covered in full detail. To get a more profound understanding of the routines, please see the <a href="https://trixi-framework.github.io/TrixiDocumentation/stable/">Trixi.jl documentation</a> as well as the <a href="https://trixi-framework.github.io/TrixiShallowWater.jl/stable/">TrixiShallowWater documentation</a>.</p><p>The following code snippet sets up the discontinuous Galerkin spectral element method (DGSEM). In this solver type, we can specify which flux functions for the surface and volume fluxes will be taken, as well as the polynomial degree (<code>polydeg</code>) of the polynomials used in the approximation space.</p><pre><code class="language-julia hljs">###############################################################################
+# Get the DG approximation space
+
+volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
+solver = DGSEM(polydeg=3, surface_flux=(flux_hll, flux_nonconservative_fjordholm_etal),
+               volume_integral=VolumeIntegralFluxDifferencing(volume_flux))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ DG{Float64}                                                                                      │
+│ ═══════════                                                                                      │
+│ basis: ……………………………………………………………… LobattoLegendreBasis{Float64}(polydeg=3)                         │
+│ mortar: …………………………………………………………… LobattoLegendreMortarL2{Float64}(polydeg=3)                      │
+│ surface integral: ………………………………… SurfaceIntegralWeakForm                                          │
+│ │ surface flux: ……………………………………… (FluxHLL(min_max_speed_davis), T…nonconservative_fjordholm_etal) │
+│ volume integral: …………………………………… VolumeIntegralFluxDifferencing                                   │
+│ │ volume flux: ………………………………………… (Trixi.flux_wintermeyer_etal, Tr…nconservative_wintermeyer_etal) │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>After the solver comes the specification of the mesh in the approximation. In this case, a <a href="https://trixi-framework.github.io/TrixiDocumentation/stable/meshes/tree_mesh/"><code>TreeMesh</code></a> is chosen, which is a Cartesian mesh. Here the domain borders must be defined, as well as the number of initial elements (<span>$2$</span> to the power of <code>initial_refinement_level</code>). Also, we have to indicate if the domain is periodic. In this example, boundary conditions were defined. Thus the periodicity is set to <code>false</code>.</p><p>Once the underlying mesh is constructed, a semidiscretization object can be created by calling <code>SemiDiscretizationHyperbolic</code>. This collects all the building blocks needed to set up the semidiscretization:</p><ul><li>The underlying mesh.</li><li>The set of equations.</li><li>The initial condition.</li><li>The solver (in this case DGSEM).</li><li>The boundary conditions.</li></ul><pre><code class="language-julia hljs">###############################################################################
+# Get the TreeMesh and setup a periodic mesh
+
+coordinates_min = spline_struct.x[1]
+coordinates_max = spline_struct.x[end]
+mesh = TreeMesh(coordinates_min, coordinates_max,
+                initial_refinement_level = 3,
+                n_cells_max = 10_000,
+                periodicity = false)
+
+# create the semi discretization object
+semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
+                                    boundary_conditions = boundary_condition)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ SemidiscretizationHyperbolic                                                                     │
+│ ════════════════════════════                                                                     │
+│ #spatial dimensions: ………………………… 1                                                                │
+│ mesh: ………………………………………………………………… TreeMesh{1, Trixi.SerialTree{1, Float64}} with length 15         │
+│ equations: …………………………………………………… ShallowWaterEquations1D                                          │
+│ initial condition: ……………………………… initial_condition_dam_break                                      │
+│ boundary conditions: ………………………… 2                                                                │
+│ │ negative x: …………………………………………… boundary_condition_slip_wall                                     │
+│ │ positive x: …………………………………………… boundary_condition_slip_wall                                     │
+│ source terms: …………………………………………… nothing                                                          │
+│ solver: …………………………………………………………… DG                                                               │
+│ total #DOFs per field: …………………… 32                                                               │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>An ordinary differential equations object is set up using a specified time range, <code>tspan</code>, and the semidiscretization object, <code>semi</code>.</p><pre><code class="language-julia hljs">###############################################################################
+# ODE solvers
+
+tspan = (0.0, 100.0)
+ode = semidiscretize(semi, tspan)</code></pre><p>The ordinary differential equations object <code>ode</code> is solved by the function <code>sol</code> which is part of the OrdinaryDiffEq.jl package. Here the time stepping method can be specified (in this case, <code>RDPK3SpFSAL49()</code>) as well as some tolerances responsible for an error-based time step control.</p><pre><code class="language-julia hljs">###############################################################################
+# run the simulation
+
+# define equidistant nodes in time for visualization of an animation
+visnodes = range(tspan[1], tspan[2], length = 90)
+
+# use a Runge-Kutta method with error-based time step size control
+sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
+            saveat = visnodes)</code></pre><p>At this point, the calculation is finished. However, to visualize the dam break problem, we want to create an animation of the solution to show its evolution over time. Above we created a uniform set of points in time <code>visnodes</code> and used the <code>saveat</code> attribute so that the <code>solve</code> saves solution information at these check-in values.</p><p>We use the plotting backend CairoMakie.jl for this purpose. To create an animation we use the <code>record</code> structure to save plots over every time step of the simulation and append them together into an animation. Inside the loop, the <code>PlotData1D</code> functionality from Trixi.jl is called to create a plotting object. Afterwards, this plotting object is visualized using the <code>lines</code> command from Makie.</p><p>Two <code>Observable</code> quantities are created, one to increment the number of plots and another for the time at which each solution occurs. The resulting animation is given below.</p><pre><code class="language-julia hljs"># Create animation of the solution
+j = Observable(1)
+time = Observable(0.0)
+
+pd_list = [PlotData1D(sol.u[i], semi) for i in 1:length(sol.t)]
+f = Figure()
+title_string = lift(t -&gt; &quot;time t = $(round(t, digits=3))&quot;, time)
+ax = Axis(f[1, 1], xlabel = &quot;ETRS89 East&quot;, ylabel = &quot;DHHN2016&quot;,
+                title = title_string)
+
+height = lift(i -&gt; pd_list[i].data[:, 1], j)
+bottom = lift(i -&gt; pd_list[i].data[:, 3], j)
+lines!(ax, pd_list[1].x, height)
+lines!(ax, pd_list[1].x, bottom)
+ylims!(ax, 38, 65)
+
+record(f, &quot;animation.gif&quot;, 1:length(pd_list)) do tt
+  j[] = tt
+  time[] = sol.t[tt]
+end</code></pre><p><img src="../animation.gif" alt="simTrixi1D"/></p><h2 id="Two-dimensional-dam-break"><a class="docs-heading-anchor" href="#Two-dimensional-dam-break">Two dimensional dam break</a><a id="Two-dimensional-dam-break-1"></a><a class="docs-heading-anchor-permalink" href="#Two-dimensional-dam-break" title="Permalink"></a></h2><p>The underlying example file can be found <a href="https://github.com/trixi-framework/TrixiBottomTopography.jl/blob/main/examples/trixishallowwater_dam_break_2D.jl">here</a>.</p><p>The two dimensional example is similar to the one dimensional case.</p><p>First, all the necessary packages and the underlying bottom topography data are loaded.</p><pre><code class="language-julia hljs"># Include packages
+using TrixiBottomTopography
+using CairoMakie
+using OrdinaryDiffEqLowStorageRK
+using Trixi
+using TrixiShallowWater
+
+Rhine_data = download(&quot;https://gist.githubusercontent.com/maxbertrand1996/a30db4dc9f5427c78160321d75a08166/raw/fa53ceb39ac82a6966cbb14e1220656cf7f97c1b/Rhine_data_2D_40.txt&quot;)</code></pre><p>Using the data, a bicubic B-spline interpolation is performed on the data to define a bottom topography function.</p><pre><code class="language-julia hljs"># B-spline interpolation of the underlying data.
+# The type of this struct is fixed as `BicubicBSpline`.
+const spline_struct = BicubicBSpline(Rhine_data)
+spline_func(x::Float64, y::Float64) = spline_interpolation(spline_struct, x, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">spline_func (generic function with 1 method)</code></pre><p>Then the two dimensional shallow water equations are defined, where the gravitational acceleration has been chosen to be <code>9.81</code> and the initial water height <code>55.0</code>. Afterwards, the initial condition is defined. Similar to the one dimensional case, in the center of the domain, a circular part with a diameter of <code>100.0</code> is chosen where the initial water height is chosen to be <code>10.0</code> units higher.</p><pre><code class="language-julia hljs">equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 55.0)
+
+function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
+
+  inicenter = SVector(357490.0, 5646519.0)
+  x_norm = x - inicenter
+  r = sqrt(x_norm[1]^2 + x_norm[2]^2)
+
+  # Calculate primitive variables
+  H =  r &lt; 50 ? 65.0 : 55.0
+  v1 = 0.0
+  v2 = 0.0
+
+  x1, x2 = x
+  b = spline_func(x1, x2)
+
+  return prim2cons(SVector(H, v1, v2, b), equations)
+end
+
+# Setting initial condition
+initial_condition = initial_condition_wave
+
+# Setting the boundary to be a free-slip wall
+boundary_condition = boundary_condition_slip_wall</code></pre><p>This assigns the initial conditions and boundary conditions to appropriate names that can be passed to the forthcoming semidiscretization.</p><p>The DGSEM solver is set up as in the one dimensional case.</p><pre><code class="language-julia hljs">###############################################################################
+# Get the DG approximation space
+
+volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
+solver = DGSEM(polydeg=3, surface_flux=(flux_fjordholm_etal, flux_nonconservative_fjordholm_etal),
+               volume_integral=VolumeIntegralFluxDifferencing(volume_flux))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ DG{Float64}                                                                                      │
+│ ═══════════                                                                                      │
+│ basis: ……………………………………………………………… LobattoLegendreBasis{Float64}(polydeg=3)                         │
+│ mortar: …………………………………………………………… LobattoLegendreMortarL2{Float64}(polydeg=3)                      │
+│ surface integral: ………………………………… SurfaceIntegralWeakForm                                          │
+│ │ surface flux: ……………………………………… (Trixi.flux_fjordholm_etal, Trix…nonconservative_fjordholm_etal) │
+│ volume integral: …………………………………… VolumeIntegralFluxDifferencing                                   │
+│ │ volume flux: ………………………………………… (Trixi.flux_wintermeyer_etal, Tr…nconservative_wintermeyer_etal) │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>Now the mesh has to be specified. As above, we use a Cartesian box mesh created as a <code>TreeMesh</code> in Trixi.jl. Because we have defined boundary conditions defined, we set the <code>periodicity</code> to be <code>false</code>.</p><pre><code class="language-julia hljs">###############################################################################
+# Get the TreeMesh and setup a periodic mesh
+
+coordinates_min = (spline_struct.x[1], spline_struct.y[1])
+coordinates_max = (spline_struct.x[end], spline_struct.y[end])
+mesh = TreeMesh(coordinates_min, coordinates_max,
+                initial_refinement_level = 3,
+                n_cells_max = 10_000,
+                periodicity = false)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ TreeMesh{2, Trixi.SerialTree{2, Float64}}                                                        │
+│ ═════════════════════════════════════════                                                        │
+│ center: …………………………………………………………… [357480.0, 5.646519e6]                                           │
+│ length: …………………………………………………………… 960.0                                                            │
+│ periodicity: ……………………………………………… (false, false)                                                   │
+│ current #cells: ……………………………………… 85                                                               │
+│ #leaf-cells: ……………………………………………… 64                                                               │
+│ maximum #cells: ……………………………………… 10000                                                            │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>When calling the semidiscretization object again, <code>boundary_conditions</code> does not have to be specified.</p><pre><code class="language-julia hljs"># create the semi discretization object
+semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
+                                    boundary_conditions = boundary_condition)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ SemidiscretizationHyperbolic                                                                     │
+│ ════════════════════════════                                                                     │
+│ #spatial dimensions: ………………………… 2                                                                │
+│ mesh: ………………………………………………………………… TreeMesh{2, Trixi.SerialTree{2, Float64}} with length 85         │
+│ equations: …………………………………………………… ShallowWaterEquations2D                                          │
+│ initial condition: ……………………………… initial_condition_wave                                           │
+│ boundary conditions: ………………………… 4                                                                │
+│ │ negative x: …………………………………………… boundary_condition_slip_wall                                     │
+│ │ positive x: …………………………………………… boundary_condition_slip_wall                                     │
+│ │ negative y: …………………………………………… boundary_condition_slip_wall                                     │
+│ │ positive y: …………………………………………… boundary_condition_slip_wall                                     │
+│ source terms: …………………………………………… nothing                                                          │
+│ solver: …………………………………………………………… DG                                                               │
+│ total #DOFs per field: …………………… 1024                                                             │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘</code></pre><p>The solution of the PDE and the animation is analogous to the one dimensional case except that we chose <code>PlotData2D</code> to create the plotting object instead of <code>PlotData1D</code> as we are in the two dimensional case now.</p><p>As in the 1D example, we use the plotting backend CairoMakie.jl. To create an animation we use the <code>record</code> structure to save plots over every time step of the simulation and append them together into an animation. Inside the loop, the <code>PlotData2D</code> functionality from Trixi.jl is called to create a plotting object. Afterwards, this plotting object is visualized using the <code>wireframe</code> command to visualize the 2D water height evolution and <code>surface</code> to visualize bicubic B-spline approximation of the bottom topography. Two <code>Observable</code> quantities are created, one to increment the number of plots and another for the time at which each solution occurs. The the resulting animation is given below.</p><pre><code class="language-julia hljs">###############################################################################
+# ODE solvers, callbacks etc.
+
+tspan = (0.0, 100.0)
+ode = semidiscretize(semi, tspan)
+
+###############################################################################
+# run the simulation
+
+# define equidistant nodes in time for visualization of an animation
+visnodes = range(tspan[1], tspan[2], length = 175)
+
+# use a Runge-Kutta method with error based time step size control
+sol = solve(ode, RDPK3SpFSAL49(), abstol = 1.0e-8, reltol = 1.0e-8,
+            saveat = visnodes);
+
+# Create an animation of the solution
+j = Observable(1)
+time = Observable(0.0)
+
+pd_list = [PlotData2D(sol.u[i], semi) for i in 1:length(sol.t)]
+f = Figure()
+
+title_string = lift(t -&gt;  &quot;time t = $(round(t, digits=3))&quot;, time)
+az = 130 * pi / 180
+el = 18 * pi / 180
+ax = Axis3(f[1, 1], xlabel = &quot;E&quot;, ylabel = &quot;N&quot;, zlabel = &quot;H&quot;,
+                  title = title_string, azimuth = az, elevation = el)
+
+height = lift(i -&gt; pd_list[i].data[1], j)
+bottom = lift(i -&gt; pd_list[i].data[4], j)
+surface!(ax, pd_list[1].x, pd_list[1].y, bottom;
+                colormap = :greenbrownterrain)
+wireframe!(ax, pd_list[1].x, pd_list[1].y, height;
+                  color = Makie.RGBA(0, 0.5, 1, 0.4))
+zlims!(ax, 35, 70)
+
+record(f, &quot;animation_2d.gif&quot;, 1:length(pd_list)) do tt
+  j[] = tt
+  time[] = sol.t[tt]
+end</code></pre><p><img src="../animation_2d.gif" alt="simTrixi2D"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../function/">« B-spline function</a><a class="docs-footer-nextpage" href="../development/">Development »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Saturday 31 January 2026 21:34">Saturday 31 January 2026</span>. Using Julia version 1.10.10.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
