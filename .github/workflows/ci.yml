@@ -51,7 +51,7 @@ jobs:
             os: windows-latest
             arch: x64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
@@ -83,7 +83,7 @@ jobs:
         arch:
           - x64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
@@ -102,7 +102,7 @@ jobs:
         with:
           directories: src
       - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: lcov.info
         env:
