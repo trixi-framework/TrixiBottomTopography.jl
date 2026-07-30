@@ -47,7 +47,7 @@ nothing #hide
 The choice of `kernel` determines the radial basis function used to build the interpolant.
 KernelInterpolation.jl implements several kernels, e.g., the `ThinPlateSplineKernel` used
 above or the `GaussKernel`. See the
-[KernelInterpolation.jl documentation](https://joshualampert.github.io/KernelInterpolation.jl/stable/)
+[KernelInterpolation.jl documentation](https://joshualampert.github.io/KernelInterpolation.jl/stable/interpolation/#Overview-of-kernels-and-adding-a-custom-kernel)
 for a full overview. Additional positional and keyword arguments are forwarded to
 KernelInterpolation.jl's `interpolate` function.
 
