@@ -112,7 +112,9 @@ makedocs(;
              "Overview" => [
                  "Data conversion" => "conversion.md",
                  "B-spline structure" => "structure.md",
-                 "B-spline function" => "function.md"
+                 "B-spline function" => "function.md",
+                 "RBF interpolation" => "rbf_interpolation.md",
+                 "Shape-preserving splines" => "shape_preserving_splines.md"
              ],
              "TrixiShallowWater.jl examples" => "trixishallowwater_jl_examples.md",
              "Advanced topics & developers" => ["Development" => "development.md",
