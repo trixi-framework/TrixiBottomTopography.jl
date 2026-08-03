@@ -148,7 +148,6 @@ coordinates_min = spline_struct.x[1]
 coordinates_max = spline_struct.x[end]
 mesh = TreeMesh(coordinates_min, coordinates_max,
                 initial_refinement_level = 3,
-                n_cells_max = 10_000,
                 periodicity = false)
 
 # create the semi discretization object
@@ -313,7 +312,6 @@ coordinates_min = (spline_struct.x[1], spline_struct.y[1])
 coordinates_max = (spline_struct.x[end], spline_struct.y[end])
 mesh = TreeMesh(coordinates_min, coordinates_max,
                 initial_refinement_level = 3,
-                n_cells_max = 10_000,
                 periodicity = false)
 ```
 
