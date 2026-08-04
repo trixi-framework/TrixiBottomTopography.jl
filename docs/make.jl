@@ -1,4 +1,5 @@
 using Documenter
+using DocumenterCodeBlocks: CodeBlocks
 import Pkg
 using TrixiBottomTopography
 using Changelog: Changelog
@@ -107,6 +108,8 @@ makedocs(;
                                   canonical = "https://trixi-framework.github.io/TrixiBottomTopography.jl/stable",
                                   edit_link = "main",
                                   size_threshold_ignore = ["index.md"],),
+         # Improve code blocks in the documentation by using DocumenterCodeBlocks.jl
+         plugins = [CodeBlocks()],
          # Explicitly specify documentation structure
          pages = ["Home" => "index.md",
              "Overview" => [
