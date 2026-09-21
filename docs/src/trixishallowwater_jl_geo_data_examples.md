@@ -1,17 +1,11 @@
 # Cliffs of Moher
 
-The [Rhine river](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/trixishallowwater_jl_examples/)
-examples use bottom topography that is already available in the TrixiBottomTopography.jl
-format. This section shows two examples that instead use topography obtained for an
-arbitrary region of the world with
+This section shows two examples that use topography obtained with
 [GeophysicalModelGenerator.jl](https://github.com/JuliaGeodynamics/GeophysicalModelGenerator.jl),
 as described in [Real topography data](@ref).
 
-The region is the coastline at the Cliffs of Moher in Ireland. The domain covers the open
-sea in the west and the cliffs, which rise up to roughly 197 m above sea level, in the east.
-In both examples a wave travels east and runs up the cliff face, which requires the
-wetting and drying capabilities of
-[TrixiShallowWater.jl](https://github.com/trixi-framework/TrixiShallowWater.jl).
+The region is a part of the coastline at the Cliffs of Moher in Ireland. The domain covers the open sea and the cliffs. In both examples a wave travels across
+the sea and finally runs up the cliffs.
 
 ## One dimensional wave run-up
 
@@ -28,11 +22,6 @@ using Trixi
 using TrixiShallowWater
 ```
 
-In contrast to the Rhine examples,
-[OrdinaryDiffEqSSPRK.jl](https://docs.sciml.ai/OrdinaryDiffEq/stable/explicit/SSPRK/)
-is used here because the strong stability preserving methods it provides accept the
-positivity limiter that keeps the water height non-negative in dry regions.
-
 The one dimensional cut through the topography is shipped with the repository, so it can be
 loaded directly.
 
@@ -45,44 +34,56 @@ nothing #hide
 The data is used to define the B-spline interpolation function as described in
 [B-spline structure](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/structure/)
 and [B-spline function](https://trixi-framework.github.io/TrixiBottomTopography.jl/dev/function/).
-No smoothing is applied here because it would flatten the steep cliff face by several meters.
+No smoothing is applied here because it would flatten the steep cliff.
 
 ```@example geo_trixi_1D
 const spline_struct = CubicBSpline(cliffs_data; end_condition = "not-a-knot")
 spline_func(x::Float64) = spline_interpolation(spline_struct, x)
 ```
 
-Plotting the interpolated topography shows the deep water in the west, the flat shelf that
-the SRTM data reports as zero, and the cliff face in the east.
+The interpolated topography can now be plotted.
 
 ```@example geo_trixi_1D
 x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], 500))
 plot_topography(x_int_pts, spline_func.(x_int_pts); xlabel = "x [m]", ylabel = "z [m]")
 ```
 
-The topography is given with respect to sea level. A positive background total water height
-$H_0$ therefore floods the shallow shelf in front of the cliffs while the cliff face itself
+The topography is given with respect to sea level. A positive background water height
+$H_0 = 30$ therefore floods the shallow shelf in front of the cliffs while the cliff face itself
 stays dry.
 
 ```@example geo_trixi_1D
-equations = ShallowWaterEquations1D(gravity = 9.81, H0 = 10.0)
+equations = ShallowWaterEquations1D(gravity = 9.81, H0 = 30.0)
 ```
 
-At time $t=0$ the water surface west of $x = -350$ is raised to $20.0$ while the rest of the
-domain stays at the background water height $10.0$. This step collapses and sends a wave
-towards the cliffs. Because part of the domain is dry, the water surface has to be shifted
-by the `threshold_limiter` of the equations to keep the water height `h` strictly positive.
+At time $t=0$ a smooth Gaussian bump of amplitude $15.0$ is placed on the water surface and is moving towards the cliffs. Its
+crest sits at $x = -100$, i.e. on the flat shelf where the undisturbed water depth is
+constant.
+
+Part of the domain is dry, so the undisturbed water depth falls back to the
+`threshold_limiter` of the equations there in order to keep the water height `h` strictly
+positive.
 
 ```@example geo_trixi_1D
+# Amplitude, crest position and width of the initial wave
+const wave_amplitude = 15.0
+const wave_center = -100.0
+const wave_width = 120.0
+
 # Defining initial condition of a wave which travels towards the cliffs
 function initial_condition_wave(x, t, equations::ShallowWaterEquations1D)
-    H = x[1] < -350.0 ? 20.0 : equations.H0
-    v = 0.0
     b = spline_func(x[1])
 
-    H = max(H, b + equations.threshold_limiter)
+    # Undisturbed water depth
+    h0 = max(equations.H0 - b, equations.threshold_limiter)
 
-    return prim2cons(SVector(H, v, b), equations)
+    # Smooth elevation of the water surface on top of it
+    h = h0 + wave_amplitude * exp(-((x[1] - wave_center) / wave_width)^2)
+
+    # Velocity of a right running simple wave
+    v = 2 * (sqrt(equations.gravity * h) - sqrt(equations.gravity * h0))
+
+    return SVector(h, h * v, b)
 end
 
 # Setting initial condition
@@ -96,9 +97,6 @@ nothing #hide
 The upcoming code parts will **not** be covered in full detail. For more information, see
 the documentation of [Trixi.jl](https://trixi-framework.github.io/TrixiDocumentation/stable/)
 and [TrixiShallowWater.jl](https://trixi-framework.github.io/TrixiShallowWater.jl/stable/).
-The essential difference to the Rhine examples is the discretization: wetting and drying
-requires the hydrostatic reconstruction of Chen and Noelle together with a shock capturing
-volume integral.
 
 ```@example geo_trixi_1D
 volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
@@ -106,7 +104,7 @@ surface_flux = (FluxHydrostaticReconstruction(flux_hll_chen_noelle,
                                               hydrostatic_reconstruction_chen_noelle),
                 flux_nonconservative_chen_noelle)
 
-basis = LobattoLegendreBasis(3)
+basis = LobattoLegendreBasis(7)
 
 indicator_sc = IndicatorHennemannGassnerShallowWater(equations, basis,
                                                     alpha_max = 0.5,
@@ -127,19 +125,13 @@ The mesh spans exactly the interval covered by the topography data.
 coordinates_min = spline_struct.x[1]
 coordinates_max = spline_struct.x[end]
 mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level = 6,
+                initial_refinement_level = 4,
                 periodicity = false)
 
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
                                     boundary_conditions = boundary_condition)
-nothing #hide
-```
 
-The positivity limiter is handed to the time integration method as a stage limiter. It cuts
-off water heights below the `threshold_limiter` after every Runge-Kutta stage.
-
-```@example geo_trixi_1D
-tspan = (0.0, 100.0)
+tspan = (0.0, 45.0)
 ode = semidiscretize(semi, tspan)
 
 stage_limiter! = PositivityPreservingLimiterShallowWater(variables = (waterheight,))
@@ -152,8 +144,7 @@ sol = solve(ode, SSPRK43(; stage_limiter!), abstol = 1.0e-6, reltol = 1.0e-6,
 nothing #hide
 ```
 
-Finally, the solution is animated. The water surface reaches the cliff face after roughly
-50 s, runs up to about 21 m, and is then reflected back towards the open sea.
+Finally, the solution is animated.
 
 ```@example geo_trixi_1D
 j = Observable(1)
@@ -168,7 +159,6 @@ height = lift(i -> pd_list[i].data[:, 1], j)
 bottom = lift(i -> pd_list[i].data[:, 3], j)
 lines!(ax, pd_list[1].x, height)
 lines!(ax, pd_list[1].x, bottom)
-ylims!(ax, -40, 60)
 
 record(f, "animation_cliffs_1d.gif", 1:length(pd_list)) do tt
     j[] = tt
@@ -208,9 +198,7 @@ const spline_struct = BicubicBSpline(cliffs_data; end_condition = "not-a-knot")
 spline_func(x::Float64, y::Float64) = spline_interpolation(spline_struct, x, y)
 ```
 
-Sampling the interpolation function on a finer set of nodes gives a three dimensional view
-of the coastline. Note that `Makie.surface` expects the values as `z[x_index, y_index]`
-whereas `evaluate_two_dimensional_interpolant` returns them as `z[y_index, x_index]`.
+Let's create a three dimensional view of the coastline.
 
 ```@example geo_trixi_2D
 n = 200
@@ -225,20 +213,31 @@ plot_topography(x_int_pts, y_int_pts, permutedims(z_int_pts);
 ```
 
 The equations and the initial condition are the direct two dimensional analogue of the one
-dimensional case above.
+dimensional case above. Since the elevation only depends on `x[1]`, the initial wave is a
+straight crest parallel to the coastline that travels towards the cliffs.
 
 ```@example geo_trixi_2D
-equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 10.0)
+equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 30.0)
+
+# Amplitude, crest position and width of the initial wave
+const wave_amplitude = 15.0
+const wave_center = -100.0
+const wave_width = 120.0
 
 function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
-    H = x[1] < -350.0 ? 20.0 : equations.H0
-    v1 = 0.0
-    v2 = 0.0
     b = spline_func(x[1], x[2])
 
-    H = max(H, b + equations.threshold_limiter)
+    # Undisturbed water depth
+    h0 = max(equations.H0 - b, equations.threshold_limiter)
 
-    return prim2cons(SVector(H, v1, v2, b), equations)
+    # Smooth elevation of the water surface on top of it
+    h = h0 + wave_amplitude * exp(-((x[1] - wave_center) / wave_width)^2)
+
+    # Velocity of a right running simple wave
+    v1 = 2 * (sqrt(equations.gravity * h) - sqrt(equations.gravity * h0))
+    v2 = 0.0
+
+    return SVector(h, h * v1, h * v2, b)
 end
 
 initial_condition = initial_condition_wave
@@ -254,7 +253,7 @@ surface_flux = (FluxHydrostaticReconstruction(flux_hll_chen_noelle,
                                               hydrostatic_reconstruction_chen_noelle),
                 flux_nonconservative_chen_noelle)
 
-basis = LobattoLegendreBasis(3)
+basis = LobattoLegendreBasis(7)
 
 indicator_sc = IndicatorHennemannGassnerShallowWater(equations, basis,
                                                     alpha_max = 0.5,
@@ -280,13 +279,13 @@ mesh = P4estMesh((1, 1);
                  polydeg = 1,
                  coordinates_min = coordinates_min,
                  coordinates_max = coordinates_max,
-                 initial_refinement_level = 4,
+                 initial_refinement_level = 3,
                  periodicity = false)
 
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
                                     boundary_conditions = boundary_condition)
 
-tspan = (0.0, 60.0)
+tspan = (0.0, 45.0)
 ode = semidiscretize(semi, tspan)
 nothing #hide
 ```
@@ -302,9 +301,9 @@ stage_limiter! = PositivityPreservingLimiterShallowWater(variables = (waterheigh
 
 amr_indicator = IndicatorLöhner(semi, variable = first)
 amr_controller = ControllerThreeLevel(semi, amr_indicator,
-                                      base_level = 4,
-                                      med_level = 5, med_threshold = 0.1,
-                                      max_level = 6, max_threshold = 0.5)
+                                      base_level = 3,
+                                      med_level = 4, med_threshold = 0.1,
+                                      max_level = 5, max_threshold = 0.5)
 amr_callback = AMRCallback(semi, amr_controller,
                            interval = 1,
                            adapt_initial_condition = true,

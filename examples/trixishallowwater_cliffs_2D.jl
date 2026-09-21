@@ -11,13 +11,13 @@ using Trixi
 using Trixi2Vtk
 using TrixiShallowWater
 
-# Load the two dimensional Cliffs of Moher topography. The domain covers the open sea in
-# the west and the cliffs, which rise up to roughly 197 m above sea level, in the east.
+# Load the two dimensional Cliffs of Moher topography. The domain covers the open sea
+# and the cliffs.
 root_dir = pkgdir(TrixiBottomTopography)
 cliffs_data = joinpath(root_dir, "examples", "data", "cliffs_data_2d_10.txt")
 
 # B-spline interpolation of the underlying data. No smoothing is applied here because it
-# would flatten the steep cliff face by several meters.
+# would flatten the steep cliff.
 spline_struct = BicubicBSpline(cliffs_data; end_condition = "not-a-knot")
 spline_func(x, y) = spline_interpolation(spline_struct, x, y)
 
@@ -33,8 +33,7 @@ if isdefined(Main, :Makie)
     # Get interpolated matrix
     z_int_pts = evaluate_two_dimensional_interpolant(spline_func, x_int_pts, y_int_pts)
 
-    # Plot the topography. `Makie.surface` expects `z[x_index, y_index]` whereas
-    # `evaluate_two_dimensional_interpolant` returns `z[y_index, x_index]`.
+    # Plot the topography
     plot_topography(x_int_pts,
                     y_int_pts,
                     permutedims(z_int_pts);
@@ -48,23 +47,32 @@ end
 ###############################################################################
 # Defining two dimensional shallow water equations
 
-# The topography is given with respect to sea level, so a positive `H0` floods the shallow
-# shelf in front of the cliffs while the cliff face itself stays dry
-equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 10.0)
+# The topography is given with respect to sea level. A positive background water height
+# H_0 = 30 therefore floods the shallow shelf in front of the cliffs while the cliff face
+# itself stays dry.
+equations = ShallowWaterEquations2D(gravity = 9.81, H0 = 30.0)
 
-# Defining initial condition of a wave which travels towards the cliffs
+# Amplitude, crest position and width of the initial wave. The crest is placed on the flat
+# shelf in front of the cliffs where the undisturbed water depth is constant.
+wave_amplitude = 15.0
+wave_center = -100.0
+wave_width = 120.0
+
+# Defining initial condition of a plane wave which travels towards the cliffs
 function initial_condition_wave(x, t, equations::ShallowWaterEquations2D)
-    # Elevated water surface in the deep water region which collapses and runs up the cliffs
-    H = x[1] < -350.0 ? 20.0 : equations.H0
-    v1 = 0.0
-    v2 = 0.0
     b = spline_func(x[1], x[2])
 
-    # It is mandatory to shift the water level in dry areas to make sure that the water
-    # height `h` stays positive, see the `threshold_limiter` of the equations above
-    H = max(H, b + equations.threshold_limiter)
+    # Undisturbed water depth
+    h0 = max(equations.H0 - b, equations.threshold_limiter)
 
-    return prim2cons(SVector(H, v1, v2, b), equations)
+    # Smooth elevation of the water surface on top of it
+    h = h0 + wave_amplitude * exp(-((x[1] - wave_center) / wave_width)^2)
+
+    # Velocity of a right running simple wave
+    v1 = 2 * (sqrt(equations.gravity * h) - sqrt(equations.gravity * h0))
+    v2 = 0.0
+
+    return SVector(h, h * v1, h * v2, b)
 end
 
 # Setting initial condition
@@ -75,16 +83,13 @@ boundary_condition = boundary_condition_slip_wall
 
 ###############################################################################
 # Get the DG approximation space
-#
-# Wetting and drying requires the hydrostatic reconstruction of Chen and Noelle together
-# with a shock capturing volume integral
 
 volume_flux = (flux_wintermeyer_etal, flux_nonconservative_wintermeyer_etal)
 surface_flux = (FluxHydrostaticReconstruction(flux_hll_chen_noelle,
                                               hydrostatic_reconstruction_chen_noelle),
                 flux_nonconservative_chen_noelle)
 
-basis = LobattoLegendreBasis(3)
+basis = LobattoLegendreBasis(7)
 
 indicator_sc = IndicatorHennemannGassnerShallowWater(equations, basis,
                                                      alpha_max = 0.5,
@@ -98,7 +103,7 @@ volume_integral = VolumeIntegralShockCapturingHG(indicator_sc;
 solver = DGSEM(basis, surface_flux, volume_integral)
 
 ###############################################################################
-# Get the P4estMesh with wall boundaries
+# Get the mesh and semidiscretization
 
 coordinates_min = (spline_struct.x[1], spline_struct.y[1])
 coordinates_max = (spline_struct.x[end], spline_struct.y[end])
@@ -106,17 +111,16 @@ mesh = P4estMesh((1, 1);
                  polydeg = 1,
                  coordinates_min = coordinates_min,
                  coordinates_max = coordinates_max,
-                 initial_refinement_level = 4,
+                 initial_refinement_level = 3,
                  periodicity = false)
 
-# create the semi discretization object
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver,
                                     boundary_conditions = boundary_condition)
 
 ###############################################################################
 # ODE solvers, callbacks etc.
 
-tspan = (0.0, 60.0)
+tspan = (0.0, 45.0)
 ode = semidiscretize(semi, tspan)
 
 # Clear the output directory if it exists and create it anew for saving the output later
@@ -132,9 +136,9 @@ stage_limiter! = PositivityPreservingLimiterShallowWater(variables = (waterheigh
 # adaptive mesh refinement to resolve the moving wave front
 amr_indicator = IndicatorLöhner(semi, variable = first)
 amr_controller = ControllerThreeLevel(semi, amr_indicator,
-                                      base_level = 4,
-                                      med_level = 5, med_threshold = 0.1,
-                                      max_level = 6, max_threshold = 0.5)
+                                      base_level = 3,
+                                      med_level = 4, med_threshold = 0.1,
+                                      max_level = 5, max_threshold = 0.5)
 amr_callback = AMRCallback(semi, amr_controller,
                            interval = 1,
                            adapt_initial_condition = true,
@@ -155,7 +159,7 @@ callbacks = CallbackSet(amr_callback, stepsize_callback, save_solution)
 # run the simulation
 
 sol = solve(ode, SSPRK43(; stage_limiter!); dt = 1.0, adaptive = false,
-            callback = callbacks);
+            callback = callbacks)
 
 # To visualize the solution and bathymetry we post-process the Trixi.jl output file(s)
 # with the Trixi2Vtk.jl functionality and plot them with ParaView.
@@ -165,6 +169,6 @@ trixi2vtk(joinpath(output_dir, "solution_*.h5"), output_directory = output_dir)
 # video of the simulation.
 #
 # In ParaView, after opening the solution_00000.pvd file, one can apply two instances
-# of the Warp By Scalar filter to visualize the water height and bathymetry in three
-# dimensions. Many additional customizations, e.g., color scaling, fonts, etc. are
-# available in ParaView.
+# of the Warp By Scalar filter to visualize the water height and bathymetry.
+#
+# For example: https://jgumainz-my.sharepoint.com/:v:/g/personal/vimarks_uni-mainz_de/IQAKqXmSRmVDSavwyq4GUSzwAdsBEl7-8c_S_O8agqehVZk?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=cfnoyx
