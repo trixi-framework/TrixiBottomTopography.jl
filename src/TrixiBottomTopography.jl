@@ -31,8 +31,14 @@ export LinearBSpline, CubicBSpline
 export BilinearBSpline, BicubicBSpline
 export spline_interpolation
 
-# Export the functions which are used DGM data conversion
-export convert_dgm_1d, convert_dgm_2d
+# Export the functions which are used for DGM and GeophysicalModelGenerator data conversion
+export convert_dgm_1d, convert_dgm_2d, convert_geo_1d, convert_geo_2d
+
+# Note, empty routines to obtain topography data are included and exported. They are extended
+# in `ext/GeophysicalModelGeneratorExt.jl` where their implementations are found.
+function geo_topo_impression end
+function create_topography_data end
+export geo_topo_impression, create_topography_data
 
 # Note, empty routines for visualization are included and exported. They are extended
 # in `ext/MakieExt.jl` where their implementations are found.

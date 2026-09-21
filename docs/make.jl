@@ -8,6 +8,9 @@ import CairoMakie
 import KernelInterpolation
 import MathOptInterface
 import HiGHS
+import GeophysicalModelGenerator
+import DataFrames
+import GMT
 
 # Copy list of authors to not need to synchronize it manually.
 # Since the authors header exists twice we create a unique identifier for the docs section.
@@ -98,7 +101,8 @@ makedocs(;
          modules = [TrixiBottomTopography,
              Base.get_extension(TrixiBottomTopography, :MakieExt),
              Base.get_extension(TrixiBottomTopography, :KernelInterpolationExt),
-             Base.get_extension(TrixiBottomTopography, :MathOptInterfaceHiGHSExt)],
+             Base.get_extension(TrixiBottomTopography, :MathOptInterfaceHiGHSExt),
+             Base.get_extension(TrixiBottomTopography, :GeophysicalModelGeneratorExt)],
          authors = "Andrew R. Winters <andrew.ross.winters@liu.se>, Michael Schlottke-Lakemper <michael@sloede.com>",
          sitename = "TrixiBottomTopography.jl",
          format = Documenter.HTML(;
@@ -114,12 +118,16 @@ makedocs(;
          pages = ["Home" => "index.md",
              "Overview" => [
                  "Data conversion" => "conversion.md",
+                 "Real topography data" => "create_convert_geo_data.md",
                  "B-spline structure" => "structure.md",
                  "B-spline function" => "function.md",
                  "RBF interpolation" => "rbf_interpolation.md",
                  "Shape-preserving splines" => "shape_preserving_splines.md"
              ],
-             "TrixiShallowWater.jl examples" => "trixishallowwater_jl_examples.md",
+             "TrixiShallowWater.jl examples" => [
+                 "Rhine river" => "trixishallowwater_jl_examples.md",
+                 "Cliffs of Moher" => "trixishallowwater_jl_geo_data_examples.md"
+             ],
              "Advanced topics & developers" => ["Development" => "development.md",
                  "Style guide" => "styleguide.md",
                  "Testing" => "testing.md"],
