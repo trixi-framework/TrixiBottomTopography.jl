@@ -218,7 +218,6 @@ itself, which is why `nx` and `ny` are required. This also allows rectangular gr
 Inputs:
 - `path_read`: String of the path of the data which should be converted
 - `path_write`: String of the path where the new file should be saved.
-              (Needs to also include the name of the file)
 - `nx`: Required keyword argument with the number of unique `x` values in the grid
 - `ny`: Required keyword argument with the number of unique `y` values in the grid
 - `excerpt`: Optional integer that specifies a stride through of the data that will be extracted. E.g.
@@ -347,7 +346,6 @@ itself, which is why `nx` and `ny` are required. This also allows rectangular gr
 Inputs:
 - `path_read`: String of the path of the data which should be converted
 - `path_write`: String of the path where the new file should be saved.
-              (Needs to also include the name of the file)
 - `nx`: Required keyword argument with the number of unique `x` values in the grid
 - `ny`: Required keyword argument with the number of unique `y` values in the grid
 - `excerpt`: Optional integer that specifies a stride through of the data that will be extracted. E.g.

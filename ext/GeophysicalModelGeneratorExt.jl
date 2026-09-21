@@ -5,7 +5,6 @@ using DataFrames
 using GMT
 using TrixiBottomTopography
 
-# Import the functions so they can be extended
 import TrixiBottomTopography: geo_topo_impression, create_topography_data
 
 """
@@ -31,8 +30,7 @@ and convert it into Cartesian coordinates.
 - `Topo_Cart`: Converted topography data in Cartesian coordinates
 
 # Notes
-The following topography data sets are available. Note that the SRTM based sets only
-contain land elevations and report a constant value of zero over water.
+The following topography data sets are available.
 
 | Dataset | Resolution | Description |
 |:--------|:----------:|:------------|

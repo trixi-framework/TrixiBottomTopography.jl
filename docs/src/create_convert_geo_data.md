@@ -1,9 +1,7 @@
 # Real topography data
 
 The [Data conversion](https://trixi-framework.github.io/TrixiBottomTopography.jl/stable/conversion/)
-section describes how to convert DGM data from
-[Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw) into a format that
-TrixiBottomTopography.jl can read. That data set only covers North Rhine-Westphalia.
+section describes how to convert DGM data.
 
 This section explains how to obtain topography data for an arbitrary region of the world
 with [GeophysicalModelGenerator.jl](https://github.com/JuliaGeodynamics/GeophysicalModelGenerator.jl)
@@ -29,7 +27,7 @@ using DataFrames # needed for the function `create_topography_data`
 ```
 
 With these packages available, `geo_topo_impression` downloads the topography of a region
-given by its longitude and latitude bounds. The coordinates used here enclose the
+given by its longitude and latitude bounds. The coordinates used here enclose a part of the
 Cliffs of Moher in Ireland.
 
 ```@example geo_data
@@ -70,10 +68,6 @@ A higher resolution gives more detail but also results in larger downloads.
 | `"@earth_relief_30m"` | 30 arc min | ETOPO1 after Gaussian spherical filtering (55 km fullwidth) |
 | `"@earth_relief_60m"` | 60 arc min | ETOPO1 after Gaussian spherical filtering (111 km fullwidth) |
 
-Note that the SRTM based data sets only contain land elevations. Over water they report a
-constant value of zero, which is why the shelf in front of the cliffs appears flat in the
-examples that follow.
-
 ## Creating a structured grid
 
 The topography returned by `geo_topo_impression` is not given on an equidistant Cartesian
@@ -82,8 +76,8 @@ The function `create_topography_data` projects the data onto such a grid and wri
 an `xyz` file.
 
 ```@example geo_data
-# In the example file the data is written to `examples/data`. To keep the repository
-# untouched, this documentation build uses a temporary directory instead.
+# In the example file the data is written to `examples/data`.
+# build a temporary directory.
 data_dir = mktempdir()
 
 df_xyz, Topo_Cart_orth = create_topography_data(low_x = -0.55,
@@ -181,8 +175,5 @@ x_int_pts = Vector(LinRange(spline_struct.x[1], spline_struct.x[end], 500))
 plot_topography(x_int_pts, spline_func.(x_int_pts); xlabel = "x [m]", ylabel = "z [m]")
 ```
 
-The profile starts roughly 32 m below sea level in the west, crosses the flat shelf that the
-SRTM data reports as zero, and rises to almost 200 m at the cliff top in the east.
-For convenience, the converted files are also shipped with the repository under
-[`examples/data`](https://github.com/trixi-framework/TrixiBottomTopography.jl/tree/main/examples/data),
-so the [Cliffs of Moher](@ref) examples can be run without GMT.jl installed.
+The profile starts roughly 32 m below sea level, crosses a flat shelf
+and rises to almost 200 m at the cliff top.

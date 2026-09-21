@@ -337,3 +337,6 @@ It is possible to open the created `solution_00000.pvd` file with
 one can apply two instances of the *Warp By Scalar* filter to visualize the water height
 and the bathymetry in three dimensions. Many additional customizations, e.g., color
 scaling and fonts, are available there.
+
+For example: https://jgumainz-my.sharepoint.com/:v:/g/personal/vimarks_uni-mainz_de/IQAKqXmSRmVDSavwyq4GUSzwAdsBEl7-8c_S_O8agqehVZk?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=cfnoyx
+

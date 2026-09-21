@@ -4,8 +4,7 @@ using Test
 using TrixiBottomTopography
 
 # The `xyz` files created by `create_topography_data` contain one `x y z` triple per line,
-# rounded to five digits, where the `x` values vary fastest. A small synthetic data set of
-# this shape is enough to check the conversion routines, so no data needs to be downloaded.
+# rounded to five digits. Check the conversion routines with some self generated data, so no data needs to be downloaded.
 # The grid is deliberately rectangular (`nx != ny`) because this is what `convert_geo_1d`
 # and `convert_geo_2d` add on top of `convert_dgm_1d` and `convert_dgm_2d`.
 const NX = 9
@@ -23,8 +22,8 @@ function write_synthetic_xyz(path)
 end
 
 # Convenience wrappers around the parsing routines of TrixiBottomTopography which are also
-# used by the B-spline constructors. This makes sure that the written files are readable by
-# the package itself.
+# used by the B-spline constructors (make sure that the written files are readable by
+# the package itself).
 parse_1d(path) = TrixiBottomTopography.parse_txt_1D(path)
 parse_2d(path) = TrixiBottomTopography.parse_txt_2D(path)
 
@@ -37,7 +36,7 @@ path_src_file = write_synthetic_xyz(joinpath(tmp_dir, "synthetic_geo.xyz"))
 
     @test isfile(path_out_file)
 
-    # The header must report the rectangular dimensions of the grid
+    # The header must report the rectangular dimensions of the grid.
     lines = readlines(path_out_file)
     @test parse(Int, lines[2]) == NX
     @test parse(Int, lines[4]) == NY
@@ -55,7 +54,7 @@ path_src_file = write_synthetic_xyz(joinpath(tmp_dir, "synthetic_geo.xyz"))
     @test z == [topography(i, j) for j in 0:(NY - 1), i in 0:(NX - 1)]
 
     # The converted file must be usable by the two dimensional B-splines, which reproduce
-    # the underlying data at the interpolation knots
+    # the data at the interpolation knots.
     spline_struct = BicubicBSpline(path_out_file)
     spline_func(x, y) = spline_interpolation(spline_struct, x, y)
     @test spline_func(0.0, 0.0)≈topography(0, 0) atol=1e-10
@@ -67,7 +66,7 @@ end
     path_out_file = joinpath(tmp_dir, "synthetic_2d_2.txt")
     convert_geo_2d(path_src_file, path_out_file; nx = NX, ny = NY, excerpt = 2)
 
-    # Every second value is taken in both directions, i.e. 5 values in `x` and 3 in `y`
+    # Every second value is taken in both directions
     lines = readlines(path_out_file)
     @test parse(Int, lines[2]) == 5
     @test parse(Int, lines[4]) == 3
@@ -86,7 +85,7 @@ end
     @test parse(Int, readlines(path_out_file)[2]) == NX
 
     # The `x` values are the coordinates along the `x` direction and the `y` values are the
-    # corresponding elevations of the third section in `y` direction, i.e. `y = 2.0`
+    # corresponding elevations of the third section in `y` direction.
     x, y = parse_1d(path_out_file)
     @test x == collect(0.0:8.0)
     @test y == [topography(i, 2) for i in 0:(NX - 1)]
@@ -105,9 +104,8 @@ end
     @test isfile(path_out_file)
     @test parse(Int, readlines(path_out_file)[2]) == NY
 
-    # The `x` values must be the coordinates along the `y` direction and *not* the
-    # elevations. The `y` values are the elevations of the fourth section in `x` direction,
-    # i.e. `x = 3.0`.
+    # The `x` values must be the coordinates along the `y` direction. 
+    # The `y` values are the elevations of the fourth section in `x` direction.
     x, y = parse_1d(path_out_file)
     @test x == collect(0.0:4.0)
     @test y == [topography(3, j) for j in 0:(NY - 1)]
