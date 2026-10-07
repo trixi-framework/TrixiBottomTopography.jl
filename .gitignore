@@ -6,6 +6,9 @@ solution_*
 *.png
 *.gif
 *.xyz
+*.vtu
+*.pvd
+gmt.history
 docs/build
 docs/src/authors.md
 docs/src/changelog.md

@@ -16,6 +16,13 @@ TrixiBottomTopography.plot_topography
 TrixiBottomTopography.plot_topography_with_interpolation_knots
 ```
 
+## GeophysicalModelGenerator.jl extension
+
+```@docs
+TrixiBottomTopography.geo_topo_impression
+TrixiBottomTopography.create_topography_data
+```
+
 ## KernelInterpolation.jl extension
 
 ```@docs

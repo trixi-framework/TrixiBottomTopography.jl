@@ -35,6 +35,7 @@ TrixiBottomTopography.jl does this by B-spline interpolation of the underlying d
 
 This package contains the following main functionalities:
 - Converting geographical data given in form of `.xyz` files, e.g., from the [DGM data set](https://www.opengeodata.nrw.de/produkte/geobasis/hm/) provided by [Geobasis NRW](https://www.bezreg-koeln.nrw.de/geobasis-nrw) to make it readable for TrixiBottomTopography.jl
+- Obtaining topography data for an arbitrary region of the world with [GeophysicalModelGenerator.jl](https://github.com/JuliaGeodynamics/GeophysicalModelGenerator.jl) and converting it to make it readable for TrixiBottomTopography.jl
 - Setting up a B-spline interpolation structure in one and two dimensions which contains all the relevant information to define a B-spline interpolation function with additional specifications
 - Using the B-spline structure to set up a B-spline interpolation function
 - Setting up a radial basis function interpolation based on scattered data leveraging [KernelInterpolation.jl](https://github.com/JoshuaLampert/KernelInterpolation.jl)
@@ -70,7 +71,7 @@ by executing
 ```julia
 julia> using Pkg; Pkg.add(["Trixi", "TrixiShallowWater", "OrdinaryDiffEqLowStorageRK"])
 ```
-Two examples that combine TrixiBottomTopography.jl together with TrixiShallowWater.jl
+Several examples that combine TrixiBottomTopography.jl together with TrixiShallowWater.jl
 are available in the `examples` folder.
 An additional example that combines TrixiBottomTopography.jl with wet/dry transitions and
 shock capturing to model a tsunami runup is available as a
