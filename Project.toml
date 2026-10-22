@@ -23,7 +23,7 @@ MathOptInterfaceHiGHSExt = ["HiGHS", "MathOptInterface"]
 [compat]
 Downloads = "1.6"
 HiGHS = "1.0"
-KernelInterpolation = "0.3.5"
+KernelInterpolation = "0.3.5, 0.4"
 LinearAlgebra = "1"
 Makie = "0.21, 0.22, 0.24"
 MathOptInterface = "1.0"
