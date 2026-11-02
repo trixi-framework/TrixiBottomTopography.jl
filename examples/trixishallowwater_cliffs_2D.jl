@@ -169,10 +169,11 @@ sol = solve(ode, SSPRK43(; stage_limiter!); dt = 1.0, adaptive = false,
 # with the Trixi2Vtk.jl functionality and plot them with ParaView.
 trixi2vtk(joinpath(output_dir, "solution_*.h5"), output_directory = output_dir)
 
-# It is possible to open the created solution_00000.pvd file with ParaView and create a
-# video of the simulation.
+# It is possible to open the created solution_00000.pvd file with ParaView
+# (https://www.paraview.org/) and create a video of the simulation. In ParaView, one can
+# apply two instances of the Warp By Scalar filter to visualize the water height and the
+# bathymetry in three dimensions. Many additional customizations, e.g., color scaling and
+# fonts, are available in ParaView.
 #
-# In ParaView, after opening the solution_00000.pvd file, one can apply two instances
-# of the Warp By Scalar filter to visualize the water height and bathymetry.
-#
-# For example: https://jgumainz-my.sharepoint.com/:v:/g/personal/vimarks_uni-mainz_de/IQAKqXmSRmVDSavwyq4GUSzwAdsBEl7-8c_S_O8agqehVZk?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=cfnoyx
+# A video of the Cliffs of Moher runup simulation can be found here:
+# https://www.youtube.com/watch?v=0fAVYD5nwT8
