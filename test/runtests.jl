@@ -10,6 +10,11 @@ using Test
         include("test_convert.jl")
     end
 
+    # Test data conversion of GeophysicalModelGenerator data
+    @testset "Conversion of GeophysicalModelGenerator data" begin
+        include("test_convert_geo.jl")
+    end
+
     # Linear B-splines
     @testset "Linear B-spline interpolation" begin
         include("test_linear_b_spline.jl")
