@@ -26,7 +26,7 @@ MathOptInterfaceHiGHSExt = ["HiGHS", "MathOptInterface"]
 [compat]
 Downloads = "1.6"
 GMT = "1.0"
-GeophysicalModelGenerator = "0.7.14, 0.8"
+GeophysicalModelGenerator = "0.7.14, 0.8, 0.9"
 HiGHS = "1.0"
 KernelInterpolation = "0.3.5, 0.4"
 LinearAlgebra = "1"
